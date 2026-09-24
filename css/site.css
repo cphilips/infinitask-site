@@ -308,6 +308,13 @@ p:last-child { margin-bottom: 0; }
 .device img { border-radius: 37px; display: block; width: 100%; }
 .device--lg { width: clamp(250px, 70vw, 340px); }
 .device__pair { display: flex; gap: clamp(1rem, 4vw, 3rem); justify-content: center; flex-wrap: wrap; }
+/* for pairs whose screenshots differ in aspect (an iPhone beside a foldable),
+   line them up by the top rather than stretching either one */
+.device__pair--top { align-items: flex-start; }
+/* A foldable's inner display really is physically wider than a phone, so show
+   it wider. It also keeps its denser screen legible at this size. */
+.device--foldable { width: clamp(280px, 42vw, 400px); border-radius: 34px; }
+.device--foldable img { border-radius: 26px; }
 
 /* -------------------------------------------------- feature bands */
 .feature {
