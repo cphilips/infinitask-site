@@ -928,6 +928,10 @@ html.js .seg { display: inline-flex; }
 .platform {
   max-width: 320px; margin-inline: auto; text-align: center;
 }
+.platform img {
+  display: block; width: 120px; height: 120px;
+  border-radius: 20%; margin: 0 auto 1rem;
+}
 .platform__os { color: var(--text-2); font-size: .95rem; }
 .badge-soon {
   display: inline-block; padding: .35rem .85rem; border-radius: 999px;
