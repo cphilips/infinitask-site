@@ -1,0 +1,574 @@
+/* ==========================================================================
+   InfiniTask — site stylesheet
+   Tokens ported from Xcode Project InfiniTask/InfiniTask/Theme.swift.
+   Do not invent values here; if the app changes, change Theme.swift first.
+   ========================================================================== */
+
+/* -------------------------------------------------- font
+   Every style in the app is SF Rounded. `ui-rounded` resolves to SF Pro
+   Rounded on Apple hardware (most of the audience). Nunito is the
+   self-hosted fallback for Windows and Android, so the site makes no
+   third-party requests at runtime. */
+@font-face {
+  font-family: 'Nunito';
+  src: url('../fonts/nunito-latin-var.woff2') format('woff2-variations');
+  font-weight: 400 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font: ui-rounded, 'SF Pro Rounded', 'Nunito', -apple-system,
+          BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* --- adaptive surfaces (Assets.xcassets *.colorset) --- */
+  --app-bg: #E8EBF2;
+  --card-bg: #FEFFFF;
+  --card-bg-2: #F2F4F8;
+  --divider: #E0E0E5;
+  --text-1: #1C1C1C;
+  --text-2: #9195BB;
+  --text-3: #AEAEB2;
+  --section-header: #6B6E8A;
+  --card-grad-a: #FFFFFF;
+  --card-grad-b: #FAFAFA;
+  --card-stroke: rgba(0, 0, 0, .05);
+
+  /* --- fixed accents (Theme.swift 88-101) --- */
+  --purple: #9A61ED;
+  --purple-dark: #534AB7;
+  --blue: #008DF1;
+  --teal: #1D9E75;
+  --coral: #FF0060;
+  --pink: #D4537E;
+  --subheader: #6B6E8A;
+  --imp-high: #E5484D;
+  --imp-med: #E8A33D;
+
+  /* --- folder palette: DISPLAY names, not enum cases --- */
+  --manilla-a: #F9E1AA;  --manilla-b: #EAB578;
+  --blue-a:    #10D3FE;  --blue-b:    #008DF1;
+  --green-a:   #00D4B8;  --green-b:   #01BABA;
+  --teal-a:    #41E9F4;  --teal-b:    #00CDDF;
+  --purple-a:  #BD74FF;  --purple-b:  #9A61ED;
+  --lavender-a:#9C8EFF;  --lavender-b:#675AE2;
+  --pink-a:    #F371C5;  --pink-b:    #D05EA8;
+  --forest-a:  #5FB87E;  --forest-b:  #2F7A4C;
+  --orange-a:  #FFBC82;  --orange-b:  #F08121;
+
+  /* --- shape (AppRadius / AppShadow) --- */
+  --r-card: 20px;
+  --r-button: 20px;
+  --r-small: 8px;
+  --r-large: 32px;
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, .06);
+  --shadow-btn: 0 4px 8px rgba(0, 0, 0, .12);
+  --shadow-lift: 0 18px 50px rgba(28, 28, 28, .16);
+
+  /* --- layout (AppLayout) --- */
+  --reading: 640px;
+  --grid: 960px;
+  --wide: 1120px;
+  --gutter: 16px;
+  --seg-track: #DADDE7;   /* segmented pill, deselected fill (Theme.swift) */
+  --nav-h: 52px;   /* measured: nav mark 28px + .7rem padding block */
+  --band: clamp(64px, 9vw, 116px);
+}
+
+/* Dark: applied by system preference, unless the page forces light. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --app-bg: #1E2030;
+    --seg-track: #191B26;
+    --card-bg: #282B40;
+    --card-bg-2: #2E3148;
+    --divider: #383B54;
+    --text-1: #F0F0F5;
+    --text-2: #9195BB;
+    --text-3: #6B6D88;
+    --section-header: #8487A8;
+    --card-grad-a: #3C3F58;
+    --card-grad-b: #292B40;
+    --card-stroke: rgba(255, 255, 255, .07);
+    --shadow-card: none;
+    --shadow-lift: 0 18px 50px rgba(0, 0, 0, .45);
+  }
+}
+:root[data-theme='dark'] {
+  --app-bg: #1E2030;
+  --seg-track: #191B26;
+  --card-bg: #282B40;
+  --card-bg-2: #2E3148;
+  --divider: #383B54;
+  --text-1: #F0F0F5;
+  --text-2: #9195BB;
+  --text-3: #6B6D88;
+  --section-header: #8487A8;
+  --card-grad-a: #3C3F58;
+  --card-grad-b: #292B40;
+  --card-stroke: rgba(255, 255, 255, .07);
+  --shadow-card: none;
+  --shadow-lift: 0 18px 50px rgba(0, 0, 0, .45);
+}
+
+/* -------------------------------------------------- base */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-1);
+  background: var(--app-bg);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+img { max-width: 100%; height: auto; display: block; }
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; border-radius: 6px; }
+
+h1, h2, h3, h4 { margin: 0 0 .5em; line-height: 1.15; letter-spacing: -.02em; }
+h1 { font-size: clamp(2.1rem, 6vw, 3.6rem); font-weight: 800; }
+h2 { font-size: clamp(1.9rem, 4.6vw, 2.9rem); font-weight: 800; }
+h3 { font-size: clamp(1.5rem, 3.3vw, 2.25rem); font-weight: 700; }   /* caps at 36px ~1090px vw */
+h4 { font-size: 1.0625rem; font-weight: 600; }
+p  { margin: 0 0 1.1em; }
+p:last-child { margin-bottom: 0; }
+
+.lede { font-size: clamp(1.05rem, 2.1vw, 1.3rem); color: var(--text-1); opacity: .82; }
+.muted { color: var(--text-2); }
+.small { font-size: .875rem; }
+
+/* .sectionHeaderText() — 13pt semibold, 0.4 kerning, uppercase */
+.section-label {
+  font-size: .8125rem;
+  font-weight: 600;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+  color: var(--text-2);
+  margin: 0 0 .35em;
+}
+
+.wrap { width: 100%; max-width: var(--grid); margin-inline: auto; padding-inline: var(--gutter); }
+.wrap--reading { max-width: var(--reading); }
+.wrap--wide { max-width: var(--wide); }
+.center { text-align: center; }
+
+.band { padding-block: var(--band); }
+.band--tint { background: var(--card-bg-2); }
+.band--edge { border-block: 1px solid var(--divider); }
+
+/* -------------------------------------------------- nav */
+.nav {
+  position: sticky; top: 0; z-index: 50;
+  display: flex; align-items: center; gap: 1.25rem;
+  padding: .7rem var(--gutter);
+  transition: background .25s ease, box-shadow .25s ease, backdrop-filter .25s ease;
+}
+.nav__home { display: flex; align-items: center; gap: .55rem; margin-right: auto; text-decoration: none; }
+.nav__home:hover { text-decoration: none; }
+.nav__mark { width: 28px; height: 28px; border-radius: 26%; box-shadow: 0 2px 6px rgba(0,0,0,.2); }
+/* The only wordmark assets in the project are white-on-transparent, and there is
+   no SVG, so the wordmark is set as text. It adapts to both themes and stays
+   crisp at any size. SF Rounded matches the app. */
+/* The wordmark asset is flat white with an alpha channel, so it is used as a
+   CSS mask and painted with `currentColor`. That means every existing rule that
+   sets `color` on .nav__word keeps working, in light and dark alike. The text
+   stays in the markup for accessibility, copy-paste, and as the fallback if a
+   browser has no mask support. */
+.nav__word { font-size: 1.15rem; font-weight: 800; letter-spacing: -.02em; color: #fff; }
+
+@supports ((-webkit-mask-image: url('')) or (mask-image: url(''))) {
+  .nav__word {
+    display: block;
+    width: 117px; height: 22px;        /* asset is 900x170, ratio 5.29:1 */
+    text-indent: -200vw; overflow: hidden; white-space: nowrap;
+    background-color: currentColor;
+    -webkit-mask: url('../img/logo/wordmark-white.png') no-repeat center / contain;
+    mask: url('../img/logo/wordmark-white.png') no-repeat center / contain;
+  }
+}
+.nav__links { display: flex; gap: 1.25rem; align-items: center; }
+.nav__links a { font-weight: 600; font-size: .95rem; color: #fff; opacity: .9; }
+.nav__links a:hover { opacity: 1; text-decoration: none; }
+
+/* solid state once scrolled off the gradient hero */
+.nav.is-stuck {
+  background: color-mix(in srgb, var(--app-bg) 82%, transparent);
+  backdrop-filter: saturate(160%) blur(18px);
+  -webkit-backdrop-filter: saturate(160%) blur(18px);
+  box-shadow: 0 1px 0 var(--divider);
+}
+.nav.is-stuck .nav__links a,
+.nav.is-stuck .nav__word { color: var(--text-1); }
+
+/* pages without a gradient hero start solid */
+.nav--solid { background: var(--app-bg); box-shadow: 0 1px 0 var(--divider); }
+.nav--solid .nav__links a,
+.nav--solid .nav__word { color: var(--text-1); }
+
+/* Narrow phones: the masked wordmark is a fixed block, unlike the text it
+   replaced, so the nav needs tightening or it overflows below ~360px. */
+@media (max-width: 400px) {
+  .nav { gap: .7rem; padding-inline: 12px; }
+  .nav__home { gap: .45rem; }
+  .nav__mark { width: 24px; height: 24px; }
+  .nav__links { gap: .8rem; }
+  .nav__links a { font-size: .875rem; }
+}
+@supports ((-webkit-mask-image: url('')) or (mask-image: url(''))) {
+  @media (max-width: 400px) {
+    .nav__word { width: 92px; height: 17px; }
+  }
+}
+
+/* -------------------------------------------------- buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  padding: .85rem 1.6rem;
+  border: 0; border-radius: var(--r-button);
+  font: inherit; font-weight: 700; font-size: 1rem;
+  cursor: pointer; text-decoration: none;
+  box-shadow: var(--shadow-btn);
+  transition: transform .15s ease, filter .15s ease;
+}
+.btn:hover { transform: translateY(-1px); filter: brightness(1.05); text-decoration: none; }
+.btn:active { transform: translateY(0); }
+.btn--primary { background: var(--blue); color: #fff; }
+.btn--light { background: #fff; color: var(--purple-dark); }
+.btn--ghost {
+  background: rgba(255, 255, 255, .16); color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .35);
+}
+
+/* -------------------------------------------------- hero */
+.hero {
+  position: relative;
+  background: linear-gradient(150deg, var(--purple) 0%, #7B6BEF 45%, var(--blue) 100%);
+  color: #fff;
+  margin-top: calc(var(--nav-h) * -1);   /* sit under the transparent nav */
+  padding-top: var(--nav-h);
+  overflow: hidden;
+}
+.hero::after {               /* soft base so the device art can break out */
+  content: ''; position: absolute; inset: auto 0 0 0; height: 46%;
+  background: linear-gradient(to bottom, transparent, var(--app-bg));
+  pointer-events: none;
+}
+.hero__inner { position: relative; z-index: 1; padding-block: clamp(3rem, 8vw, 5.5rem) 0; text-align: center; }
+.hero__icon {
+  width: clamp(104px, 16vw, 148px); height: auto; margin: 0 auto 1.5rem;
+  border-radius: 24%; box-shadow: 0 22px 50px rgba(30, 20, 70, .38);
+}
+
+/* The name under the icon, same masked artwork as the nav so it stays one
+   consistent logo. Falls back to bold text where masks are unsupported. */
+.hero__wordmark {
+  display: block; margin: 0 auto clamp(1.5rem, 3vw, 2.1rem);
+  color: #fff; font-size: clamp(2rem, 7vw, 3rem); font-weight: 800;
+  letter-spacing: -.02em; line-height: 1;
+}
+@supports ((-webkit-mask-image: url('')) or (mask-image: url(''))) {
+  .hero__wordmark {
+    width: clamp(210px, 36vw, 320px);
+    aspect-ratio: 900 / 170;          /* the asset's own proportions */
+    text-indent: -200vw; overflow: hidden; white-space: nowrap;
+    background-color: currentColor;
+    -webkit-mask: url('../img/logo/wordmark-white.png') no-repeat center / contain;
+    mask: url('../img/logo/wordmark-white.png') no-repeat center / contain;
+  }
+}
+.hero h1 { color: #fff; margin-bottom: .45em; }
+.hero__lede {
+  max-width: 34ch; margin: 0 auto 2rem;
+  font-size: clamp(1.05rem, 2.2vw, 1.3rem); line-height: 1.5;
+  color: rgba(255, 255, 255, .92);
+}
+.hero__device { margin-top: clamp(2.5rem, 6vw, 4rem); }
+
+/* -------------------------------------------------- device frame */
+.device {
+  position: relative;
+  width: clamp(230px, 62vw, 300px);
+  margin-inline: auto;
+  border-radius: 46px;
+  padding: 10px;
+  background: linear-gradient(160deg, #3a3d4d, #17181f);
+  box-shadow: var(--shadow-lift), 0 0 0 1px rgba(0, 0, 0, .25);
+}
+.device img { border-radius: 37px; display: block; width: 100%; }
+.device--lg { width: clamp(250px, 70vw, 340px); }
+.device__pair { display: flex; gap: clamp(1rem, 4vw, 3rem); justify-content: center; flex-wrap: wrap; }
+
+/* -------------------------------------------------- feature bands */
+.feature {
+  display: grid; gap: clamp(2rem, 5vw, 4rem); align-items: center;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 860px) {
+  .feature { grid-template-columns: 1fr 1fr; }
+  .feature--flip .feature__art { order: -1; }
+}
+.feature + .feature { margin-top: var(--band); }
+.feature__text { max-width: 46ch; }
+.feature__text h3 { margin-bottom: .45em; }
+/* ---------------------------------------- Capture: the Add Things showcase
+   Mirrors the in-app "Add Things" sheet: a grouped-background box holding a
+   grid of cardSurface cells, each an 80pt asset over a 15pt medium label.
+   Labels are the exact `TaskSection.sheetLabel` strings from TaskDetailView. */
+.capture {
+  position: relative;
+  max-width: 860px; margin-inline: auto;
+  padding-bottom: var(--band);
+  text-align: center;
+}
+.capture h3 { font-size: clamp(1.9rem, 4.6vw, 2.9rem); font-weight: 800; }   /* hero weight, kept above the feature h3s */
+/* Full-bleed rule closing the section, matching the band--edge line under the
+   hero. Sits on a pseudo-element because .capture is width-constrained.
+   Safe against a scrollbar because body sets overflow-x: hidden. */
+.capture::after {
+  content: ''; position: absolute; left: 50%; bottom: 0;
+  width: 100vw; transform: translateX(-50%);
+  border-bottom: 1px solid var(--divider);
+}
+.capture + .feature { margin-top: var(--band); }
+.capture__lede { max-width: 48ch; margin-inline: auto; }
+
+.addthings {
+  margin: clamp(2rem, 4vw, 3rem) auto 0;
+  max-width: 720px;
+  background: var(--card-bg-2);
+  border: 1px solid var(--divider);
+  border-radius: var(--r-large);
+  padding: clamp(1.1rem, 3vw, 1.75rem);
+  text-align: left;
+}
+.addthings__label { margin-bottom: .9rem; padding-inline: .5rem; }
+
+.addthings__grid {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; gap: .75rem;
+  grid-template-columns: repeat(2, 1fr);   /* the app's own 2-column sheet */
+}
+@media (min-width: 640px) { .addthings__grid { grid-template-columns: repeat(5, 1fr); } }
+
+.addthings__grid li {
+  display: flex; flex-direction: column; align-items: center; gap: .6rem;
+  padding: 1.1rem .5rem;
+  background: linear-gradient(to bottom, var(--card-grad-a), var(--card-grad-b));
+  border: 1px solid var(--card-stroke);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-card);
+  text-align: center;
+}
+.addthings__grid img { width: 56px; height: 56px; }   /* 240px source, crisp to @4x */
+.addthings__grid span {
+  font-size: .9375rem; font-weight: 500; line-height: 1.2;   /* 15pt medium */
+  color: var(--text-1);
+}
+
+.capture__device { margin-top: clamp(2.5rem, 5vw, 3.5rem); }
+
+/* -------------------------------------------------- cards */
+.card {
+  background: linear-gradient(to bottom, var(--card-grad-a), var(--card-grad-b));
+  border: 1px solid var(--card-stroke);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-card);
+  padding: 1.5rem;
+}
+.grid-cards {
+  display: grid; gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+.grid-tiles {
+  display: grid; gap: .75rem;
+  grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+}
+
+/* ---------------------------------------- day / night preview
+   One device, two stacked screenshots crossfaded by a segmented control that
+   mirrors the app's own. Starts on whichever the visitor's OS is set to, and
+   keeps following the OS until they pick a side themselves. */
+.seg {
+  display: none;                       /* JS drives it, so hide it without JS */
+  margin: clamp(1.75rem, 4vw, 2.5rem) auto 0;
+  padding: 4px;
+  gap: 4px;
+  background: var(--seg-track);
+  border-radius: 999px;
+}
+html.js .seg { display: inline-flex; }
+
+.seg__btn {
+  appearance: none; border: 0; cursor: pointer;
+  font: inherit; font-size: .9375rem; font-weight: 600;
+  color: var(--text-1); opacity: .6;
+  background: transparent;
+  padding: .5rem 1.4rem;
+  border-radius: 999px;
+  transition: background .2s ease, opacity .2s ease, box-shadow .2s ease;
+}
+.seg__btn:hover { opacity: .85; }
+.seg__btn[aria-pressed='true'] {
+  background: var(--card-bg);
+  opacity: 1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .12);
+}
+
+.daynight { margin-top: clamp(1.75rem, 4vw, 2.5rem); }
+.daynight__stack {
+  position: relative;
+  aspect-ratio: 620 / 1348;            /* the screenshots' own proportions */
+  border-radius: 37px;
+  overflow: hidden;
+}
+.daynight__shot {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  border-radius: 0;
+  opacity: 0;
+  transition: opacity .4s ease;
+}
+.daynight__shot.is-active { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .daynight__shot { transition: none; } }
+
+/* -------------------------------------------------- Pro band */
+.pro {
+  background: linear-gradient(155deg, #2B2450 0%, var(--purple-dark) 45%, #2E5FD0 100%);
+  color: #fff;
+}
+.pro h2, .pro h3 { color: #fff; }
+.pro .section-label { color: rgba(255, 255, 255, .7); }
+.pro__grid {
+  display: grid; gap: 1rem; margin-top: 2.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+.pro__card {
+  background: rgba(255, 255, 255, .09);
+  border: 1px solid rgba(255, 255, 255, .16);
+  border-radius: var(--r-card);
+  padding: 1.5rem;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.pro__card {
+  display: flex; flex-direction: column;
+}
+/* The source illustrations have different aspect ratios, so normalise the
+   image box and let each one sit inside it. Keeps every heading on one line. */
+.pro__card img {
+  width: 100%; aspect-ratio: 16 / 10; object-fit: contain; object-position: center;
+  border-radius: 12px; margin-bottom: 1.1rem;
+}
+.pro__card h4 { font-size: 1.1rem; margin-bottom: .3em; }
+.pro__card p { color: rgba(255, 255, 255, .8); font-size: .95rem; margin: 0; }
+.pro__note { color: rgba(255, 255, 255, .82); }
+
+/* -------------------------------------------------- price / platform */
+.platform {
+  max-width: 320px; margin-inline: auto; text-align: center;
+}
+.platform__os { color: var(--text-2); font-size: .95rem; }
+.badge-soon {
+  display: inline-block; padding: .35rem .85rem; border-radius: 999px;
+  background: var(--purple); color: #fff;
+  font-size: .8125rem; font-weight: 700; letter-spacing: .4px; text-transform: uppercase;
+}
+
+/* -------------------------------------------------- signup */
+.signup { display: flex; gap: .6rem; flex-wrap: wrap; justify-content: center; margin-top: 1.5rem; }
+.signup input[type='email'] {
+  flex: 1 1 260px; max-width: 340px;
+  padding: .85rem 1.1rem;
+  font: inherit; font-size: 1rem;
+  color: var(--text-1);
+  background: var(--card-bg);
+  border: 1px solid var(--divider);
+  border-radius: var(--r-button);
+}
+.signup input::placeholder { color: var(--text-3); }
+.signup--onDark input[type='email'] { border-color: rgba(255, 255, 255, .3); }
+.form-msg { margin-top: .9rem; font-weight: 600; min-height: 1.4em; }
+.form-msg[data-state='error'] { color: var(--coral); }
+.form-msg[data-state='ok'] { color: var(--teal); }
+
+/* -------------------------------------------------- footer */
+.footer { padding-block: 3rem; border-top: 1px solid var(--divider); }
+.footer__row { display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+.footer__brand { display: flex; align-items: center; gap: .5rem; }
+.footer__brand img { width: 24px; height: 24px; border-radius: 26%; }
+.footer__brand span { font-weight: 800; font-size: 1.05rem; letter-spacing: -.02em; color: var(--text-1); }
+
+@supports ((-webkit-mask-image: url('')) or (mask-image: url(''))) {
+  .footer__brand span {
+    display: block;
+    width: 106px; height: 20px;
+    text-indent: -200vw; overflow: hidden; white-space: nowrap;
+    background-color: currentColor;
+    -webkit-mask: url('../img/logo/wordmark-white.png') no-repeat center / contain;
+    mask: url('../img/logo/wordmark-white.png') no-repeat center / contain;
+  }
+}
+.footer a { color: var(--text-2); font-weight: 600; font-size: .95rem; }
+.footer a:hover { color: var(--text-1); }
+.footer__legal { color: var(--text-3); font-size: .85rem; margin-top: 1.5rem; }
+
+/* -------------------------------------------------- support page */
+.support-layout { display: grid; gap: 2.5rem; grid-template-columns: 1fr; }
+@media (min-width: 900px) {
+  .support-layout { grid-template-columns: 220px 1fr; align-items: start; }
+  .support-nav { position: sticky; top: calc(var(--nav-h) + 24px); }
+}
+.support-nav ul { list-style: none; margin: 0; padding: 0; }
+.support-nav li { margin-bottom: .35rem; }
+.support-nav a { color: var(--text-2); font-weight: 600; font-size: .95rem; }
+.support-nav a:hover { color: var(--text-1); text-decoration: none; }
+
+.filter {
+  width: 100%; padding: .9rem 1.1rem; font: inherit; font-size: 1rem;
+  color: var(--text-1); background: var(--card-bg);
+  border: 1px solid var(--divider); border-radius: var(--r-button);
+  margin-bottom: 2rem;
+}
+.article { scroll-margin-top: calc(var(--nav-h) + 24px); margin-bottom: 1rem; }
+.article h3 { margin-bottom: .6em; }
+.article ul, .article ol { margin: 0 0 1.1em; padding-left: 1.3em; }
+.article li { margin-bottom: .4em; }
+.article li:last-child { margin-bottom: 0; }
+.article blockquote {
+  margin: 1.2em 0; padding: .9em 1.2em;
+  border-left: 3px solid var(--purple);
+  background: var(--card-bg-2); border-radius: 0 var(--r-small) var(--r-small) 0;
+  color: var(--text-1);
+}
+.support-section { margin-bottom: 3.5rem; scroll-margin-top: calc(var(--nav-h) + 24px); }
+.no-results { color: var(--text-2); font-style: italic; }
+[hidden] { display: none !important; }
+
+/* -------------------------------------------------- prose (privacy) */
+.prose h2 { margin-top: 2.5em; font-size: clamp(1.4rem, 3vw, 1.9rem); }
+.prose h2:first-of-type { margin-top: 0; }
+.prose h3 { margin-top: 1.8em; font-size: 1.2rem; }
+.prose ul { padding-left: 1.3em; margin-bottom: 1.1em; }
+.prose li { margin-bottom: .5em; }
+.prose table { width: 100%; border-collapse: collapse; margin: 1.5em 0; font-size: .95rem; }
+.prose th, .prose td { text-align: left; padding: .7em .8em; border-bottom: 1px solid var(--divider); vertical-align: top; }
+.prose th { color: var(--text-2); font-weight: 600; font-size: .8125rem; letter-spacing: .4px; text-transform: uppercase; }
+
+.page-head { padding-block: clamp(2.5rem, 6vw, 4rem) clamp(1.5rem, 4vw, 2.5rem); }
+.page-head h1 { margin-bottom: .3em; }
+
+/* -------------------------------------------------- reveal */
+html.js .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
+html.js .reveal.is-in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { html.js .reveal { opacity: 1; transform: none; } }
