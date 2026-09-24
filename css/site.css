@@ -299,32 +299,32 @@ p:last-child { margin-bottom: 0; }
   background: color-mix(in srgb, var(--blue) 11%, transparent);
 }
 
-/* Always solid white, in both themes, so it reads as the one raised chip
-   inside the glass. The ring keeps it from dissolving into a light pill. */
+/* Inverts with the theme: near-black on light, near-white on dark. Uses the
+   existing text/surface tokens, so it flips automatically and always sits at
+   maximum contrast against whatever the glass is sitting on. */
 .nav__links .nav__cta {
   margin-left: 4px;
   padding: .42rem 1.05rem;
-  background: #FFFFFF;
-  color: var(--purple-dark);
+  background: var(--text-1);
+  color: var(--card-bg);
   opacity: 1;
   font-weight: 700;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, .9),
-    0 0 0 1px rgba(14, 16, 30, .07),
-    0 1px 2px rgba(14, 16, 30, .10),
-    0 3px 8px rgba(14, 16, 30, .10);
-  transition: transform .18s cubic-bezier(.2,.7,.3,1), box-shadow .18s ease, background .18s ease;
+    inset 0 1px 0 rgba(255, 255, 255, .16),
+    0 1px 2px rgba(14, 16, 30, .16),
+    0 3px 10px rgba(14, 16, 30, .18);
+  transition: transform .18s cubic-bezier(.2,.7,.3,1), box-shadow .18s ease, filter .18s ease;
 }
 .nav__links .nav__cta:hover {
-  background: #FFFFFF;
+  color: var(--card-bg);
   transform: translateY(-1px);
+  filter: brightness(1.14);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, .9),
-    0 0 0 1px rgba(14, 16, 30, .08),
-    0 2px 4px rgba(14, 16, 30, .12),
-    0 8px 18px rgba(14, 16, 30, .16);
+    inset 0 1px 0 rgba(255, 255, 255, .16),
+    0 2px 4px rgba(14, 16, 30, .18),
+    0 8px 20px rgba(14, 16, 30, .24);
 }
-.nav__links .nav__cta:active { transform: translateY(0) scale(.97); }
+.nav__links .nav__cta:active { transform: translateY(0) scale(.97); filter: brightness(1); }
 
 /* Narrow phones: drop the wordmark so the two pills still fit side by side. */
 @media (max-width: 460px) {
