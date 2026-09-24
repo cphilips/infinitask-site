@@ -436,6 +436,45 @@
     window.__read = { measure: measure, repaint: paintRead };
   })();
 
+  /* ---------------------------------------------- config marquee
+     The loop works by sliding the track exactly half its own width, so the two
+     halves have to be identical and each half has to be wider than the screen,
+     or a gap walks across the page once per cycle. Rather than hard-coding a
+     pile of duplicate markup for the widest screen anyone might have, clone up
+     to that width here and set the duration from the real distance, so the
+     drift runs at the same speed whatever it ended up being. */
+  (function () {
+    var track = document.querySelector('.marquee__track');
+    if (!track) { return; }
+
+    var SPEED = 46;                 // px per second
+    var base = [].slice.call(track.children);
+    if (!base.length) { return; }
+
+    var clone = function (node) {
+      var c = node.cloneNode(true);
+      c.setAttribute('aria-hidden', 'true');     // the originals carry the alt text
+      var img = c.querySelector('img');
+      if (img) { img.alt = ''; }
+      track.appendChild(c);
+    };
+
+    // Measure against the widest the viewport could ever get on this device, not
+    // the current window: a phone reports its portrait width, and turning it
+    // sideways would otherwise walk a gap across the page once per cycle.
+    var s = window.screen || {};
+    var widest = Math.max(s.width || 0, s.height || 0, window.innerWidth);
+    var target = widest * 1.15;
+    var guard = 0;
+    while (track.scrollWidth < target && guard++ < 20) { base.forEach(clone); }
+
+    var half = track.scrollWidth;
+    [].slice.call(track.children).forEach(clone);   // second half, for the loop
+
+    track.style.setProperty('--marquee-s', (half / SPEED).toFixed(1) + 's');
+    track.classList.add('is-running');
+  })();
+
   /* ---------------------------------------------- Add Things modal
      Tapping a tile in the Add Things grid opens the explainer at that feature.
      A native <dialog> does the heavy lifting: Esc, focus trapping and the

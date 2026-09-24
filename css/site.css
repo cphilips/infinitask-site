@@ -984,6 +984,40 @@ html.js .seg { display: inline-flex; }
   white-space: nowrap; border: 0;
 }
 
+/* -------------------------------------------------- config marquee
+   A slow edge-to-edge drift of real Task configurations, under the Add Things
+   grid. Full-bleed out of .capture's 860px column using the same left/transform
+   trick as the rule above it, which body's overflow-x: hidden keeps safe.
+
+   The track only animates once JS has cloned enough copies to fill it, so
+   without JS it degrades to a plain scrollable row rather than a loop with a
+   visible gap in it. */
+.marquee {
+  position: relative; left: 50%; transform: translateX(-50%);
+  width: 100vw; margin-top: clamp(2rem, 4vw, 3rem);
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
+          mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
+}
+.marquee__track { display: flex; width: max-content; }
+.marquee__track.is-running { animation: marquee-drift var(--marquee-s, 42s) linear infinite; }
+.marquee__item { flex: none; margin: 0 clamp(14px, 2vw, 28px) 0 0; }
+.marquee__item img {
+  display: block; width: auto; height: clamp(300px, 42vw, 470px);
+  filter: drop-shadow(0 18px 38px rgba(20, 22, 40, .24));
+}
+@keyframes marquee-drift { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* Pause on hover, but only where hovering is a real thing. On a touch screen
+   :hover sticks after a tap and would leave it stopped for good. */
+@media (hover: hover) {
+  .marquee:hover .marquee__track.is-running { animation-play-state: paused; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee { overflow-x: auto; }
+  .marquee__track.is-running { animation: none; }
+}
+
 /* -------------------------------------------------- section props
    Small recreations of the app's own furniture sitting above three of the
    feature headings, to give each one something to look at before the copy.
