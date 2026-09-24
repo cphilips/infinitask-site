@@ -84,6 +84,7 @@
   --glass-rim:  #FFFFFF;      /* specular edge */
   --glass-glow: #FFFFFF;      /* light caught inside */
   --glass-bright: 1.08;
+  --nav-pill-h: 46px;   /* both nav pills share this */
   --nav-h: 52px;   /* measured: nav mark 28px + .7rem padding block */
   --band: clamp(64px, 9vw, 116px);
 }
@@ -233,6 +234,8 @@ p:last-child { margin-bottom: 0; }
    masked pseudo-element ring. */
 .nav__pill {
   position: relative;
+  min-height: var(--nav-pill-h);
+  box-sizing: border-box;
   background:
     linear-gradient(to bottom,
       color-mix(in srgb, var(--glass-tint) 62%, transparent),
@@ -270,17 +273,31 @@ p:last-child { margin-bottom: 0; }
 
 .nav__home {
   display: flex; align-items: center; gap: .5rem;
-  padding: 6px 13px 6px 7px;
-  border-radius: 16px;                 /* brand pill is a rounded rect */
+  padding: 0 16px 0 8px;
+  border-radius: 999px;                /* same shape and height as the links pill */
   text-decoration: none;
 }
 .nav__home:hover { text-decoration: none; }
-.nav__mark { width: 26px; height: 26px; border-radius: 26%; }
+.nav__mark { width: 30px; height: 30px; border-radius: 26%; }
+
+/* The wordmark asset is flat white with an alpha channel, so it is used as a
+   CSS mask and painted with currentColor. Text stays in the markup for screen
+   readers, copy-paste, and as the fallback where masks are unsupported. */
 .nav__word { font-size: 1.05rem; font-weight: 800; letter-spacing: -.02em; color: var(--text-1); }
+@supports ((-webkit-mask-image: url('')) or (mask-image: url(''))) {
+  .nav__word {
+    display: block;
+    width: 108px; height: 20px;        /* asset is 900x170, ratio 5.29:1 */
+    text-indent: -200vw; overflow: hidden; white-space: nowrap;
+    background-color: currentColor;
+    -webkit-mask: url('../img/logo/wordmark-white.png') no-repeat center / contain;
+          mask: url('../img/logo/wordmark-white.png') no-repeat center / contain;
+  }
+}
 
 .nav__links {
   display: flex; align-items: center; gap: 2px;
-  padding: 5px 6px;
+  padding: 0 6px;
   border-radius: 999px;                /* links pill is fully rounded */
 }
 .nav__links a {
@@ -328,10 +345,11 @@ p:last-child { margin-bottom: 0; }
 
 /* Narrow phones: drop the wordmark so the two pills still fit side by side. */
 @media (max-width: 460px) {
+  :root { --nav-pill-h: 42px; }
   .nav { gap: .5rem; padding-inline: 10px; }
-  .nav__home { padding: 6px; gap: 0; }
+  .nav__home { padding: 0 7px; gap: 0; }
   .nav__word { display: none; }
-  .nav__links { padding: 4px 5px; }
+  .nav__links { padding: 0 5px; }
   .nav__links a { padding: .38rem .6rem; font-size: .8125rem; }
   .nav__links .nav__cta { padding: .38rem .8rem; margin-left: 2px; }
 }
