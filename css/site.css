@@ -159,7 +159,11 @@ a { color: var(--blue); text-decoration: none; }
 a:hover { text-decoration: underline; }
 :focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; border-radius: 6px; }
 
-h1, h2, h3, h4 { margin: 0 0 .5em; line-height: 1.15; letter-spacing: -.02em; }
+h1, h2, h3, h4 {
+  margin: 0 0 .5em; line-height: 1.15; letter-spacing: -.02em;
+  text-wrap: balance;          /* stops a single word orphaning on the last line */
+}
+p, li { text-wrap: pretty; }   /* same idea, lighter touch, for prose */
 h1 { font-size: clamp(2.1rem, 6vw, 3.6rem); font-weight: 800; }
 h2 { font-size: clamp(1.9rem, 4.6vw, 2.9rem); font-weight: 800; }
 h3 { font-size: clamp(1.5rem, 3.3vw, 2.25rem); font-weight: 700; }   /* caps at 36px ~1090px vw */
@@ -239,6 +243,11 @@ p:last-child { margin-bottom: 0; }
 .nav--solid .nav__links a,
 .nav--solid .nav__word { color: var(--text-1); }
 
+/* which page you are on */
+.nav__links a[aria-current='page'] { opacity: 1; font-weight: 700; }
+.nav--solid .nav__links a[aria-current='page'],
+.nav.is-stuck .nav__links a[aria-current='page'] { color: var(--blue); }
+
 /* Narrow phones: the masked wordmark is a fixed block, unlike the text it
    replaced, so the nav needs tightening or it overflows below ~360px. */
 @media (max-width: 400px) {
@@ -265,7 +274,7 @@ p:last-child { margin-bottom: 0; }
   transition: transform .15s ease, filter .15s ease;
 }
 .btn:hover { transform: translateY(-1px); filter: brightness(1.05); text-decoration: none; }
-.btn:active { transform: translateY(0); }
+.btn:active { transform: translateY(0) scale(.98); filter: brightness(.98); }
 .btn--primary { background: var(--blue); color: #fff; }
 .btn--light { background: #fff; color: var(--purple-dark); }
 .btn--ghost {
