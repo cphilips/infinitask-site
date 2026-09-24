@@ -25,8 +25,16 @@ ones to upload to App Store Connect.
 
 ## Preview it locally
 
+> **Use the `~/infinitask-site` shortcut, not the real path.** The folder lives
+> under `iPhaze/✂️ Design/`, and the emoji gets stripped when you paste that
+> path into Terminal, which makes `cd` fail with a confusing
+> "No such file or directory". The shortcut avoids it entirely. It is a
+> symlink, so it always points at the real folder.
+
+
 ```bash
-cd "/Users/craigphilips/Documents/iPhaze/✂️ Design/App Design/InfiniTask/Website" && python3 -m http.server 8080
+cd ~/infinitask-site
+python3 -m http.server 8080
 ```
 
 Then open <http://localhost:8080>. Stop it with Ctrl-C.
@@ -70,7 +78,9 @@ Make a **new, empty, public** repo called `infinitask-site` (no README, no
 ### 2. Push it
 
 ```bash
-cd "/Users/craigphilips/Documents/iPhaze/✂️ Design/App Design/InfiniTask/Website" && git remote add origin git@github.com:cphilips/infinitask-site.git && git push -u origin main
+cd ~/infinitask-site
+git remote add origin git@github.com:cphilips/infinitask-site.git
+git push -u origin main
 ```
 
 ### 3. Turn Pages on
@@ -107,7 +117,10 @@ Then update the App Store Connect Support and Privacy URLs to the new domain.
 ### Updating the site afterwards
 
 ```bash
-cd "/Users/craigphilips/Documents/iPhaze/✂️ Design/App Design/InfiniTask/Website" && git add -A && git commit -m "Update site" && git push
+cd ~/infinitask-site
+git add -A
+git commit -m "Update site"
+git push
 ```
 
 Pages redeploys on every push to `main`.
