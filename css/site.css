@@ -64,6 +64,13 @@
   --shadow-card: 0 4px 12px rgba(0, 0, 0, .06);
   --shadow-btn: 0 4px 8px rgba(0, 0, 0, .12);
   --shadow-lift: 0 18px 50px rgba(28, 28, 28, .16);
+  /* device drop shadow: light from the top-left, so it falls down and right.
+     Three layers — contact, mid, ambient — so it reads soft rather than muddy. */
+  --shadow-device:
+    1px 2px 4px rgba(14, 16, 30, .09),
+    3px 8px 18px rgba(14, 16, 30, .11),
+    8px 26px 48px rgba(14, 16, 30, .15),
+    14px 44px 80px rgba(14, 16, 30, .10);
 
   /* --- layout (AppLayout) --- */
   --reading: 640px;
@@ -92,6 +99,11 @@
     --card-stroke: rgba(255, 255, 255, .07);
     --shadow-card: none;
     --shadow-lift: 0 18px 50px rgba(0, 0, 0, .45);
+    --shadow-device:
+      1px 2px 4px rgba(0, 0, 0, .34),
+      3px 8px 18px rgba(0, 0, 0, .34),
+      8px 26px 48px rgba(0, 0, 0, .40),
+      14px 44px 80px rgba(0, 0, 0, .28);
   }
 }
 :root[data-theme='dark'] {
@@ -109,6 +121,11 @@
   --card-stroke: rgba(255, 255, 255, .07);
   --shadow-card: none;
   --shadow-lift: 0 18px 50px rgba(0, 0, 0, .45);
+  --shadow-device:
+    1px 2px 4px rgba(0, 0, 0, .34),
+    3px 8px 18px rgba(0, 0, 0, .34),
+    8px 26px 48px rgba(0, 0, 0, .40),
+    14px 44px 80px rgba(0, 0, 0, .28);
 }
 
 /* -------------------------------------------------- base */
@@ -296,14 +313,21 @@ p:last-child { margin-bottom: 0; }
 .hero__device { margin-top: clamp(2.5rem, 6vw, 4rem); }
 
 /* -------------------------------------------------- device frame */
+/* The gradient and rim highlights sit on the frame itself, so the gloss lives
+   in the bezel and never washes over the screenshot. */
 .device {
   position: relative;
   width: clamp(230px, 62vw, 300px);
   margin-inline: auto;
   border-radius: 46px;
   padding: 10px;
-  background: linear-gradient(160deg, #3a3d4d, #17181f);
-  box-shadow: var(--shadow-lift), 0 0 0 1px rgba(0, 0, 0, .25);
+  background: linear-gradient(148deg,
+    #5b6178 0%, #3c4155 22%, #262a37 55%, #191b24 78%, #101219 100%);
+  box-shadow:
+    inset 0 1.5px 1px rgba(255, 255, 255, .26),   /* top rim catches the light */
+    inset 0 -1.5px 1px rgba(0, 0, 0, .45),        /* bottom rim falls away */
+    0 0 0 1px rgba(0, 0, 0, .3),
+    var(--shadow-device);
 }
 .device img { border-radius: 37px; display: block; width: 100%; }
 .device--lg { width: clamp(250px, 70vw, 340px); }
@@ -459,8 +483,13 @@ html.js .seg { display: inline-flex; }
   margin: clamp(2.5rem, 5vw, 3.5rem) auto 0;
   padding: 12px;
   border-radius: 28px;
-  background: linear-gradient(160deg, #3a3d4d, #17181f);
-  box-shadow: var(--shadow-lift), 0 0 0 1px rgba(0, 0, 0, .25);
+  background: linear-gradient(148deg,
+    #5b6178 0%, #3c4155 22%, #262a37 55%, #191b24 78%, #101219 100%);
+  box-shadow:
+    inset 0 1.5px 1px rgba(255, 255, 255, .26),
+    inset 0 -1.5px 1px rgba(0, 0, 0, .45),
+    0 0 0 1px rgba(0, 0, 0, .3),
+    var(--shadow-device);
 }
 .device-wide__screen { border-radius: 18px; overflow: hidden; }
 .device-wide__screen img { display: block; width: 100%; height: auto; }
