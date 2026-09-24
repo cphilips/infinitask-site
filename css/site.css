@@ -977,9 +977,37 @@ html.js .seg { display: inline-flex; }
 .support-layout { display: grid; gap: 2.5rem; grid-template-columns: 1fr; }
 @media (min-width: 900px) {
   .support-layout { grid-template-columns: 220px 1fr; align-items: start; }
-  .support-nav { position: sticky; top: calc(var(--nav-h) + 24px); }
+  .support-nav {
+    position: sticky;
+    /* Clear of the veil, not just the nav, or the section list sits inside the
+       blurred strip. z-index keeps it above the veil (190) and below the
+       pill (200) while it settles. */
+    top: calc(var(--veil-h) + 24px);
+    z-index: 191;
+  }
 }
-.support-nav ul { list-style: none; margin: 0; padding: 0; }
+/* Reading progress. A grey track beside the section list with a purple fill
+   whose tip sits level with whichever section you are currently reading, so
+   the bar and the labels say the same thing. JS writes --read, 0 to 1, as a
+   fraction of the way through the five sections rather than of raw scroll,
+   which is what keeps the tip lined up with the label. */
+.support-nav { --read: 0; }
+.support-nav ul {
+  list-style: none; margin: 0; padding: 0 0 0 18px;
+  position: relative;
+}
+.support-nav ul::before,
+.support-nav ul::after {
+  content: ''; position: absolute; left: 0; top: 0;
+  width: 3px; border-radius: 999px;
+}
+.support-nav ul::before { height: 100%; background: var(--divider); }
+.support-nav ul::after  { height: calc(var(--read) * 100%); background: var(--purple); }
+.support-nav a.is-current { color: var(--text-1); }
+@media (prefers-reduced-motion: no-preference) {
+  .support-nav a { transition: color .2s ease; }
+}
+
 .support-nav li { margin-bottom: .35rem; }
 .support-nav a { color: var(--text-2); font-weight: 600; font-size: .95rem; }
 .support-nav a:hover { color: var(--text-1); text-decoration: none; }
@@ -990,7 +1018,7 @@ html.js .seg { display: inline-flex; }
   border: 1px solid var(--divider); border-radius: var(--r-button);
   margin-bottom: 2rem;
 }
-.article { scroll-margin-top: calc(var(--nav-h) + 24px); margin-bottom: 1rem; }
+.article { scroll-margin-top: calc(var(--veil-h) + 24px); margin-bottom: 1rem; }
 .article h3 { margin-bottom: .6em; }
 .article ul, .article ol { margin: 0 0 1.1em; padding-left: 1.3em; }
 .article li { margin-bottom: .4em; }
@@ -1001,7 +1029,7 @@ html.js .seg { display: inline-flex; }
   background: var(--card-bg-2); border-radius: 0 var(--r-small) var(--r-small) 0;
   color: var(--text-1);
 }
-.support-section { margin-bottom: 3.5rem; scroll-margin-top: calc(var(--nav-h) + 24px); }
+.support-section { margin-bottom: 3.5rem; scroll-margin-top: calc(var(--veil-h) + 24px); }
 .no-results { color: var(--text-2); font-style: italic; }
 [hidden] { display: none !important; }
 

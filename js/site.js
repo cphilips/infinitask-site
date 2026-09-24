@@ -352,6 +352,90 @@
     });
   }
 
+  /* ---------------------------------------------- reading progress
+     Fills the bar beside the Support page's section list. Progress is measured
+     in sections, not in pixels: section index plus how far through it you are,
+     over the section count. Raw scroll progress would drift away from the
+     labels, because the sections are not the same length. */
+  (function () {
+    var sideNav = document.querySelector('.support-nav');
+    if (!sideNav) { return; }
+
+    var links = [].slice.call(sideNav.querySelectorAll('a[href^="#"]'));
+    var marks = [];
+    var rTicking = false;
+    var current = -1;
+
+    var measure = function () {
+      marks = [];
+      links.forEach(function (a) {
+        var el = document.getElementById(a.getAttribute('href').slice(1));
+        if (!el) { return; }
+        var r = el.getBoundingClientRect();
+        marks.push({ a: a, top: r.top + window.scrollY, h: Math.max(1, r.height) });
+      });
+    };
+
+    var PROBE = 0.34;   // reading line, as a fraction down the viewport
+
+    var paintRead = function () {
+      rTicking = false;
+      if (!marks.length) { return; }
+
+      var n = marks.length;
+      var y = window.scrollY;
+      // Measure against a line a third down the viewport, not the very top,
+      // since that is roughly what you are actually reading.
+      var probe = y + window.innerHeight * PROBE;
+      var p = 0;
+
+      if (probe >= marks[0].top) {
+        var i = n - 1;
+        for (var k = 0; k < n; k++) { if (probe >= marks[k].top) { i = k; } }
+        var f = Math.min(1, Math.max(0, (probe - marks[i].top) / marks[i].h));
+        p = (i + f) / n;
+      }
+
+      // That line cannot travel the last (1 - PROBE) of a viewport, so the tail
+      // of the page would snap to the end in one step. Blend it in over exactly
+      // the distance the line comes up short by.
+      var max = document.documentElement.scrollHeight - window.innerHeight;
+      var tail = window.innerHeight * (1 - PROBE);
+      if (max > 0 && tail > 0) {
+        var t = Math.min(1, Math.max(0, (y - (max - tail)) / tail));
+        p = p + (1 - p) * t;
+      }
+
+      sideNav.style.setProperty('--read', p.toFixed(4));
+
+      // Derive the highlighted label from the bar, so the two can never
+      // disagree about which section you are in.
+      var at = Math.min(n - 1, Math.floor(p * n));
+      if (at !== current) {
+        current = at;
+        links.forEach(function (a, k) { a.classList.toggle('is-current', k === at); });
+      }
+    };
+
+    var onRead = function () {
+      if (!rTicking) { rTicking = true; window.requestAnimationFrame(paintRead); }
+    };
+
+    measure();
+    paintRead();
+    window.addEventListener('scroll', onRead, { passive: true });
+    window.addEventListener('resize', function () { measure(); onRead(); }, { passive: true });
+    window.addEventListener('load', function () { measure(); onRead(); });
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function () { measure(); onRead(); });
+    }
+    // The filter hides whole articles, so the sections change height under it.
+    var filter = document.getElementById('filter');
+    if (filter) { filter.addEventListener('input', function () { measure(); onRead(); }); }
+
+    window.__read = { measure: measure, repaint: paintRead };
+  })();
+
   /* ---------------------------------------------- veil tuner
      Add ?tune to any URL to get live sliders for the scroll veil. Never loads
      otherwise, so it costs visitors nothing and there is nothing to strip out
