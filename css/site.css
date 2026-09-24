@@ -442,6 +442,37 @@ html.js .seg { display: inline-flex; }
 .daynight__shot.is-active { opacity: 1; }
 @media (prefers-reduced-motion: reduce) { .daynight__shot { transition: none; } }
 
+/* ---------------------------------------- unfolded (landscape) device
+   For foldable captures taken from simctl, which give clean screen content
+   with no bezel. If a framed window capture is dropped in later, use a plain
+   <img> instead and drop this frame entirely. */
+.device-wide {
+  position: relative;
+  width: min(100%, 860px);
+  margin: clamp(2.5rem, 5vw, 3.5rem) auto 0;
+  padding: 12px;
+  border-radius: 28px;
+  background: linear-gradient(160deg, #3a3d4d, #17181f);
+  box-shadow: var(--shadow-lift), 0 0 0 1px rgba(0, 0, 0, .25);
+}
+.device-wide__screen { border-radius: 18px; overflow: hidden; }
+.device-wide__screen img { display: block; width: 100%; height: auto; }
+
+/* the fold, suggested rather than drawn: a soft seam down the centre */
+.device-wide__crease {
+  position: absolute; top: 12px; bottom: 12px; left: 50%;
+  width: 34px; transform: translateX(-50%);
+  pointer-events: none;
+  background: linear-gradient(to right,
+    rgba(0,0,0,0) 0%, rgba(0,0,0,.055) 42%, rgba(0,0,0,.085) 50%,
+    rgba(0,0,0,.055) 58%, rgba(0,0,0,0) 100%);
+}
+@media (max-width: 640px) {
+  .device-wide { padding: 7px; border-radius: 18px; }
+  .device-wide__screen { border-radius: 12px; }
+  .device-wide__crease { top: 7px; bottom: 7px; width: 20px; }
+}
+
 /* -------------------------------------------------- Pro band */
 .pro {
   background: linear-gradient(155deg, #2B2450 0%, var(--purple-dark) 45%, #2E5FD0 100%);
