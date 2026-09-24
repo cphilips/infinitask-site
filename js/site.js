@@ -363,6 +363,9 @@
       { p: '--veil-blur',         label: 'Blur',         min: 0,   max: 48,  step: 1,   unit: 'px' },
       { p: '--veil-scrim-alpha',  label: 'Fade',         min: 0,   max: 1,   step: .02, unit: ''   },
       { p: '--veil-scrim-stop',   label: 'Fade depth',   min: 5,   max: 100, step: 1,   unit: '%'  },
+      { p: '--veil-shade-alpha',  label: 'Top shade',    min: 0,   max: 1,   step: .02, unit: ''   },
+      { p: '--veil-shade-stop',   label: 'Shade depth',  min: 2,   max: 100, step: 1,   unit: '%'  },
+      { p: '--veil-shade',        label: 'Shade colour', type: 'color' },
       { p: '--veil-start',        label: 'Starts at',    min: 0,   max: 400, step: 5,   unit: 'px' },
       { p: '--veil-ramp',         label: 'Ramp',         min: 20,  max: 600, step: 10,  unit: 'px' }
     ];
@@ -390,6 +393,8 @@
       '#veil-tuner button{flex:1;border:0;border-radius:9px;padding:7px 0;font:600 12px ui-rounded,sans-serif;' +
       'background:rgba(255,255,255,.14);color:#fff;cursor:pointer}' +
       '#veil-tuner button:hover{background:rgba(255,255,255,.24)}' +
+      '#veil-tuner .vt-colour{height:26px;padding:0;border:0;border-radius:7px;background:none;cursor:pointer}' +
+      '#veil-tuner .vt-rows{max-height:52vh;overflow:auto}' +
       '#veil-tuner .vt-out{margin:9px 0 0;padding:8px;border-radius:9px;background:rgba(0,0,0,.35);' +
       'font:11px/1.5 ui-monospace,monospace;white-space:pre-wrap;max-height:140px;overflow:auto;display:none}';
     document.head.appendChild(css);
@@ -397,12 +402,26 @@
     var initial = {};
     var rows = panel.querySelector('.vt-rows');
 
-    var read = function (p) {
-      return parseFloat(getComputedStyle(rootEl).getPropertyValue(p));
+    var read = function (k) {
+      var raw = getComputedStyle(rootEl).getPropertyValue(k.p).trim();
+      if (k.type === 'color') { return hex(raw); }
+      return parseFloat(raw);
+    };
+    // <input type="color"> only accepts #rrggbb, but a computed custom property
+    // comes back however the browser feels like serialising it.
+    var hex = function (raw) {
+      if (/^#[0-9a-f]{6}$/i.test(raw)) { return raw; }
+      var m = raw.match(/-?[\d.]+/g);
+      if (!m || m.length < 3) { return '#000000'; }
+      return '#' + m.slice(0, 3).map(function (n) {
+        var v = parseFloat(n);
+        if (v <= 1 && raw.indexOf('srgb') > -1) { v *= 255; }
+        return ('0' + Math.round(v).toString(16)).slice(-2);
+      }).join('');
     };
     var cssText = function () {
       return KNOBS.map(function (k) {
-        return '  ' + k.p + ': ' + (k.el.value + k.unit) + ';';
+        return '  ' + k.p + ': ' + k.el.value + (k.unit || '') + ';';
       }).join('\n');
     };
     var show = function () {
@@ -412,22 +431,27 @@
     };
 
     KNOBS.forEach(function (k) {
-      initial[k.p] = read(k.p);
+      initial[k.p] = read(k);
       var wrap = document.createElement('label');
       wrap.innerHTML = '<span class="vt-k"><span>' + k.label + '</span><b></b></span>';
       var input = document.createElement('input');
-      input.type = 'range';
-      input.min = k.min; input.max = k.max; input.step = k.step;
+      if (k.type === 'color') {
+        input.type = 'color';
+        input.className = 'vt-colour';
+      } else {
+        input.type = 'range';
+        input.min = k.min; input.max = k.max; input.step = k.step;
+      }
       input.value = initial[k.p];
       wrap.appendChild(input);
       rows.appendChild(wrap);
       k.el = input;
       k.out = wrap.querySelector('b');
-      k.out.textContent = input.value + k.unit;
+      k.out.textContent = input.value + (k.unit || '');
 
       input.addEventListener('input', function () {
-        k.out.textContent = input.value + k.unit;
-        rootEl.style.setProperty(k.p, input.value + k.unit);
+        k.out.textContent = input.value + (k.unit || '');
+        rootEl.style.setProperty(k.p, input.value + (k.unit || ''));
         if (window.__veil) { window.__veil.measure(); window.__veil.repaint(); }
         if (panel.querySelector('.vt-out').style.display === 'block') { show(); }
       });
@@ -444,7 +468,7 @@
       KNOBS.forEach(function (k) {
         rootEl.style.removeProperty(k.p);
         k.el.value = initial[k.p];
-        k.out.textContent = k.el.value + k.unit;
+        k.out.textContent = k.el.value + (k.unit || '');
       });
       if (window.__veil) { window.__veil.measure(); window.__veil.repaint(); }
       panel.querySelector('.vt-out').style.display = 'none';

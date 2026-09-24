@@ -396,6 +396,13 @@ body.has-bottom-nav {
   --veil-blur: 16px;           /* blur at the very top edge, in effect */
   --veil-scrim-alpha: .72;     /* how solid the fade is at the top edge, 0-1 */
   --veil-scrim-stop: 46%;      /* how far down the fade has gone completely */
+
+  /* A second, darker fade over the top edge only. The blur alone leaves a hard
+     line where it starts, and over a bright background the scrim reads as a
+     pale wash. This sits on top of both and softens the edge back down. */
+  --veil-shade: #1E2030;       /* on-palette: the dark app background */
+  --veil-shade-alpha: .28;     /* strength at the very top edge, 0-1 */
+  --veil-shade-stop: 32%;      /* how far down it has gone completely */
   --veil-start: 40px;          /* scroll position where it starts to appear */
   --veil-ramp: 170px;          /* further scrolling until it is fully on */
 
@@ -438,11 +445,20 @@ body.has-bottom-nav {
 /* The fade itself. Painted over the blur, in the colour of whatever section is
    currently passing underneath. */
 .veil::after {
-  content: ''; position: absolute; inset: 0;
+  content: ''; position: absolute; inset: 0; z-index: 1;
   background: linear-gradient(to bottom,
     color-mix(in srgb, var(--veil-scrim) calc(var(--veil-scrim-alpha) * 100%), transparent) 0%,
     transparent var(--veil-scrim-stop));
   transition: background .35s ease;   /* @property is what lets this animate */
+}
+
+/* The darker top edge, over everything else, and deliberately shorter than the
+   scrim so it reads as a soft edge rather than a second wash. */
+.veil::before {
+  content: ''; position: absolute; inset: 0; z-index: 2;
+  background: linear-gradient(to bottom,
+    color-mix(in srgb, var(--veil-shade) calc(var(--veil-shade-alpha) * 100%), transparent) 0%,
+    transparent var(--veil-shade-stop));
 }
 
 /* Someone who has asked for less transparency gets the fade without the blur. */
