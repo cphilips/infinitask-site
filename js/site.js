@@ -105,7 +105,7 @@
       bTicking = false;
       var vw = document.documentElement.clientWidth;
       var big = Math.max(88, Math.min(124, vw * 0.13));
-      var small = 32;                                   // the size asked for
+      var small = 56;                                   // the size asked for
       var navH = parseFloat(getComputedStyle(document.documentElement)
                    .getPropertyValue('--nav-pill-h')) || 46;
       var navTop = Math.max(10, Math.min(18, vw * 0.016));

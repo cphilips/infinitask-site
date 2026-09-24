@@ -421,7 +421,8 @@ p:last-child { margin-bottom: 0; }
 /* Static wordmark above the headline. Deliberately not part of the morphing
    icon: it stays put and scrolls away with the rest of the hero. */
 .hero__wordmark {
-  display: block; margin: 0 auto clamp(1.1rem, 2.4vw, 1.6rem);
+  display: block;
+  margin: 72px auto clamp(1.1rem, 2.4vw, 1.6rem);   /* clear space under the icon */
   color: #fff; font-size: clamp(2rem, 7vw, 3rem); font-weight: 800;
   letter-spacing: -.02em; line-height: 1;
 }
