@@ -1108,9 +1108,16 @@ html.js .seg { display: inline-flex; }
   display: flex; flex-direction: column; align-items: center; gap: .45rem;
   width: 100%; padding: .6rem .3rem; border: 0; border-radius: 16px;
   background: none; cursor: pointer; font: inherit; color: inherit;
-  transition: background .18s ease, transform .18s ease;
 }
-.addthings__tile:hover { background: var(--card-bg-2); transform: translateY(-2px); }
+.addthings__tile span { transition: color .18s ease; }
+/* The tile sits inside a card that already lifts on hover, so the hover here is
+   the label alone: blue and underlined, the way a link behaves. */
+.addthings__tile:hover span,
+.addthings__tile:focus-visible span {
+  color: var(--blue);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
 .addthings__tile:focus-visible { outline: 2px solid var(--purple); outline-offset: 2px; }
 
 /* ---- mobile: the rail narrows to icon over label, as in the mockup */
