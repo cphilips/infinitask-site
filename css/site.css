@@ -980,6 +980,80 @@ html.js .seg { display: inline-flex; }
   white-space: nowrap; border: 0;
 }
 
+/* -------------------------------------------------- section props
+   Small recreations of the app's own furniture sitting above three of the
+   feature headings, to give each one something to look at before the copy.
+
+   aria-hidden because they are scenery, not content: the words inside them are
+   set dressing, and a screen reader announcing "Finish the App Store shots" as
+   page copy would be nonsense. They also reuse the feature's own .reveal, and
+   stagger off its .is-in, so the fade needs no extra JS. */
+.props { display: flex; gap: .7rem; margin-bottom: 1.5rem; }
+
+html.js .feature .prop {
+  opacity: 0; transform: translateY(14px);
+  transition: opacity .55s ease, transform .55s ease;
+  transition-delay: var(--d, 0s);
+}
+html.js .feature.is-in .prop { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  html.js .feature .prop { opacity: 1; transform: none; transition: none; }
+}
+
+/* ---- Task cards */
+.props--tasks { max-width: 430px; }
+.tcard {
+  position: relative; flex: 1 1 0; min-width: 0;
+  background: var(--card-bg);
+  border: 1px solid var(--card-stroke-solid);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-card);
+  padding: .85rem .9rem 1rem;
+}
+.tcard__top { display: flex; align-items: flex-start; justify-content: space-between; gap: .5rem; margin-bottom: .45rem; }
+.tcard__date { color: var(--blue); font-size: .8125rem; font-weight: 600; }
+.tcard__play {
+  width: 26px; height: 26px; border-radius: 50%; flex: none;
+  background: color-mix(in srgb, var(--blue) 16%, transparent);
+  color: var(--blue); display: grid; place-items: center;
+}
+.tcard__play svg { width: 13px; height: 13px; }
+.tcard__title {
+  margin: 0 0 .35rem; font-size: .9375rem; font-weight: 700; line-height: 1.25;
+  color: var(--text-1);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.tcard__note {
+  margin: 0 0 .85rem; font-size: .8125rem; line-height: 1.35; color: var(--text-2);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.tcard__icons { display: flex; gap: .45rem; color: var(--blue); }
+.tcard__icons svg { width: 15px; height: 15px; flex: none; }
+.tcard__flag {
+  position: absolute; right: .75rem; bottom: .7rem;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--imp-high); color: #fff;
+  display: grid; place-items: center;
+  font-size: .78rem; font-weight: 800; line-height: 1;
+}
+
+/* ---- Project and Notebook covers */
+.props--covers { gap: 1rem; }
+.cover { display: flex; flex-direction: column; flex: 0 1 104px; min-width: 0; }
+.cover img {
+  width: 100%; height: auto; border-radius: 3px;
+  filter: drop-shadow(0 7px 16px rgba(20, 22, 40, .2));
+}
+.cover__name { margin-top: .55rem; font-size: .875rem; font-weight: 700; color: var(--text-1); }
+.cover__meta { font-size: .75rem; color: var(--text-2); }
+
+@media (max-width: 560px) {
+  .props--tasks { max-width: none; }
+  .tcard { padding: .75rem .8rem .9rem; }
+  .props--covers { gap: .8rem; }
+  .cover { flex-basis: 88px; }
+}
+
 /* -------------------------------------------------- Add Things modal
    Tapping a tile in the Add Things grid opens a two-column explainer: a rail of
    the ten things you can put on a Task, and a panel showing the real section as
