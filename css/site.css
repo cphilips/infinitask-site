@@ -80,6 +80,10 @@
   --wide: 1120px;
   --gutter: 16px;
   --seg-track: #DADDE7;   /* segmented pill, deselected fill (Theme.swift) */
+  --glass-tint: #FFFFFF;      /* the pane itself */
+  --glass-rim:  #FFFFFF;      /* specular edge */
+  --glass-glow: #FFFFFF;      /* light caught inside */
+  --glass-bright: 1.08;
   --nav-h: 52px;   /* measured: nav mark 28px + .7rem padding block */
   --band: clamp(64px, 9vw, 116px);
 }
@@ -102,6 +106,14 @@
     --card-stroke-solid: rgba(255, 255, 255, .12);   /* subtle in dark; white would glare */
     --shadow-card: none;
     --shadow-card-hover: 0 10px 24px rgba(0, 0, 0, .45);
+  --glass-tint: #454A63;
+  --glass-rim:  #FFFFFF;
+  --glass-glow: #FFFFFF;
+  --glass-bright: 1.15;
+    --glass-tint: #454A63;
+    --glass-rim:  #FFFFFF;
+    --glass-glow: #FFFFFF;
+    --glass-bright: 1.15;
     --shadow-lift: 0 18px 50px rgba(0, 0, 0, .45);
     --shadow-device:
       1px 2px 4px rgba(0, 0, 0, .34),
@@ -194,73 +206,106 @@ p:last-child { margin-bottom: 0; }
 .band--tint { background: var(--card-bg-2); }
 .band--edge { border-block: 1px solid var(--divider); }
 
-/* -------------------------------------------------- nav */
+/* -------------------------------------------------- nav
+   A floating split nav: a transparent fixed rail holding two pills, brand on
+   the left and links on the right. The rail ignores pointer events so it never
+   blocks the page behind it; the pills take them back. */
 .nav {
-  position: sticky; top: 0; z-index: 50;
-  display: flex; align-items: center; gap: 1.25rem;
-  padding: .7rem var(--gutter);
-  transition: background .25s ease, box-shadow .25s ease, backdrop-filter .25s ease;
+  position: fixed;
+  top: clamp(10px, 1.6vw, 18px);
+  left: 0; right: 0;
+  z-index: 200;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: .75rem;
+  padding-inline: clamp(12px, 3vw, 26px);
+  pointer-events: none;
 }
-.nav__home { display: flex; align-items: center; gap: .55rem; margin-right: auto; text-decoration: none; }
+.nav > * { pointer-events: auto; }
+
+/* Liquid Glass, approximated.
+   Four things together sell it, and the blur is the least important:
+   1. backdrop blur + saturation, so colour behind bleeds through richer
+   2. a faint top-down tint, because real glass is not uniformly transparent
+   3. a SPECULAR RIM — bright along the top edge, dimmer at the bottom. This is
+      the part that reads as glass rather than as frosting.
+   4. an inner glow, as if light were caught inside the pane.
+   The rim is a gradient border, which CSS cannot do directly, so it is a
+   masked pseudo-element ring. */
+.nav__pill {
+  position: relative;
+  background:
+    linear-gradient(to bottom,
+      color-mix(in srgb, var(--glass-tint) 62%, transparent),
+      color-mix(in srgb, var(--glass-tint) 40%, transparent));
+  backdrop-filter: blur(18px) saturate(185%) brightness(var(--glass-bright));
+  -webkit-backdrop-filter: blur(18px) saturate(185%) brightness(var(--glass-bright));
+  border: 0;
+  box-shadow:
+    inset 0 0 18px color-mix(in srgb, var(--glass-glow) 14%, transparent),
+    0 1px 2px rgba(14, 16, 30, .05),
+    0 8px 26px rgba(14, 16, 30, .09);
+}
+
+/* the specular rim */
+.nav__pill::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(150deg,
+    color-mix(in srgb, var(--glass-rim) 92%, transparent) 0%,
+    color-mix(in srgb, var(--glass-rim) 30%, transparent) 38%,
+    color-mix(in srgb, var(--glass-rim) 14%, transparent) 62%,
+    color-mix(in srgb, var(--glass-rim) 58%, transparent) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
+}
+@supports not ((-webkit-mask-composite: xor) or (mask-composite: exclude)) {
+  .nav__pill { border: 1px solid color-mix(in srgb, var(--glass-rim) 55%, transparent); }
+  .nav__pill::before { display: none; }
+}
+
+.nav__home {
+  display: flex; align-items: center; gap: .5rem;
+  padding: 6px 13px 6px 7px;
+  border-radius: 16px;                 /* brand pill is a rounded rect */
+  text-decoration: none;
+}
 .nav__home:hover { text-decoration: none; }
-.nav__mark { width: 28px; height: 28px; border-radius: 26%; box-shadow: 0 2px 6px rgba(0,0,0,.2); }
-/* The only wordmark assets in the project are white-on-transparent, and there is
-   no SVG, so the wordmark is set as text. It adapts to both themes and stays
-   crisp at any size. SF Rounded matches the app. */
-/* The wordmark asset is flat white with an alpha channel, so it is used as a
-   CSS mask and painted with `currentColor`. That means every existing rule that
-   sets `color` on .nav__word keeps working, in light and dark alike. The text
-   stays in the markup for accessibility, copy-paste, and as the fallback if a
-   browser has no mask support. */
-.nav__word { font-size: 1.15rem; font-weight: 800; letter-spacing: -.02em; color: #fff; }
+.nav__mark { width: 26px; height: 26px; border-radius: 26%; }
+.nav__word { font-size: 1.05rem; font-weight: 800; letter-spacing: -.02em; color: var(--text-1); }
 
-@supports ((-webkit-mask-image: url('')) or (mask-image: url(''))) {
-  .nav__word {
-    display: block;
-    width: 117px; height: 22px;        /* asset is 900x170, ratio 5.29:1 */
-    text-indent: -200vw; overflow: hidden; white-space: nowrap;
-    background-color: currentColor;
-    -webkit-mask: url('../img/logo/wordmark-white.png') no-repeat center / contain;
-    mask: url('../img/logo/wordmark-white.png') no-repeat center / contain;
-  }
+.nav__links {
+  display: flex; align-items: center; gap: 2px;
+  padding: 5px 6px;
+  border-radius: 999px;                /* links pill is fully rounded */
 }
-.nav__links { display: flex; gap: 1.25rem; align-items: center; }
-.nav__links a { font-weight: 600; font-size: .95rem; color: #fff; opacity: .9; }
-.nav__links a:hover { opacity: 1; text-decoration: none; }
-
-/* solid state once scrolled off the gradient hero */
-.nav.is-stuck {
-  background: color-mix(in srgb, var(--app-bg) 82%, transparent);
-  backdrop-filter: saturate(160%) blur(18px);
-  -webkit-backdrop-filter: saturate(160%) blur(18px);
-  box-shadow: 0 1px 0 var(--divider);
+.nav__links a {
+  padding: .42rem .85rem;
+  border-radius: 999px;
+  font-weight: 600; font-size: .9375rem;
+  color: var(--text-1); opacity: .72;
+  transition: background .18s ease, opacity .18s ease, color .18s ease;
 }
-.nav.is-stuck .nav__links a,
-.nav.is-stuck .nav__word { color: var(--text-1); }
-
-/* pages without a gradient hero start solid */
-.nav--solid { background: var(--app-bg); box-shadow: 0 1px 0 var(--divider); }
-.nav--solid .nav__links a,
-.nav--solid .nav__word { color: var(--text-1); }
-
-/* which page you are on */
-.nav__links a[aria-current='page'] { opacity: 1; font-weight: 700; }
-.nav--solid .nav__links a[aria-current='page'],
-.nav.is-stuck .nav__links a[aria-current='page'] { color: var(--blue); }
-
-/* Narrow phones: the masked wordmark is a fixed block, unlike the text it
-   replaced, so the nav needs tightening or it overflows below ~360px. */
-@media (max-width: 400px) {
-  .nav { gap: .7rem; padding-inline: 12px; }
-  .nav__home { gap: .45rem; }
-  .nav__mark { width: 24px; height: 24px; }
-  .nav__links { gap: .8rem; }
-  .nav__links a { font-size: .875rem; }
+.nav__links a:hover {
+  opacity: 1; text-decoration: none;
+  background: color-mix(in srgb, var(--text-1) 7%, transparent);
 }
-@supports ((-webkit-mask-image: url('')) or (mask-image: url(''))) {
-  @media (max-width: 400px) {
-    .nav__word { width: 92px; height: 17px; }
-  }
+.nav__links a[aria-current='page'] {
+  opacity: 1; color: var(--blue);
+  background: color-mix(in srgb, var(--blue) 11%, transparent);
+}
+
+/* Narrow phones: drop the wordmark so the two pills still fit side by side. */
+@media (max-width: 460px) {
+  .nav { gap: .5rem; padding-inline: 10px; }
+  .nav__home { padding: 6px; gap: 0; }
+  .nav__word { display: none; }
+  .nav__links { padding: 4px 5px; }
+  .nav__links a { padding: .38rem .6rem; font-size: .8125rem; }
 }
 
 /* -------------------------------------------------- buttons */
@@ -287,8 +332,7 @@ p:last-child { margin-bottom: 0; }
   position: relative;
   background: linear-gradient(150deg, var(--purple) 0%, #7B6BEF 45%, var(--blue) 100%);
   color: #fff;
-  margin-top: calc(var(--nav-h) * -1);   /* sit under the transparent nav */
-  padding-top: var(--nav-h);
+  padding-top: calc(var(--nav-h) + 12px);   /* clear the floating nav */
   overflow: hidden;
 }
 .hero::after {               /* soft base so the device art can break out */
@@ -657,7 +701,7 @@ html.js .seg { display: inline-flex; }
 .prose th, .prose td { text-align: left; padding: .7em .8em; border-bottom: 1px solid var(--divider); vertical-align: top; }
 .prose th { color: var(--text-2); font-weight: 600; font-size: .8125rem; letter-spacing: .4px; text-transform: uppercase; }
 
-.page-head { padding-block: clamp(2.5rem, 6vw, 4rem) clamp(1.5rem, 4vw, 2.5rem); }
+.page-head { padding-block: calc(var(--nav-h) + clamp(2rem, 5vw, 3.5rem)) clamp(1.5rem, 4vw, 2.5rem); }
 .page-head h1 { margin-bottom: .3em; }
 
 /* -------------------------------------------------- reveal */
