@@ -392,19 +392,19 @@ body.has-bottom-nav {
   syntax: '<color>'; inherits: true; initial-value: #E8EBF2;
 }
 :root {
-  --veil-h: 140px;             /* how far down the page the effect reaches */
-  --veil-blur: 16px;           /* blur at the very top edge, in effect */
-  --veil-scrim-alpha: .72;     /* how solid the fade is at the top edge, 0-1 */
-  --veil-scrim-stop: 46%;      /* how far down the fade has gone completely */
+  --veil-h: 120px;             /* how far down the page the effect reaches */
+  --veil-blur: 10px;           /* blur at the very top edge, in effect */
+  --veil-scrim-alpha: .38;     /* how solid the fade is at the top edge, 0-1 */
+  --veil-scrim-stop: 38%;      /* how far down the fade has gone completely */
 
   /* A second, darker fade over the top edge only. The blur alone leaves a hard
      line where it starts, and over a bright background the scrim reads as a
      pale wash. This sits on top of both and softens the edge back down. */
   --veil-shade: #1E2030;       /* on-palette: the dark app background */
-  --veil-shade-alpha: .28;     /* strength at the very top edge, 0-1 */
-  --veil-shade-stop: 32%;      /* how far down it has gone completely */
-  --veil-start: 40px;          /* scroll position where it starts to appear */
-  --veil-ramp: 170px;          /* further scrolling until it is fully on */
+  --veil-shade-alpha: .12;     /* strength at the very top edge, 0-1 */
+  --veil-shade-stop: 40%;      /* how far down it has gone completely */
+  --veil-start: 65px;          /* scroll position where it starts to appear */
+  --veil-ramp: 180px;          /* further scrolling until it is fully on */
 
   --veil-scrim: var(--app-bg); /* what content fades towards. JS retargets this
                                   per section, see data-veil in the markup. */
