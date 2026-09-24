@@ -358,12 +358,12 @@ body.has-bottom-nav {
   padding-bottom: calc(var(--nav-pill-h) + 34px + env(safe-area-inset-bottom, 0px));
 }
 @media (max-width: 780px) {
-  html:not(.js) body:has(#brand) .nav {
+  html:not(.js) .nav {
     top: auto;
     bottom: calc(12px + env(safe-area-inset-bottom, 0px));
     justify-content: center;
   }
-  html:not(.js) body:has(#brand) { padding-bottom: calc(var(--nav-pill-h) + 34px); }
+  html:not(.js) body { padding-bottom: calc(var(--nav-pill-h) + 34px); }
 }
 
 @media (max-width: 460px) {

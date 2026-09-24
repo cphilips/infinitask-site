@@ -90,6 +90,50 @@
     });
   }
 
+  /* ---------------------------------------------- nav placement
+     On the home page the pinned app icon sits centred at the top, so on a
+     narrow window it runs into the links pill on the right. A fixed breakpoint
+     cannot catch that: the pill's width follows its text, which moves with
+     font size and zoom. Measure the real gap instead and drop the pill to the
+     bottom of the screen when it runs out, where it is closer to thumbs
+     anyway.
+
+     Every page runs the same test with the same numbers, including Support and
+     Privacy, which carry no icon of their own. There is nothing for the pill
+     to hit there, but the nav should not jump sides halfway through the site.
+     Depends only on the viewport and the pill, never on scroll. */
+  (function () {
+    var navEl = document.getElementById('nav');
+    var navPill = document.querySelector('.nav__links');
+    if (!navEl || !navPill) { return; }
+    var atBottom = null;
+
+    var placeNav = function () {
+      var vw = document.documentElement.clientWidth;
+      var big = Math.max(88, Math.min(124, vw * 0.13));  // hero icon, as in paint()
+      var small = 56;                                    // pinned icon
+      // Worst case, not the final case: halfway through the morph the icon is
+      // still (big + small) / 2 across and already sitting on the nav line,
+      // which is where it actually touches the links.
+      var widest = (big + small) / 2;
+      var pad = parseFloat(getComputedStyle(navEl).paddingLeft) || 12;
+      // Where the pill WOULD sit at the top right, not where it is now.
+      // Measuring the moved pill flips the test back, and the nav oscillates.
+      var leftIfTop = vw - pad - navPill.getBoundingClientRect().width;
+      var bottom = (vw / 2 + widest / 2 + 24) > leftIfTop;
+
+      if (bottom === atBottom) { return; }
+      atBottom = bottom;
+      navEl.classList.toggle('nav--bottom', bottom);
+      document.body.classList.toggle('has-bottom-nav', bottom);
+    };
+
+    placeNav();
+    window.addEventListener('resize', placeNav, { passive: true });
+    // The pill is as wide as its text, so re-measure once the real face lands.
+    if (document.fonts && document.fonts.ready) { document.fonts.ready.then(placeNav); }
+  })();
+
   /* ---------------------------------------------- morphing app icon
      One element does two jobs: the big logo in the hero, and a small
      back-to-top button pinned at the top left once you scroll. Geometry is
@@ -99,9 +143,6 @@
   var slot = document.querySelector('.brand-slot');
   if (brand && slot) {
     var mark = brand.querySelector('.brand__mark');
-    var navEl = document.getElementById('nav');
-    var navPill = document.querySelector('.nav__links');
-    var bottomNav = null;
     var bTicking = false;
 
     var paint = function () {
@@ -129,26 +170,6 @@
       mark.style.width = size.toFixed(1) + 'px';
       mark.style.height = size.toFixed(1) + 'px';
       brand.classList.toggle('is-pinned', ease > 0.6);
-
-      // Would the pinned icon collide with the links pill? Measure rather than
-      // guess a breakpoint: the pill's width follows its text, font size and
-      // zoom. Compare against where the pill WOULD sit at the top right, not
-      // where it currently is, or moving it would flip the test and oscillate.
-      if (navPill) {
-        var padInline = parseFloat(getComputedStyle(navEl).paddingLeft) || 12;
-        var pillW = navPill.getBoundingClientRect().width;
-        var pillLeftIfTop = vw - padInline - pillW;
-        // Worst case, not the final case: halfway through the morph the icon is
-        // still (big + small) / 2 across and already sitting on the nav line,
-        // which is where it actually touches the links.
-        var widest = (big + small) / 2;
-        var needsBottom = (vw / 2 + widest / 2 + 24) > pillLeftIfTop;
-        if (needsBottom !== bottomNav) {
-          bottomNav = needsBottom;
-          navEl.classList.toggle('nav--bottom', needsBottom);
-          document.body.classList.toggle('has-bottom-nav', needsBottom);
-        }
-      }
 
       document.documentElement.style.setProperty('--brand-slot-h', big + 'px');
     };
