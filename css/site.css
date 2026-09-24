@@ -376,10 +376,18 @@ p:last-child { margin-bottom: 0; }
 /* -------------------------------------------------- hero */
 .hero {
   position: relative;
+  /* Sampled from Background-Colour2 in Assets.xcassets, the warm Pro card.
+     Mostly vertical, with a golden lean to the top right, as in the artwork. */
   background:
-    radial-gradient(120% 90% at 78% 8%, rgba(255,255,255,.22), transparent 55%),
-    radial-gradient(90% 70% at 12% 92%, rgba(255,120,220,.20), transparent 60%),
-    linear-gradient(152deg, var(--purple) 0%, #7B6BEF 44%, var(--blue) 100%);
+    radial-gradient(120% 80% at 88% -6%, rgba(255, 214, 140, .85), transparent 58%),
+    linear-gradient(172deg,
+      #F9C275 0%,
+      #F1A488 9%,
+      #DA8CA8 16%,
+      #9A66CC 26%,
+      #7A5CDD 46%,
+      #6A57E4 68%,
+      #6858E6 100%);   /* same hues, deepened where the copy sits */
   color: #fff;
   padding-top: calc(var(--nav-h) + 12px);
   overflow: visible;             /* the showcase peeks out of the bottom */
@@ -417,7 +425,7 @@ p:last-child { margin-bottom: 0; }
 .hero__lede {
   max-width: 36ch; margin: 0 auto 2rem;
   font-size: clamp(1.02rem, 2.1vw, 1.22rem); line-height: 1.55;
-  color: rgba(255, 255, 255, .9);
+  color: #fff;
 }
 
 /* ---------------- CTA: Apple mark, label, chevron */
