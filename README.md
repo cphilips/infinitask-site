@@ -153,6 +153,30 @@ both once they are live.
 
 ---
 
+## A note on caching
+
+`index.html`, `support.html` and `privacy.html` load the CSS and JS with a
+version query, e.g. `css/site.css?v=202609241708`. **Bump that stamp whenever
+you change `site.css` or `site.js`**, or browsers will keep serving the old
+copy. Any new number works; the date and time is just a convention.
+
+```bash
+cd ~/infinitask-site && python3 - <<'EOF'
+import re, glob, datetime
+s = datetime.datetime.now().strftime('%Y%m%d%H%M')
+for p in ['index.html','support.html','privacy.html']:
+    t = open(p).read()
+    t = re.sub(r'(site\.(?:css|js))\?v=\d+', r'\1?v=' + s, t)
+    open(p,'w').write(t)
+print('stamped', s)
+EOF
+```
+
+Without this, a CSS change can look like it did not work at all. It cost us
+several rounds of confusion before it was added.
+
+---
+
 ## How the design system works
 
 `css/site.css` is a direct port of

@@ -90,6 +90,27 @@
     });
   }
 
+  /* ---------------------------------------------- hero fan
+     Drives --fan from 0 to 1 across the first screenful of scrolling, so the
+     three screens swing apart as you come down the page. rAF-throttled, and
+     skipped entirely for anyone who prefers reduced motion. */
+  var fan = document.querySelector('.fan');
+  if (fan && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    var ticking = false;
+    var applyFan = function () {
+      ticking = false;
+      var travel = Math.max(window.innerHeight * 0.7, 380);
+      var p = Math.min(1, Math.max(0, window.scrollY / travel));
+      fan.style.setProperty('--fan', p.toFixed(3));
+    };
+    var onFanScroll = function () {
+      if (!ticking) { ticking = true; window.requestAnimationFrame(applyFan); }
+    };
+    applyFan();
+    window.addEventListener('scroll', onFanScroll, { passive: true });
+    window.addEventListener('resize', onFanScroll, { passive: true });
+  }
+
   /* ---------------------------------------------- day / night preview
      Starts on whatever the visitor's OS is set to. Keeps following the OS
      until they pick a side, after which their choice sticks for the visit. */
