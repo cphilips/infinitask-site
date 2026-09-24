@@ -988,7 +988,7 @@ html.js .seg { display: inline-flex; }
    set dressing, and a screen reader announcing "Finish the App Store shots" as
    page copy would be nonsense. They also reuse the feature's own .reveal, and
    stagger off its .is-in, so the fade needs no extra JS. */
-.props { display: flex; gap: .7rem; margin-bottom: 1.5rem; }
+.props { display: flex; gap: .7rem; margin-top: 1.6rem; }
 
 html.js .feature .prop {
   opacity: 0; transform: translateY(14px);
