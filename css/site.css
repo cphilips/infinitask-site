@@ -33,6 +33,7 @@
   --card-grad-a: #FFFFFF;
   --card-grad-b: #FAFAFA;
   --card-stroke: rgba(0, 0, 0, .05);
+  --card-stroke-solid: #FFFFFF;        /* cardSurface() light stroke */
 
   /* --- fixed accents (Theme.swift 88-101) --- */
   --purple: #9A61ED;
@@ -97,6 +98,7 @@
     --card-grad-a: #3C3F58;
     --card-grad-b: #292B40;
     --card-stroke: rgba(255, 255, 255, .07);
+    --card-stroke-solid: rgba(255, 255, 255, .12);   /* subtle in dark; white would glare */
     --shadow-card: none;
     --shadow-lift: 0 18px 50px rgba(0, 0, 0, .45);
     --shadow-device:
@@ -119,6 +121,7 @@
   --card-grad-a: #3C3F58;
   --card-grad-b: #292B40;
   --card-stroke: rgba(255, 255, 255, .07);
+  --card-stroke-solid: rgba(255, 255, 255, .12);   /* subtle in dark; white would glare */
   --shadow-card: none;
   --shadow-lift: 0 18px 50px rgba(0, 0, 0, .45);
   --shadow-device:
@@ -396,7 +399,7 @@ p:last-child { margin-bottom: 0; }
   display: flex; flex-direction: column; align-items: center; gap: .6rem;
   padding: 1.1rem .5rem;
   background: linear-gradient(to bottom, var(--card-grad-a), var(--card-grad-b));
-  border: 1px solid var(--card-stroke);
+  border: 1px solid var(--card-stroke-solid);
   border-radius: var(--r-card);
   box-shadow: var(--shadow-card);
   text-align: center;
