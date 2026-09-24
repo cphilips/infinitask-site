@@ -99,6 +99,9 @@
   var slot = document.querySelector('.brand-slot');
   if (brand && slot) {
     var mark = brand.querySelector('.brand__mark');
+    var navEl = document.getElementById('nav');
+    var navPill = document.querySelector('.nav__links');
+    var bottomNav = null;
     var bTicking = false;
 
     var paint = function () {
@@ -126,6 +129,26 @@
       mark.style.width = size.toFixed(1) + 'px';
       mark.style.height = size.toFixed(1) + 'px';
       brand.classList.toggle('is-pinned', ease > 0.6);
+
+      // Would the pinned icon collide with the links pill? Measure rather than
+      // guess a breakpoint: the pill's width follows its text, font size and
+      // zoom. Compare against where the pill WOULD sit at the top right, not
+      // where it currently is, or moving it would flip the test and oscillate.
+      if (navPill) {
+        var padInline = parseFloat(getComputedStyle(navEl).paddingLeft) || 12;
+        var pillW = navPill.getBoundingClientRect().width;
+        var pillLeftIfTop = vw - padInline - pillW;
+        // Worst case, not the final case: halfway through the morph the icon is
+        // still (big + small) / 2 across and already sitting on the nav line,
+        // which is where it actually touches the links.
+        var widest = (big + small) / 2;
+        var needsBottom = (vw / 2 + widest / 2 + 24) > pillLeftIfTop;
+        if (needsBottom !== bottomNav) {
+          bottomNav = needsBottom;
+          navEl.classList.toggle('nav--bottom', needsBottom);
+          document.body.classList.toggle('has-bottom-nav', needsBottom);
+        }
+      }
 
       document.documentElement.style.setProperty('--brand-slot-h', big + 'px');
     };

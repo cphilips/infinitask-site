@@ -343,12 +343,32 @@ p:last-child { margin-bottom: 0; }
 }
 .nav__links .nav__cta:active { transform: translateY(0) scale(.97); filter: brightness(1); }
 
-/* Narrow phones: drop the wordmark so the two pills still fit side by side. */
+/* The pinned icon sits centred at the top, so on anything but a wide window it
+   collides with the links pill. A fixed breakpoint is the wrong tool here: the
+   pill's width depends on its text, which moves with font size and zoom. JS
+   measures the real gap and sets .nav--bottom, which drops the pill to the
+   bottom of the screen, where it is closer to thumbs anyway.
+   The media query is the no-JS fallback. */
+.nav--bottom {
+  top: auto;
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  justify-content: center;
+}
+body.has-bottom-nav {
+  padding-bottom: calc(var(--nav-pill-h) + 34px + env(safe-area-inset-bottom, 0px));
+}
+@media (max-width: 780px) {
+  html:not(.js) body:has(#brand) .nav {
+    top: auto;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    justify-content: center;
+  }
+  html:not(.js) body:has(#brand) { padding-bottom: calc(var(--nav-pill-h) + 34px); }
+}
+
 @media (max-width: 460px) {
   :root { --nav-pill-h: 42px; }
   .nav { gap: .5rem; padding-inline: 10px; }
-  .nav__home { padding: 0 7px; gap: 0; }
-  .nav__word { display: none; }
   .nav__links { padding: 0 5px; }
   .nav__links a { padding: .38rem .6rem; font-size: .8125rem; }
   .nav__links .nav__cta { padding: .38rem .8rem; margin-left: 2px; }
