@@ -216,7 +216,7 @@ p:last-child { margin-bottom: 0; }
   top: clamp(10px, 1.6vw, 18px);
   left: 0; right: 0;
   z-index: 200;
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; align-items: center; justify-content: flex-end;
   gap: .75rem;
   padding-inline: clamp(12px, 3vw, 26px);
   pointer-events: none;
@@ -393,28 +393,32 @@ p:last-child { margin-bottom: 0; }
   overflow: visible;             /* the showcase peeks out of the bottom */
 }
 .hero__inner { position: relative; z-index: 2; padding-block: clamp(2.5rem, 7vw, 4.5rem) 0; text-align: center; }
-.hero__icon {
-  width: clamp(88px, 13vw, 124px); height: auto; margin: 0 auto 1.35rem;
-  border-radius: 24%; box-shadow: 0 22px 50px rgba(30, 20, 70, .38);
+
+/* ---------------- the morphing app icon
+   One element does both jobs: the big logo in the hero, and the small
+   back-to-top button pinned at the corner once you scroll. JS writes the
+   geometry in pixels each frame, so nothing swaps and nothing jumps. */
+.brand-slot { height: var(--brand-slot-h, 200px); }
+
+.brand {
+  position: fixed; top: 0; left: 0; z-index: 210;
+  display: block; width: 1px; height: 1px;   /* JS sizes and places it */
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
 }
-/* The name under the icon, same masked asset as the nav so the logo stays one
-   thing. Falls back to bold text where masks are unsupported. */
-.hero__wordmark {
-  display: block; margin: 0 auto clamp(1.4rem, 3vw, 2rem);
-  color: #fff; font-size: clamp(2rem, 7vw, 3rem); font-weight: 800;
-  letter-spacing: -.02em; line-height: 1;
+.brand:hover { text-decoration: none; }
+.brand__mark {
+  position: absolute; top: 0; left: 0;
+  max-width: none;               /* the global img rule would clamp it to the 1px parent */
+  border-radius: 24%;
+  box-shadow: 0 22px 50px rgba(30, 20, 70, .38);
+  transition: box-shadow .3s ease;
 }
 @supports ((-webkit-mask-image: url('')) or (mask-image: url(''))) {
-  .hero__wordmark {
-    width: clamp(190px, 33vw, 300px);
-    aspect-ratio: 900 / 170;
-    text-indent: -200vw; overflow: hidden; white-space: nowrap;
-    background-color: currentColor;
-    -webkit-mask: url('../img/logo/wordmark-white.png') no-repeat center / contain;
-          mask: url('../img/logo/wordmark-white.png') no-repeat center / contain;
   }
-}
-
+/* once it is the corner button it needs to read against whatever is behind */
+.brand.is-pinned .brand__mark { box-shadow: 0 2px 10px rgba(14, 16, 30, .22); }
+.brand.is-pinned 
 .hero h1 { color: #fff; margin-bottom: .5em; }
 /* the last two words carry the accent, as in the mockup */
 .hero__accent {

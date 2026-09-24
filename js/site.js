@@ -90,6 +90,55 @@
     });
   }
 
+  /* ---------------------------------------------- morphing app icon
+     One element does two jobs: the big logo in the hero, and a small
+     back-to-top button pinned at the top left once you scroll. Geometry is
+     written in pixels each frame rather than guessed in CSS, so it lands
+     correctly at any viewport width. */
+  var brand = document.getElementById('brand');
+  var slot = document.querySelector('.brand-slot');
+  if (brand && slot) {
+    var mark = brand.querySelector('.brand__mark');
+    var bTicking = false;
+
+    var paint = function () {
+      bTicking = false;
+      var vw = document.documentElement.clientWidth;
+      var big = Math.max(88, Math.min(124, vw * 0.13));
+      var small = 32;                                   // the size asked for
+      var gutter = vw < 460 ? 10 : Math.min(26, vw * 0.03);
+      var navH = parseFloat(getComputedStyle(document.documentElement)
+                   .getPropertyValue('--nav-pill-h')) || 46;
+      var navTop = Math.max(10, Math.min(18, vw * 0.016));
+
+      var travel = Math.max(window.innerHeight * 0.32, 180);
+      var p = Math.min(1, Math.max(0, window.scrollY / travel));
+      var ease = p * p * (3 - 2 * p);                   // smoothstep
+
+      var size = big + (small - big) * ease;
+      var sx = (vw - big) / 2;                          // centred in the hero
+      var sy = slot.getBoundingClientRect().top;
+      var ex = gutter;                                  // pinned top left
+      var ey = navTop + (navH - small) / 2;
+
+      brand.style.transform = 'translate(' +
+        (sx + (ex - sx) * ease).toFixed(1) + 'px,' +
+        (sy + (ey - sy) * ease).toFixed(1) + 'px)';
+      mark.style.width = size.toFixed(1) + 'px';
+      mark.style.height = size.toFixed(1) + 'px';
+      brand.classList.toggle('is-pinned', ease > 0.6);
+
+      document.documentElement.style.setProperty('--brand-slot-h', big + 'px');
+    };
+
+    var onBrand = function () {
+      if (!bTicking) { bTicking = true; window.requestAnimationFrame(paint); }
+    };
+    paint();
+    window.addEventListener('scroll', onBrand, { passive: true });
+    window.addEventListener('resize', onBrand, { passive: true });
+  }
+
   /* ---------------------------------------------- hero fan
      Drives --fan from 0 to 1 across the first screenful of scrolling, so the
      three screens swing apart as you come down the page. rAF-throttled, and

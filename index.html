@@ -13,15 +13,11 @@
 <meta property="og:image" content="img/icon/icon-512.png">
 <meta property="og:type" content="website">
 <script>document.documentElement.className += ' js';</script>
-<link rel="stylesheet" href="css/site.css?v=20260924171457">
+<link rel="stylesheet" href="css/site.css?v=20260924171840">
 </head>
 <body>
 
 <header class="nav" id="nav">
-  <a class="nav__home nav__pill" href="index.html" aria-label="InfiniTask home">
-    <img class="nav__mark" src="img/icon/apple-touch-icon.png" alt="" width="180" height="180">
-    <span class="nav__word">InfiniTask</span>
-  </a>
   <nav class="nav__links nav__pill" aria-label="Main">
     <a href="#features">Features</a>
     <a href="#pro">Pro</a>
@@ -33,10 +29,13 @@
 <main>
 
   <!-- ============================================ hero -->
-  <section class="hero">
+  <a class="brand" id="brand" href="#top" aria-label="InfiniTask, back to top">
+    <img class="brand__mark" src="img/icon/app-icon.webp" alt="" width="460" height="460">
+  </a>
+
+  <section class="hero" id="top">
     <div class="wrap hero__inner">
-      <img class="hero__icon" src="img/icon/app-icon.webp" alt="" width="460" height="460">
-      <span class="hero__wordmark">InfiniTask</span>
+      <div class="brand-slot" aria-hidden="true"></div>
       <h1>Gorgeous task management for <span class="hero__accent">everyone.</span></h1>
       <p class="hero__lede">Most task apps make you choose between beautiful and simple. InfiniTask doesn't. Every detail's been considered, every interaction smoothed &mdash; so all you have to do is open it and go.</p>
 
@@ -368,6 +367,6 @@
   </div>
 </footer>
 
-<script src="js/site.js?v=20260924171457"></script>
+<script src="js/site.js?v=20260924171840"></script>
 </body>
 </html>
