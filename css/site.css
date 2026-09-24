@@ -1003,7 +1003,13 @@ html.js .seg { display: inline-flex; }
   --at-blue-soft: #D5E8F5;
   --at-blue-soft-2: #CBE7FA;
   --at-pink-soft: #FECDDF;
-  --at-line: #EFEFF2;
+  --at-line: #EFEFF2;      /* hairlines inside the card */
+  --at-edge: #E9EBF3;      /* the division between rail and pane */
+  --at-hover: #E9EBF380;
+  --at-ring: #D3D4DA;      /* unticked checklist circle */
+  --at-raised: #FFFFFF;    /* selected segment */
+  --at-scroll: #97979766;
+  --at-shadow: 0 30px 70px rgba(19, 19, 22, .28);
 
   width: min(860px, calc(100vw - 32px));
   max-height: min(600px, calc(100vh - 48px));
@@ -1011,7 +1017,7 @@ html.js .seg { display: inline-flex; }
   border-radius: 22px;
   background: var(--at-bg);
   color: var(--at-ink);
-  box-shadow: 0 30px 70px rgba(19, 19, 22, .28);
+  box-shadow: var(--at-shadow);
 }
 .at::backdrop { background: rgba(19, 19, 22, .38); backdrop-filter: blur(3px); }
 .at[open] { display: block; }
@@ -1021,11 +1027,12 @@ html.js .seg { display: inline-flex; }
 /* ---- rail */
 .at__rail {
   background: var(--at-rail); padding: 14px 10px;
+  border-right: 1px solid var(--at-edge);
   overflow-y: auto; overscroll-behavior: contain;
-  scrollbar-width: thin; scrollbar-color: #9797974d transparent;
+  scrollbar-width: thin; scrollbar-color: var(--at-scroll) transparent;
 }
 .at__rail::-webkit-scrollbar { width: 6px; }
-.at__rail::-webkit-scrollbar-thumb { background: #97979766; border-radius: 999px; }
+.at__rail::-webkit-scrollbar-thumb { background: var(--at-scroll); border-radius: 999px; }
 .at__tab {
   display: flex; align-items: center; gap: .7rem; width: 100%;
   padding: .5rem .6rem; margin-bottom: 2px;
@@ -1034,7 +1041,7 @@ html.js .seg { display: inline-flex; }
   text-align: left;
 }
 .at__tab img { width: 34px; height: 34px; flex: none; border-radius: 9px; }
-.at__tab:hover { background: #E9EBF380; }
+.at__tab:hover { background: var(--at-hover); }
 .at__tab[aria-selected="true"] { background: var(--at-sel); }
 .at__tab:focus-visible { outline: 2px solid var(--at-blue); outline-offset: -2px; }
 
@@ -1095,13 +1102,64 @@ html.js .seg { display: inline-flex; }
 .fp__play { margin-left: auto; width: 30px; height: 30px; border-radius: 50%; background: var(--at-blue-soft-2); color: var(--at-blue); display: grid; place-items: center; flex: none; }
 .fp__play svg { width: 15px; height: 15px; }
 
-.fp__tick { width: 19px; height: 19px; border-radius: 50%; border: 1.5px solid #D3D4DA; display: grid; place-items: center; font-size: .7rem; color: transparent; flex: none; }
+.fp__tick { width: 19px; height: 19px; border-radius: 50%; border: 1.5px solid var(--at-ring); display: grid; place-items: center; font-size: .7rem; color: transparent; flex: none; }
 .fp__tick--on { background: var(--at-blue); border-color: var(--at-blue); color: #fff; }
 .fp__done { color: var(--at-muted); text-decoration: line-through; }
 
 .fp__seg { display: flex; gap: 3px; background: var(--at-pill); border-radius: 10px; padding: 3px; margin: .6rem 0; font-size: .8125rem; font-weight: 600; }
 .fp__seg span { flex: 1; text-align: center; padding: .35rem 0; border-radius: 8px; color: var(--at-muted); }
-.fp__seg .on { background: #fff; color: var(--at-ink); box-shadow: 0 1px 3px rgba(19, 19, 22, .12); }
+.fp__seg .on { background: var(--at-raised); color: var(--at-ink); box-shadow: 0 1px 3px rgba(19, 19, 22, .12); }
+
+
+/* Dark. The light values above are Craig's exact mockup colours, so these are
+   their counterparts from the site's own dark tokens: the rail recedes to
+   --app-bg, the pane sits on --card-bg, and the card lifts to --card-bg-2, the
+   same three-step stack the rest of the site uses. Coral and blue stay vivid,
+   as they do in the app. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .at {
+    --at-bg: #282B40;
+    --at-rail: #1E2030;
+    --at-sel: #2E3148;
+    --at-ink: #F0F0F5;
+    --at-close: #4E5270;
+    --at-card: #2E3148;
+    --at-card-head: #333756;
+    --at-pill: #3C4060;
+    --at-muted: #8487A8;
+    --at-blue-soft: #1A2D40;
+    --at-blue-soft-2: #1F3752;
+    --at-pink-soft: #45203A;
+    --at-line: #383B54;
+    --at-edge: #383B54;
+    --at-hover: #2E314880;
+    --at-ring: #4A4E68;
+    --at-raised: #4A4E68;
+    --at-scroll: #8487A866;
+    --at-shadow: 0 30px 70px rgba(0, 0, 0, .55);
+  }
+}
+:root[data-theme='dark'] .at {
+  --at-bg: #282B40;
+  --at-rail: #1E2030;
+  --at-sel: #2E3148;
+  --at-ink: #F0F0F5;
+  --at-close: #4E5270;
+  --at-card: #2E3148;
+  --at-card-head: #333756;
+  --at-pill: #3C4060;
+  --at-muted: #8487A8;
+  --at-blue-soft: #1A2D40;
+  --at-blue-soft-2: #1F3752;
+  --at-pink-soft: #45203A;
+  --at-line: #383B54;
+  --at-edge: #383B54;
+  --at-hover: #2E314880;
+  --at-ring: #4A4E68;
+  --at-raised: #4A4E68;
+  --at-scroll: #8487A866;
+  --at-shadow: 0 30px 70px rgba(0, 0, 0, .55);
+}
 
 /* ---- the grid tiles that open it */
 .addthings__tile {
