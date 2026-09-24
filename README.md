@@ -53,16 +53,76 @@ better over `http://` than `file://`.
 
 ---
 
-## Hosting
+## Hosting on GitHub Pages
 
-Any static host. Drag the whole `Website` folder onto:
+The repo is already initialised here with a first commit on `main`. Everything
+below runs from this folder.
+
+### 1. Create the repo on GitHub
+
+Make a **new, empty, public** repo called `infinitask-site` (no README, no
+.gitignore, no licence, or the first push will be rejected).
+
+> Public matters: Pages from a *private* repo needs GitHub Pro. This repo holds
+> only the marketing site, so publishing it costs you nothing. Your app source
+> stays where it is, in the separate `cphilips/InfiniTask` repo.
+
+### 2. Push it
+
+```bash
+cd "/Users/craigphilips/Documents/iPhaze/✂️ Design/App Design/InfiniTask/Website" && git remote add origin git@github.com:cphilips/infinitask-site.git && git push -u origin main
+```
+
+### 3. Turn Pages on
+
+Repo → **Settings → Pages** → Source: **Deploy from a branch** → Branch `main`,
+folder `/ (root)` → Save. First build takes a minute or two.
+
+Live at **https://cphilips.github.io/infinitask-site/**
+
+Every asset path is relative, so the site works at that subpath *and* at a root
+domain later with no edits.
+
+### 4. Later: your own domain
+
+Once you own it, two halves:
+
+**On GitHub** — Settings → Pages → Custom domain → enter it → Save. That writes
+a `CNAME` file into the repo, so `git pull` afterwards. Tick **Enforce HTTPS**
+once the certificate is issued (can take up to an hour).
+
+**At your registrar** — for an apex domain like `infinitask.app`, four A records:
+
+```
+185.199.108.153
+185.199.109.153
+185.199.110.153
+185.199.111.153
+```
+
+For `www.` instead, a single CNAME record pointing at `cphilips.github.io`.
+
+Then update the App Store Connect Support and Privacy URLs to the new domain.
+
+### Updating the site afterwards
+
+```bash
+cd "/Users/craigphilips/Documents/iPhaze/✂️ Design/App Design/InfiniTask/Website" && git add -A && git commit -m "Update site" && git push
+```
+
+Pages redeploys on every push to `main`.
+
+---
+
+## Hosting elsewhere
+
+Any static host works. Drag this whole folder onto:
 
 - **Netlify** — drop it at <https://app.netlify.com/drop>, done in seconds
 - **Cloudflare Pages** — free, fast, custom domain included
-- **GitHub Pages** — free if the repo is public
 - **Vercel** — `vercel deploy` from this folder
 
-Apple needs both of these to be live, public URLs before you submit:
+Apple needs both of these live and public before you submit:
 
 | App Store Connect field | Page |
 |---|---|
@@ -71,10 +131,6 @@ Apple needs both of these to be live, public URLs before you submit:
 
 A broken Support URL is the single most common App Store rejection, so click
 both once they are live.
-
-> **Note on this folder's path.** It contains an emoji and spaces, which is
-> fine for drag-and-drop hosting and for the local preview. If you ever want
-> git-based deploys or CI, copy the folder somewhere with a plainer path first.
 
 ---
 
