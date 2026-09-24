@@ -54,8 +54,14 @@ better over `http://` than `file://`.
    [Buttondown](https://buttondown.email) both work with no backend. Left
    empty, the form falls back to opening the visitor's email app, so the page
    is never broken.
-3. **Swap the launch CTA.** When the app ships, replace the "Coming soon"
-   badge and button in `index.html` with a real App Store link.
+3. **Swap the launch CTAs.** When the app ships, three things point at the
+   `#get` section instead of the App Store, because there is nothing to link
+   to yet:
+   - the **Get** button in the nav — `nav__cta` in all three pages
+   - the hero's "Coming soon to the App Store" button in `index.html`
+   - the **Coming soon** badge on the platform card in `index.html`
+
+   Replace all three with your real `https://apps.apple.com/...` URL.
 4. **Check the date** at the top of `privacy.html` still reflects the last
    real change.
 
