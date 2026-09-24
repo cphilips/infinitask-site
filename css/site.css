@@ -374,6 +374,82 @@ body.has-bottom-nav {
   .nav__links .nav__cta { padding: .38rem .8rem; margin-left: 2px; }
 }
 
+/* -------------------------------------------------- scroll veil
+   The iOS scroll edge effect: content passing under the pinned icon and the
+   links pill blurs and fades away instead of colliding with them.
+
+   Six stacked layers, each blurred a little harder and masked to a band a
+   little higher up. That is the only way to fake a progressive blur in CSS:
+   one backdrop-filter can do exactly one radius, and masking a single layer
+   just cuts the blur off with a visible edge. Because the layers are siblings
+   in one stacking context, each one samples the blurred output of the ones
+   below it, so the blur accumulates towards the top.
+
+   ============ EVERY KNOB IS IN THIS BLOCK ============
+   Nothing below it needs touching to retune the effect. Add ?tune to the URL
+   for live sliders. */
+@property --veil-scrim {
+  syntax: '<color>'; inherits: true; initial-value: #E8EBF2;
+}
+:root {
+  --veil-h: 140px;             /* how far down the page the effect reaches */
+  --veil-blur: 16px;           /* blur at the very top edge, in effect */
+  --veil-scrim-alpha: .72;     /* how solid the fade is at the top edge, 0-1 */
+  --veil-scrim-stop: 46%;      /* how far down the fade has gone completely */
+  --veil-start: 40px;          /* scroll position where it starts to appear */
+  --veil-ramp: 170px;          /* further scrolling until it is fully on */
+
+  --veil-scrim: var(--app-bg); /* what content fades towards. JS retargets this
+                                  per section, see data-veil in the markup. */
+  --veil: 0;                   /* 0-1 fade, written by JS. Not for hand-editing. */
+}
+
+.veil {
+  position: fixed; inset: 0 0 auto 0;
+  height: var(--veil-h);
+  z-index: 190;                /* under the pill (200) and the icon (210), so
+                                  both stay crisp on top of the blur */
+  pointer-events: none;
+  opacity: var(--veil);
+  display: none;               /* six backdrop-filters are not free. JS only
+                                  switches them on once they are needed. */
+}
+.veil.is-on { display: block; }
+
+.veil > i { position: absolute; inset: 0; display: block; }
+
+/* Layer blur. Gaussian blurs compose as the root of the sum of squares, so six
+   equal layers read as about 2.45x one of them. Dividing by that keeps
+   --veil-blur meaning roughly what it says at the top edge. */
+.veil > i {
+  -webkit-backdrop-filter: blur(calc(var(--veil-blur) / 2.45));
+          backdrop-filter: blur(calc(var(--veil-blur) / 2.45));
+}
+
+/* Each mask starts hard at the top and dissolves lower down. The overlap
+   between them is what stops you seeing six separate bands. */
+.veil > i:nth-child(1) { -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 60%, transparent 100%); mask-image: linear-gradient(to bottom, #000 0%, #000 60%, transparent 100%); }
+.veil > i:nth-child(2) { -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 48%, transparent  84%); mask-image: linear-gradient(to bottom, #000 0%, #000 48%, transparent  84%); }
+.veil > i:nth-child(3) { -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 36%, transparent  68%); mask-image: linear-gradient(to bottom, #000 0%, #000 36%, transparent  68%); }
+.veil > i:nth-child(4) { -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 24%, transparent  52%); mask-image: linear-gradient(to bottom, #000 0%, #000 24%, transparent  52%); }
+.veil > i:nth-child(5) { -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 12%, transparent  36%); mask-image: linear-gradient(to bottom, #000 0%, #000 12%, transparent  36%); }
+.veil > i:nth-child(6) { -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000  0%, transparent  20%); mask-image: linear-gradient(to bottom, #000 0%, #000  0%, transparent  20%); }
+
+/* The fade itself. Painted over the blur, in the colour of whatever section is
+   currently passing underneath. */
+.veil::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(to bottom,
+    color-mix(in srgb, var(--veil-scrim) calc(var(--veil-scrim-alpha) * 100%), transparent) 0%,
+    transparent var(--veil-scrim-stop));
+  transition: background .35s ease;   /* @property is what lets this animate */
+}
+
+/* Someone who has asked for less transparency gets the fade without the blur. */
+@media (prefers-reduced-transparency: reduce) {
+  .veil > i { -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+
 /* -------------------------------------------------- buttons */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: .5rem;

@@ -134,6 +134,93 @@
     if (document.fonts && document.fonts.ready) { document.fonts.ready.then(placeNav); }
   })();
 
+  /* ---------------------------------------------- scroll veil
+     Drives the iOS-style blur and fade at the top of the page. Two jobs:
+     fade the whole effect in as you start scrolling, and keep its scrim the
+     colour of whatever section is currently passing underneath, so it does not
+     wash the dark Pro band towards the light page background.
+     Every number lives in css/site.css. This only reads them. */
+  (function () {
+    var veil = document.querySelector('.veil');
+    if (!veil) { return; }
+
+    var root = document.documentElement;
+    var knobs = { start: 40, ramp: 170, h: 140 };
+    var bands = [];
+    var vTicking = false;
+    var lastTint = null;
+    var isOn = false;
+
+    var px = function (name, fallback) {
+      var v = parseFloat(getComputedStyle(root).getPropertyValue(name));
+      return isNaN(v) ? fallback : v;
+    };
+
+    // Re-read the knobs. Called at startup, on resize, and by the tuner.
+    var measure = function () {
+      knobs.start = px('--veil-start', 40);
+      knobs.ramp = Math.max(1, px('--veil-ramp', 170));
+      knobs.h = px('--veil-h', 140);
+
+      bands = [];
+      var sections = document.querySelectorAll('main > section, main > .band');
+      for (var i = 0; i < sections.length; i++) {
+        var el = sections[i];
+        var r = el.getBoundingClientRect();
+        bands.push({
+          top: r.top + window.scrollY,
+          bottom: r.bottom + window.scrollY,
+          tint: el.getAttribute('data-veil')
+        });
+      }
+    };
+
+    var paintVeil = function () {
+      vTicking = false;
+      var y = window.scrollY;
+
+      var p = Math.min(1, Math.max(0, (y - knobs.start) / knobs.ramp));
+      var ease = p * p * (3 - 2 * p);                  // smoothstep, as the icon uses
+
+      if ((ease > 0) !== isOn) {
+        isOn = ease > 0;
+        veil.classList.toggle('is-on', isOn);
+      }
+      root.style.setProperty('--veil', ease.toFixed(3));
+      if (!isOn) { return; }
+
+      // Which section is under the middle of the strip right now?
+      var probe = y + knobs.h * 0.5;
+      var tint = null;
+      for (var i = 0; i < bands.length; i++) {
+        if (probe >= bands[i].top && probe < bands[i].bottom) { tint = bands[i].tint; break; }
+      }
+      if (tint !== lastTint) {
+        lastTint = tint;
+        // Clearing it falls back to the stylesheet's var(--app-bg), which is
+        // what keeps the default following light and dark on its own.
+        if (tint) { root.style.setProperty('--veil-scrim', tint); }
+        else { root.style.removeProperty('--veil-scrim'); }
+      }
+    };
+
+    var onVeil = function () {
+      if (!vTicking) { vTicking = true; window.requestAnimationFrame(paintVeil); }
+    };
+
+    measure();
+    paintVeil();
+    window.addEventListener('scroll', onVeil, { passive: true });
+    window.addEventListener('resize', function () { measure(); onVeil(); }, { passive: true });
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function () { measure(); onVeil(); });
+    }
+    window.addEventListener('load', function () { measure(); onVeil(); });
+
+    // Expose just enough for the tuner below to re-read after it changes a knob.
+    window.__veil = { measure: measure, repaint: paintVeil };
+  })();
+
   /* ---------------------------------------------- morphing app icon
      One element does two jobs: the big logo in the hero, and a small
      back-to-top button pinned at the top left once you scroll. Geometry is
@@ -264,4 +351,106 @@
       if (empty) { empty.hidden = hits !== 0; }
     });
   }
+
+  /* ---------------------------------------------- veil tuner
+     Add ?tune to any URL to get live sliders for the scroll veil. Never loads
+     otherwise, so it costs visitors nothing and there is nothing to strip out
+     before shipping. When it looks right, hit Copy and paste the block over
+     the :root knobs in css/site.css. */
+  if (/[?&]tune\b/.test(location.search) && document.querySelector('.veil')) {
+    var KNOBS = [
+      { p: '--veil-h',            label: 'Height',       min: 40,  max: 340, step: 2,   unit: 'px' },
+      { p: '--veil-blur',         label: 'Blur',         min: 0,   max: 48,  step: 1,   unit: 'px' },
+      { p: '--veil-scrim-alpha',  label: 'Fade',         min: 0,   max: 1,   step: .02, unit: ''   },
+      { p: '--veil-scrim-stop',   label: 'Fade depth',   min: 5,   max: 100, step: 1,   unit: '%'  },
+      { p: '--veil-start',        label: 'Starts at',    min: 0,   max: 400, step: 5,   unit: 'px' },
+      { p: '--veil-ramp',         label: 'Ramp',         min: 20,  max: 600, step: 10,  unit: 'px' }
+    ];
+    var rootEl = document.documentElement;
+
+    var panel = document.createElement('div');
+    panel.id = 'veil-tuner';
+    panel.innerHTML = '<h6>Scroll veil</h6><div class="vt-rows"></div>' +
+      '<div class="vt-foot"><button type="button" class="vt-copy">Copy CSS</button>' +
+      '<button type="button" class="vt-reset">Reset</button></div>' +
+      '<pre class="vt-out"></pre>';
+
+    var css = document.createElement('style');
+    css.textContent =
+      '#veil-tuner{position:fixed;right:14px;bottom:14px;z-index:9999;width:250px;' +
+      'padding:14px 16px 12px;border-radius:16px;background:rgba(22,24,38,.93);' +
+      'backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);color:#fff;' +
+      'font:13px/1.35 ui-rounded,-apple-system,sans-serif;box-shadow:0 12px 40px rgba(0,0,0,.4)}' +
+      '#veil-tuner h6{margin:0 0 10px;font-size:11px;letter-spacing:.5px;text-transform:uppercase;' +
+      'opacity:.6;font-weight:700;color:#fff}' +
+      '#veil-tuner label{display:block;margin-bottom:9px}' +
+      '#veil-tuner .vt-k{display:flex;justify-content:space-between;font-size:11px;opacity:.75;margin-bottom:3px}' +
+      '#veil-tuner input{width:100%;accent-color:#9A61ED;margin:0}' +
+      '#veil-tuner .vt-foot{display:flex;gap:6px;margin-top:4px}' +
+      '#veil-tuner button{flex:1;border:0;border-radius:9px;padding:7px 0;font:600 12px ui-rounded,sans-serif;' +
+      'background:rgba(255,255,255,.14);color:#fff;cursor:pointer}' +
+      '#veil-tuner button:hover{background:rgba(255,255,255,.24)}' +
+      '#veil-tuner .vt-out{margin:9px 0 0;padding:8px;border-radius:9px;background:rgba(0,0,0,.35);' +
+      'font:11px/1.5 ui-monospace,monospace;white-space:pre-wrap;max-height:140px;overflow:auto;display:none}';
+    document.head.appendChild(css);
+
+    var initial = {};
+    var rows = panel.querySelector('.vt-rows');
+
+    var read = function (p) {
+      return parseFloat(getComputedStyle(rootEl).getPropertyValue(p));
+    };
+    var cssText = function () {
+      return KNOBS.map(function (k) {
+        return '  ' + k.p + ': ' + (k.el.value + k.unit) + ';';
+      }).join('\n');
+    };
+    var show = function () {
+      var out = panel.querySelector('.vt-out');
+      out.style.display = 'block';
+      out.textContent = cssText();
+    };
+
+    KNOBS.forEach(function (k) {
+      initial[k.p] = read(k.p);
+      var wrap = document.createElement('label');
+      wrap.innerHTML = '<span class="vt-k"><span>' + k.label + '</span><b></b></span>';
+      var input = document.createElement('input');
+      input.type = 'range';
+      input.min = k.min; input.max = k.max; input.step = k.step;
+      input.value = initial[k.p];
+      wrap.appendChild(input);
+      rows.appendChild(wrap);
+      k.el = input;
+      k.out = wrap.querySelector('b');
+      k.out.textContent = input.value + k.unit;
+
+      input.addEventListener('input', function () {
+        k.out.textContent = input.value + k.unit;
+        rootEl.style.setProperty(k.p, input.value + k.unit);
+        if (window.__veil) { window.__veil.measure(); window.__veil.repaint(); }
+        if (panel.querySelector('.vt-out').style.display === 'block') { show(); }
+      });
+    });
+
+    panel.querySelector('.vt-copy').addEventListener('click', function () {
+      show();
+      if (navigator.clipboard) { navigator.clipboard.writeText(cssText()); }
+      var b = panel.querySelector('.vt-copy');
+      b.textContent = 'Copied';
+      setTimeout(function () { b.textContent = 'Copy CSS'; }, 1200);
+    });
+    panel.querySelector('.vt-reset').addEventListener('click', function () {
+      KNOBS.forEach(function (k) {
+        rootEl.style.removeProperty(k.p);
+        k.el.value = initial[k.p];
+        k.out.textContent = k.el.value + k.unit;
+      });
+      if (window.__veil) { window.__veil.measure(); window.__veil.repaint(); }
+      panel.querySelector('.vt-out').style.display = 'none';
+    });
+
+    document.body.appendChild(panel);
+  }
+
 }());
