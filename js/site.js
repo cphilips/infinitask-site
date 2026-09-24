@@ -436,6 +436,78 @@
     window.__read = { measure: measure, repaint: paintRead };
   })();
 
+  /* ---------------------------------------------- Add Things modal
+     Tapping a tile in the Add Things grid opens the explainer at that feature.
+     A native <dialog> does the heavy lifting: Esc, focus trapping and the
+     backdrop are the platform's job, not ours. The rail is a real tab list, so
+     arrow keys move between features the way a tab list is supposed to. */
+  (function () {
+    var dlg = document.getElementById('addThings');
+    if (!dlg || typeof dlg.showModal !== 'function') { return; }
+
+    var tabs = [].slice.call(dlg.querySelectorAll('.at__tab'));
+    var rail = dlg.querySelector('.at__rail');
+    var pane = dlg.querySelector('.at__pane');
+    var opener = null;
+
+    var select = function (key, moveFocus) {
+      tabs.forEach(function (tab) {
+        var on = tab.dataset.thing === key || tab.getAttribute('data-key') === key;
+        tab.setAttribute('aria-selected', on ? 'true' : 'false');
+        tab.tabIndex = on ? 0 : -1;
+        document.getElementById(tab.getAttribute('aria-controls')).hidden = !on;
+        if (on) {
+          if (moveFocus) { tab.focus(); }
+          // Keep the chosen feature in view when it is far down the rail.
+          if (tab.offsetTop < rail.scrollTop ||
+              tab.offsetTop + tab.offsetHeight > rail.scrollTop + rail.clientHeight) {
+            rail.scrollTop = tab.offsetTop - rail.clientHeight / 2 + tab.offsetHeight / 2;
+          }
+          pane.scrollTop = 0;
+        }
+      });
+    };
+
+    var open = function (key, from) {
+      opener = from || null;
+      select(key || tabs[0].getAttribute('data-key'), false);
+      dlg.showModal();
+    };
+
+    document.addEventListener('click', function (e) {
+      var tile = e.target.closest('.addthings__tile');
+      if (tile) { e.preventDefault(); open(tile.getAttribute('data-thing'), tile); }
+    });
+
+    dlg.addEventListener('click', function (e) {
+      if (e.target.closest('.at__close')) { dlg.close(); return; }
+      var tab = e.target.closest('.at__tab');
+      if (tab) { select(tab.getAttribute('data-key'), false); return; }
+      // Clicking the backdrop: the dialog element itself fills the whole
+      // viewport, so a hit on it rather than on .at__inner is outside the card.
+      if (e.target === dlg) { dlg.close(); }
+    });
+
+    rail.addEventListener('keydown', function (e) {
+      var i = tabs.indexOf(document.activeElement);
+      if (i < 0) { return; }
+      var next = null;
+      if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { next = (i + 1) % tabs.length; }
+      else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { next = (i - 1 + tabs.length) % tabs.length; }
+      else if (e.key === 'Home') { next = 0; }
+      else if (e.key === 'End') { next = tabs.length - 1; }
+      if (next === null) { return; }
+      e.preventDefault();
+      select(tabs[next].getAttribute('data-key'), true);
+    });
+
+    // Put focus back where it came from, or the tile is lost behind you.
+    dlg.addEventListener('close', function () {
+      if (opener && document.contains(opener)) { opener.focus(); }
+      opener = null;
+    });
+  })();
+
   /* ---------------------------------------------- veil tuner
      Add ?tune to any URL to get live sliders for the scroll veil. Never loads
      otherwise, so it costs visitors nothing and there is nothing to strip out

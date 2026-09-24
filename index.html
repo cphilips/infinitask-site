@@ -13,7 +13,7 @@
 <meta property="og:image" content="img/icon/icon-512.png">
 <meta property="og:type" content="website">
 <script>document.documentElement.className += ' js';</script>
-<link rel="stylesheet" href="css/site.css?v=20260924181609">
+<link rel="stylesheet" href="css/site.css?v=20260924215943">
 </head>
 <body>
 
@@ -98,7 +98,7 @@
   <!-- ============================================ thesis -->
   <section class="band">
     <div class="wrap wrap--reading center reveal">
-      <p class="section-label">Meticulous design, for everyone</p>
+      <p class="section-label">The whole point</p>
       <h2>Meticulously crafted to let you just get things done.</h2>
       <p class="lede">The whole core app is free. Properly free, not a demo. Pro is a few crafted extras for the people who fancy them, never a gate.</p>
     </div>
@@ -116,16 +116,16 @@
         <div class="addthings">
           <p class="section-label addthings__label">Add Things</p>
           <ul class="addthings__grid">
-            <li><img src="img/art/feat-due.webp" alt="" width="224" height="224" loading="lazy"><span>Due Date</span></li>
-            <li><img src="img/art/feat-files.webp" alt="" width="224" height="224" loading="lazy"><span>Attachments</span></li>
-            <li><img src="img/art/feat-location.webp" alt="" width="224" height="224" loading="lazy"><span>Location</span></li>
-            <li><img src="img/art/feat-url.webp" alt="" width="224" height="224" loading="lazy"><span>Website</span></li>
-            <li><img src="img/art/feat-timeframe.webp" alt="" width="224" height="224" loading="lazy"><span>Timeframe</span></li>
-            <li><img src="img/art/feat-reminder.webp" alt="" width="224" height="224" loading="lazy"><span>Reminder</span></li>
-            <li><img src="img/art/feat-timer.webp" alt="" width="224" height="224" loading="lazy"><span>Timer</span></li>
-            <li><img src="img/art/feat-checklist.webp" alt="" width="224" height="224" loading="lazy"><span>Checklist</span></li>
-            <li><img src="img/art/feat-linknote.webp" alt="" width="224" height="224" loading="lazy"><span>Link Note</span></li>
-            <li><img src="img/art/feat-importance.webp" alt="" width="224" height="224" loading="lazy"><span>Importance</span></li>
+            <li><button type="button" class="addthings__tile" data-thing="due"><img src="img/art/feat-due.webp" alt="" width="224" height="224" loading="lazy"><span>Due Date</span></button></li>
+            <li><button type="button" class="addthings__tile" data-thing="files"><img src="img/art/feat-files.webp" alt="" width="224" height="224" loading="lazy"><span>Attachments</span></button></li>
+            <li><button type="button" class="addthings__tile" data-thing="location"><img src="img/art/feat-location.webp" alt="" width="224" height="224" loading="lazy"><span>Location</span></button></li>
+            <li><button type="button" class="addthings__tile" data-thing="website"><img src="img/art/feat-url.webp" alt="" width="224" height="224" loading="lazy"><span>Website</span></button></li>
+            <li><button type="button" class="addthings__tile" data-thing="timeframe"><img src="img/art/feat-timeframe.webp" alt="" width="224" height="224" loading="lazy"><span>Timeframe</span></button></li>
+            <li><button type="button" class="addthings__tile" data-thing="reminder"><img src="img/art/feat-reminder.webp" alt="" width="224" height="224" loading="lazy"><span>Reminder</span></button></li>
+            <li><button type="button" class="addthings__tile" data-thing="timer"><img src="img/art/feat-timer.webp" alt="" width="224" height="224" loading="lazy"><span>Timer</span></button></li>
+            <li><button type="button" class="addthings__tile" data-thing="checklist"><img src="img/art/feat-checklist.webp" alt="" width="224" height="224" loading="lazy"><span>Checklist</span></button></li>
+            <li><button type="button" class="addthings__tile" data-thing="linknote"><img src="img/art/feat-linknote.webp" alt="" width="224" height="224" loading="lazy"><span>Link Note</span></button></li>
+            <li><button type="button" class="addthings__tile" data-thing="importance"><img src="img/art/feat-importance.webp" alt="" width="224" height="224" loading="lazy"><span>Importance</span></button></li>
           </ul>
         </div>
 
@@ -370,6 +370,117 @@
   </div>
 </footer>
 
-<script src="js/site.js?v=20260924181609"></script>
+<dialog class="at" id="addThings" aria-labelledby="at-heading">
+  <h2 class="visually-hidden" id="at-heading">What you can add to a Task</h2>
+  <button class="at__close" type="button" aria-label="Close"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+  <div class="at__inner">
+    <div class="at__rail" role="tablist" aria-label="Things you can add">
+        <button class="at__tab" role="tab" id="at-tab-due" aria-controls="at-panel-due" aria-selected="true" tabindex="0" data-key="due"><img src="img/art/feat-due.webp" alt="" width="224" height="224" loading="lazy"><span>Due Date</span></button>
+        <button class="at__tab" role="tab" id="at-tab-files" aria-controls="at-panel-files" aria-selected="false" tabindex="-1" data-key="files"><img src="img/art/feat-files.webp" alt="" width="224" height="224" loading="lazy"><span>Attachments</span></button>
+        <button class="at__tab" role="tab" id="at-tab-location" aria-controls="at-panel-location" aria-selected="false" tabindex="-1" data-key="location"><img src="img/art/feat-location.webp" alt="" width="224" height="224" loading="lazy"><span>Location</span></button>
+        <button class="at__tab" role="tab" id="at-tab-website" aria-controls="at-panel-website" aria-selected="false" tabindex="-1" data-key="website"><img src="img/art/feat-url.webp" alt="" width="224" height="224" loading="lazy"><span>Website</span></button>
+        <button class="at__tab" role="tab" id="at-tab-timeframe" aria-controls="at-panel-timeframe" aria-selected="false" tabindex="-1" data-key="timeframe"><img src="img/art/feat-timeframe.webp" alt="" width="224" height="224" loading="lazy"><span>Timeframe</span></button>
+        <button class="at__tab" role="tab" id="at-tab-reminder" aria-controls="at-panel-reminder" aria-selected="false" tabindex="-1" data-key="reminder"><img src="img/art/feat-reminder.webp" alt="" width="224" height="224" loading="lazy"><span>Reminder</span></button>
+        <button class="at__tab" role="tab" id="at-tab-timer" aria-controls="at-panel-timer" aria-selected="false" tabindex="-1" data-key="timer"><img src="img/art/feat-timer.webp" alt="" width="224" height="224" loading="lazy"><span>Timer</span></button>
+        <button class="at__tab" role="tab" id="at-tab-checklist" aria-controls="at-panel-checklist" aria-selected="false" tabindex="-1" data-key="checklist"><img src="img/art/feat-checklist.webp" alt="" width="224" height="224" loading="lazy"><span>Checklist</span></button>
+        <button class="at__tab" role="tab" id="at-tab-linknote" aria-controls="at-panel-linknote" aria-selected="false" tabindex="-1" data-key="linknote"><img src="img/art/feat-linknote.webp" alt="" width="224" height="224" loading="lazy"><span>Link Note</span></button>
+        <button class="at__tab" role="tab" id="at-tab-importance" aria-controls="at-panel-importance" aria-selected="false" tabindex="-1" data-key="importance"><img src="img/art/feat-importance.webp" alt="" width="224" height="224" loading="lazy"><span>Importance</span></button>
+    </div>
+    <div class="at__pane">
+        <div class="at__panel" role="tabpanel" id="at-panel-due" aria-labelledby="at-tab-due">
+          <h3 class="at__title">Due Date</h3>
+          <div class="fp">
+            <div class="fp__head"><img src="img/art/feat-due.webp" alt="" width="224" height="224" loading="lazy"><span class="fp__name">DUE DATE</span><span class="fp__remove">Remove</span></div>
+            <div class="fp__body"><div class="fp__row"><span class="fp__lab">Date</span><span class="fp__pill">23 Jun 2026</span><span class="fp__pill">09:00</span><span class="fp__warn"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.6 15 14H1z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 6v3.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11.6" r=".9" fill="currentColor"/></svg>Overdue</span></div></div>
+          </div>
+          <p>Pin a Task to a day, and to a time if the time matters. Today shows you what is due, and anything that slips turns Overdue so it cannot quietly disappear.</p>
+          <p>Leave the time off and it stays a day rather than a deadline.</p>
+        </div>
+        <div class="at__panel" role="tabpanel" id="at-panel-files" aria-labelledby="at-tab-files" hidden>
+          <h3 class="at__title">Attachments</h3>
+          <div class="fp">
+            <div class="fp__head"><img src="img/art/feat-files.webp" alt="" width="224" height="224" loading="lazy"><span class="fp__name">ATTACHMENTS</span><span class="fp__remove">Remove all</span></div>
+            <div class="fp__body"><div class="fp__row fp__row--file"><span class="fp__thumb fp__thumb--a"></span><span class="fp__meta"><b>Photo</b><i>2.2 MB</i></span><span class="fp__btn">View</span><span class="fp__minus">&minus;</span></div><div class="fp__row fp__row--file"><span class="fp__thumb fp__thumb--b"></span><span class="fp__meta"><b>Scan.pdf</b><i>480 KB</i></span><span class="fp__btn">View</span><span class="fp__minus">&minus;</span></div><div class="fp__row fp__add"><span class="fp__plus">+</span>Add File</div></div>
+          </div>
+          <p>Photos, PDFs and whatever else the Task needs to carry. Attach from your library, from Files, or straight from the camera.</p>
+          <p>Every attachment is copied into the app on your device. Nothing is uploaded, because there is nowhere to upload it to.</p>
+        </div>
+        <div class="at__panel" role="tabpanel" id="at-panel-location" aria-labelledby="at-tab-location" hidden>
+          <h3 class="at__title">Location</h3>
+          <div class="fp">
+            <div class="fp__head"><img src="img/art/feat-location.webp" alt="" width="224" height="224" loading="lazy"><span class="fp__name">LOCATION</span><span class="fp__remove">Remove</span></div>
+            <div class="fp__body"><div class="fp__row fp__row--stack"><span class="fp__meta"><b>King&rsquo;s Cross Station</b><i>Euston Rd, London N1 9AL</i></span></div></div>
+          </div>
+          <p>Where the Task actually happens. Start typing and Apple Maps suggests matching places, or type the address yourself and skip the search entirely.</p>
+          <p>InfiniTask never asks for your location. The search is what you typed, nothing more.</p>
+        </div>
+        <div class="at__panel" role="tabpanel" id="at-panel-website" aria-labelledby="at-tab-website" hidden>
+          <h3 class="at__title">Website</h3>
+          <div class="fp">
+            <div class="fp__head"><img src="img/art/feat-url.webp" alt="" width="224" height="224" loading="lazy"><span class="fp__name">WEBSITES</span><span class="fp__remove">Remove</span></div>
+            <div class="fp__body"><div class="fp__row fp__row--stack"><span class="fp__meta"><b>Tickets and travel</b><i>nationalrail.co.uk</i></span></div><div class="fp__row fp__add"><span class="fp__plus">+</span>Add Website</div></div>
+          </div>
+          <p>Keep the link with the Task instead of hunting for it again later. Paste a URL and your phone reads the page title once, so the link arrives properly labelled rather than as a wall of address.</p>
+          <p>Type your own title instead and no request is made at all.</p>
+        </div>
+        <div class="at__panel" role="tabpanel" id="at-panel-timeframe" aria-labelledby="at-tab-timeframe" hidden>
+          <h3 class="at__title">Timeframe</h3>
+          <div class="fp">
+            <div class="fp__head"><img src="img/art/feat-timeframe.webp" alt="" width="224" height="224" loading="lazy"><span class="fp__name">TIMEFRAME</span><span class="fp__remove">Remove</span></div>
+            <div class="fp__body"><div class="fp__row"><span class="fp__lab">Start</span><span class="fp__pill">1 Jul 2026</span></div><div class="fp__row"><span class="fp__lab">End</span><span class="fp__pill">14 Jul 2026</span></div></div>
+          </div>
+          <p>Some work is a stretch rather than a deadline. Give a Task a start and an end and it reads as a run of days, not one date you are already behind on.</p>
+          <p>Useful for the things that are genuinely in progress rather than simply late.</p>
+        </div>
+        <div class="at__panel" role="tabpanel" id="at-panel-reminder" aria-labelledby="at-tab-reminder" hidden>
+          <h3 class="at__title">Reminder</h3>
+          <div class="fp">
+            <div class="fp__head"><img src="img/art/feat-reminder.webp" alt="" width="224" height="224" loading="lazy"><span class="fp__name">REMINDER</span><span class="fp__remove">Remove</span></div>
+            <div class="fp__body"><div class="fp__row"><span class="fp__lab">Alert</span><span class="fp__pill">23 Jun 2026</span><span class="fp__pill">08:30</span></div></div>
+          </div>
+          <p>A nudge at a time you choose, kept separate from the Due Date. Something can be due Friday and worth remembering on Wednesday.</p>
+          <p>Notifications are scheduled locally on your device, so nothing about the Task has to leave your phone to make one happen.</p>
+        </div>
+        <div class="at__panel" role="tabpanel" id="at-panel-timer" aria-labelledby="at-tab-timer" hidden>
+          <h3 class="at__title">Timer</h3>
+          <div class="fp">
+            <div class="fp__head"><img src="img/art/feat-timer.webp" alt="" width="224" height="224" loading="lazy"><span class="fp__name">TIMER</span><span class="fp__remove">Remove</span></div>
+            <div class="fp__body"><div class="fp__row"><span class="fp__val">1 minute <svg viewBox="0 0 8 13" aria-hidden="true"><path d="M1.5 1.5 6 6.5l-4.5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="fp__play"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3.2 12.5 8 5 12.8z" fill="currentColor"/></svg></span></div></div>
+          </div>
+          <p>Work on one Task at a time. Set a length, press play, and the Focus Timer takes over with the rest of the app out of the way.</p>
+          <p>Start it from the Task, or from the play button on any Task card.</p>
+        </div>
+        <div class="at__panel" role="tabpanel" id="at-panel-checklist" aria-labelledby="at-tab-checklist" hidden>
+          <h3 class="at__title">Checklist</h3>
+          <div class="fp">
+            <div class="fp__head"><img src="img/art/feat-checklist.webp" alt="" width="224" height="224" loading="lazy"><span class="fp__name">CHECKLIST</span><span class="fp__remove">Remove</span></div>
+            <div class="fp__body"><div class="fp__row fp__row--tick"><span class="fp__tick fp__tick--on">&check;</span><span class="fp__done">Measure the alcove</span></div><div class="fp__row fp__row--tick"><span class="fp__tick fp__tick--on">&check;</span><span class="fp__done">Order the brackets</span></div><div class="fp__row fp__row--tick"><span class="fp__tick"></span><span>Borrow a spirit level</span></div><div class="fp__row fp__add"><span class="fp__plus">+</span>Add Item</div></div>
+          </div>
+          <p>Break a Task into steps and tick them off as you go, without turning one job into five separate Tasks.</p>
+          <p>Best for the Tasks that are really a short sequence: pack, book, confirm.</p>
+        </div>
+        <div class="at__panel" role="tabpanel" id="at-panel-linknote" aria-labelledby="at-tab-linknote" hidden>
+          <h3 class="at__title">Link Note</h3>
+          <div class="fp">
+            <div class="fp__head"><img src="img/art/feat-linknote.webp" alt="" width="224" height="224" loading="lazy"><span class="fp__name">LINKED NOTES</span><span class="fp__remove">Remove</span></div>
+            <div class="fp__body"><div class="fp__row fp__row--stack"><span class="fp__meta"><b>Kitchen shelves</b><i>Measurements, two photos, the receipt</i></span></div></div>
+          </div>
+          <p>Some Tasks need more room than a Task gives them. Link one to a Note and the writing, images, checklists and files live in your Notebook, a tap away from the Task.</p>
+          <p>The Task stays short. The thinking goes where there is space for it.</p>
+        </div>
+        <div class="at__panel" role="tabpanel" id="at-panel-importance" aria-labelledby="at-tab-importance" hidden>
+          <h3 class="at__title">Importance</h3>
+          <div class="fp">
+            <div class="fp__head"><img src="img/art/feat-importance.webp" alt="" width="224" height="224" loading="lazy"><span class="fp__name">IMPORTANCE</span><span class="fp__remove">Remove</span></div>
+            <div class="fp__body"><div class="fp__seg"><span>Low</span><span class="on">Medium</span><span>High</span></div></div>
+          </div>
+          <p>Low, Medium or High, each with a colour of its own. The Tasks that matter look like they matter, from across the screen, without opening anything.</p>
+          <p>Leave it off entirely and the Task carries no flag at all.</p>
+        </div>
+    </div>
+  </div>
+</dialog>
+
+<script src="js/site.js?v=20260924215943"></script>
 </body>
 </html>
