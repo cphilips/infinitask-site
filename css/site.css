@@ -376,46 +376,127 @@ p:last-child { margin-bottom: 0; }
 /* -------------------------------------------------- hero */
 .hero {
   position: relative;
-  background: linear-gradient(150deg, var(--purple) 0%, #7B6BEF 45%, var(--blue) 100%);
+  background:
+    radial-gradient(120% 90% at 78% 8%, rgba(255,255,255,.22), transparent 55%),
+    radial-gradient(90% 70% at 12% 92%, rgba(255,120,220,.20), transparent 60%),
+    linear-gradient(152deg, var(--purple) 0%, #7B6BEF 44%, var(--blue) 100%);
   color: #fff;
-  padding-top: calc(var(--nav-h) + 12px);   /* clear the floating nav */
-  overflow: hidden;
+  padding-top: calc(var(--nav-h) + 12px);
+  overflow: visible;             /* the showcase peeks out of the bottom */
 }
-.hero::after {               /* soft base so the device art can break out */
-  content: ''; position: absolute; inset: auto 0 0 0; height: 46%;
-  background: linear-gradient(to bottom, transparent, var(--app-bg));
-  pointer-events: none;
-}
-.hero__inner { position: relative; z-index: 1; padding-block: clamp(3rem, 8vw, 5.5rem) 0; text-align: center; }
+.hero__inner { position: relative; z-index: 2; padding-block: clamp(2.5rem, 7vw, 4.5rem) 0; text-align: center; }
 .hero__icon {
-  width: clamp(104px, 16vw, 148px); height: auto; margin: 0 auto 1.5rem;
+  width: clamp(88px, 13vw, 124px); height: auto; margin: 0 auto 1.35rem;
   border-radius: 24%; box-shadow: 0 22px 50px rgba(30, 20, 70, .38);
 }
-
-/* The name under the icon, same masked artwork as the nav so it stays one
-   consistent logo. Falls back to bold text where masks are unsupported. */
+/* The name under the icon, same masked asset as the nav so the logo stays one
+   thing. Falls back to bold text where masks are unsupported. */
 .hero__wordmark {
-  display: block; margin: 0 auto clamp(1.5rem, 3vw, 2.1rem);
+  display: block; margin: 0 auto clamp(1.4rem, 3vw, 2rem);
   color: #fff; font-size: clamp(2rem, 7vw, 3rem); font-weight: 800;
   letter-spacing: -.02em; line-height: 1;
 }
 @supports ((-webkit-mask-image: url('')) or (mask-image: url(''))) {
   .hero__wordmark {
-    width: clamp(210px, 36vw, 320px);
-    aspect-ratio: 900 / 170;          /* the asset's own proportions */
+    width: clamp(190px, 33vw, 300px);
+    aspect-ratio: 900 / 170;
     text-indent: -200vw; overflow: hidden; white-space: nowrap;
     background-color: currentColor;
     -webkit-mask: url('../img/logo/wordmark-white.png') no-repeat center / contain;
-    mask: url('../img/logo/wordmark-white.png') no-repeat center / contain;
+          mask: url('../img/logo/wordmark-white.png') no-repeat center / contain;
   }
 }
-.hero h1 { color: #fff; margin-bottom: .45em; }
-.hero__lede {
-  max-width: 34ch; margin: 0 auto 2rem;
-  font-size: clamp(1.05rem, 2.2vw, 1.3rem); line-height: 1.5;
-  color: rgba(255, 255, 255, .92);
+
+.hero h1 { color: #fff; margin-bottom: .5em; }
+/* the last two words carry the accent, as in the mockup */
+.hero__accent {
+  background: linear-gradient(100deg, #E5C9FF 0%, #FF9AD5 55%, #FF7ABF 100%);
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent;
 }
-.hero__device { margin-top: clamp(2.5rem, 6vw, 4rem); }
+.hero__lede {
+  max-width: 36ch; margin: 0 auto 2rem;
+  font-size: clamp(1.02rem, 2.1vw, 1.22rem); line-height: 1.55;
+  color: rgba(255, 255, 255, .9);
+}
+
+/* ---------------- CTA: Apple mark, label, chevron */
+.cta {
+  display: inline-flex; align-items: center; gap: .7rem;
+  padding: .95rem 1.5rem .95rem 1.4rem;
+  border-radius: 999px;
+  background: #fff; color: var(--purple-dark);
+  font-weight: 700; font-size: clamp(1rem, 1.7vw, 1.08rem);
+  text-decoration: none;
+  box-shadow: 0 2px 6px rgba(26, 12, 64, .16), 0 12px 30px rgba(26, 12, 64, .22);
+  transition: transform .2s cubic-bezier(.2,.7,.3,1), box-shadow .2s ease;
+}
+.cta:hover {
+  text-decoration: none; transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(26, 12, 64, .18), 0 18px 42px rgba(26, 12, 64, .3);
+}
+.cta:active { transform: translateY(0) scale(.99); }
+.cta__apple { width: 17px; height: 21px; flex: none; }
+.cta__chev  { width: 9px;  height: 15px; flex: none; opacity: .55; transition: transform .2s ease; }
+.cta:hover .cta__chev { transform: translateX(3px); }
+
+/* ---------------- four pillars */
+.pillars {
+  list-style: none; margin: clamp(2.25rem, 5vw, 3.25rem) auto 0; padding: 0;
+  display: grid; gap: clamp(.6rem, 1.6vw, 1.1rem);
+  grid-template-columns: repeat(4, 1fr);
+  max-width: 660px;
+}
+.pillar { display: flex; flex-direction: column; align-items: center; gap: .7rem; }
+.pillar__icon {
+  display: grid; place-items: center;
+  width: clamp(52px, 8vw, 62px); aspect-ratio: 1;
+  border-radius: 30%;
+  color: #fff;
+  background: linear-gradient(to bottom, rgba(255,255,255,.26), rgba(255,255,255,.12));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .5),
+    inset 0 0 18px rgba(255, 255, 255, .1),
+    0 4px 14px rgba(26, 12, 64, .16);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.pillar__icon svg { width: 52%; height: 52%; }
+.pillar__label {
+  font-size: clamp(.8125rem, 1.5vw, .9375rem); font-weight: 600; line-height: 1.25;
+  color: rgba(255, 255, 255, .95);
+}
+
+/* The showcase hangs into the band below, so that band needs clearance or the
+   device sits on top of its heading. */
+.hero + .band { padding-top: clamp(190px, 26vw, 300px); }
+
+/* ---------------- the showcase device, angled, breaking into the next band */
+.hero__showcase {
+  position: relative; z-index: 2;
+  margin-top: clamp(2.5rem, 6vw, 4rem);
+  margin-bottom: clamp(-230px, -22vw, -120px);   /* peek into the section below */
+  perspective: 1600px;
+  display: flex; justify-content: center;
+  pointer-events: none;
+}
+.device--hero {
+  width: clamp(230px, 46vw, 340px);
+  transform: rotateX(7deg) rotateY(-15deg) rotate(2.5deg);
+  transform-origin: 50% 0;
+  box-shadow:
+    inset 0 1.5px 1px rgba(255, 255, 255, .26),
+    inset 0 -1.5px 1px rgba(0, 0, 0, .45),
+    0 0 0 1px rgba(0, 0, 0, .3),
+    22px 50px 90px rgba(18, 10, 48, .45),
+    8px 18px 34px rgba(18, 10, 48, .3);
+}
+@media (prefers-reduced-motion: reduce) { .device--hero { transform: none; } }
+
+@media (max-width: 720px) {
+  .pillars { grid-template-columns: repeat(2, 1fr); max-width: 340px; row-gap: 1.4rem; }
+  .device--hero { transform: rotateX(5deg) rotateY(-9deg) rotate(1.5deg); }
+}
 
 /* -------------------------------------------------- device frame */
 /* The gradient and rim highlights sit on the frame itself, so the gloss lives
