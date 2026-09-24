@@ -106,7 +106,6 @@
       var vw = document.documentElement.clientWidth;
       var big = Math.max(88, Math.min(124, vw * 0.13));
       var small = 32;                                   // the size asked for
-      var gutter = vw < 460 ? 10 : Math.min(26, vw * 0.03);
       var navH = parseFloat(getComputedStyle(document.documentElement)
                    .getPropertyValue('--nav-pill-h')) || 46;
       var navTop = Math.max(10, Math.min(18, vw * 0.016));
@@ -118,7 +117,7 @@
       var size = big + (small - big) * ease;
       var sx = (vw - big) / 2;                          // centred in the hero
       var sy = slot.getBoundingClientRect().top;
-      var ex = gutter;                                  // pinned top left
+      var ex = (vw - small) / 2;                        // stays centred when pinned
       var ey = navTop + (navH - small) / 2;
 
       brand.style.transform = 'translate(' +

@@ -418,7 +418,24 @@ p:last-child { margin-bottom: 0; }
   }
 /* once it is the corner button it needs to read against whatever is behind */
 .brand.is-pinned .brand__mark { box-shadow: 0 2px 10px rgba(14, 16, 30, .22); }
-.brand.is-pinned 
+/* Static wordmark above the headline. Deliberately not part of the morphing
+   icon: it stays put and scrolls away with the rest of the hero. */
+.hero__wordmark {
+  display: block; margin: 0 auto clamp(1.1rem, 2.4vw, 1.6rem);
+  color: #fff; font-size: clamp(2rem, 7vw, 3rem); font-weight: 800;
+  letter-spacing: -.02em; line-height: 1;
+}
+@supports ((-webkit-mask-image: url('')) or (mask-image: url(''))) {
+  .hero__wordmark {
+    width: clamp(180px, 31vw, 280px);
+    aspect-ratio: 900 / 170;
+    text-indent: -200vw; overflow: hidden; white-space: nowrap;
+    background-color: currentColor;
+    -webkit-mask: url('../img/logo/wordmark-white.png') no-repeat center / contain;
+          mask: url('../img/logo/wordmark-white.png') no-repeat center / contain;
+  }
+}
+
 .hero h1 { color: #fff; margin-bottom: .5em; }
 /* the last two words carry the accent, as in the mockup */
 .hero__accent {
