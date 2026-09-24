@@ -510,8 +510,7 @@ p:last-child { margin-bottom: 0; }
     translateX(calc(-6% - var(--fan) * 62%))
     translateY(calc(var(--fan) * -22px))
     rotateX(6deg) rotateY(-11deg)
-    rotate(calc(-2deg - var(--fan) * 7deg))
-    scale(calc(.94 - var(--fan) * .02));
+    rotate(calc(-2deg - var(--fan) * 7deg));   /* no scale: all three match */
 }
 .fan__card--right {
   z-index: 1;
@@ -519,8 +518,7 @@ p:last-child { margin-bottom: 0; }
     translateX(calc(6% + var(--fan) * 62%))
     translateY(calc(var(--fan) * -14px))
     rotateX(6deg) rotateY(-11deg)
-    rotate(calc(3deg + var(--fan) * 8deg))
-    scale(calc(.9 - var(--fan) * .02));
+    rotate(calc(3deg + var(--fan) * 8deg));   /* no scale: all three match */
 }
 .fan__card--centre,
 .fan__card--left,
