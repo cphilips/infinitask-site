@@ -1028,6 +1028,14 @@ html.js .seg { display: inline-flex; }
   width: 100%; aspect-ratio: 16 / 10; object-fit: contain; object-position: center;
   border-radius: 12px; margin-bottom: 1.1rem;
 }
+/* This one is a full-bleed gradient rather than an illustration on nothing, so
+   it fills its box instead of sitting inside it, and takes a rounder corner to
+   settle into the card. */
+.pro__card img.pro__card-img--bleed {
+  object-fit: cover;
+  border-radius: 18px;
+}
+
 .pro__card h4 { font-size: 1.1rem; margin-bottom: .3em; }
 .pro__card p { color: rgba(255, 255, 255, .8); font-size: .95rem; margin: 0; }
 .pro__note { color: rgba(255, 255, 255, .82); }
