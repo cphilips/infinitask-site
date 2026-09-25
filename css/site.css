@@ -1001,11 +1001,15 @@ html.js .seg { display: inline-flex; }
 }
 .marquee__track { display: flex; width: max-content; }
 .marquee__track.is-running { animation: marquee-drift var(--marquee-s, 42s) linear infinite; }
-.marquee__item { flex: none; margin: 0 clamp(14px, 2vw, 28px) 0 0; }
-.marquee__item img {
-  display: block; width: auto; height: clamp(300px, 42vw, 470px);
-  filter: drop-shadow(0 18px 38px rgba(20, 22, 40, .24));
+.marquee__item { flex: none; margin: 0 clamp(16px, 2.4vw, 34px) 0 0; }
+/* The reel uses the site's own device frame so it matches every other phone on
+   the page, rather than three differently-framed exports. */
+.device--reel {
+  width: clamp(168px, 22vw, 232px);
+  margin-inline: 0;
+  border-radius: 34px; padding: 7px;
 }
+.device--reel img { border-radius: 28px; }
 @keyframes marquee-drift { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
 /* Pause on hover, but only where hovering is a real thing. On a touch screen
