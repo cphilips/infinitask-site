@@ -770,6 +770,41 @@ body.has-bottom-nav {
 .capture__intro .lede { color: rgba(255, 255, 255, .92); }
 
 
+/* "PRO feature" pill. Sits above the Add Things card to say plainly that
+   colour is part of Pro, rather than letting the free copy imply otherwise. */
+.pro-note {
+  display: flex; align-items: center; gap: .75rem; text-align: left;
+  max-width: 420px; margin: clamp(1.6rem, 3.5vw, 2.4rem) auto 0;
+  padding: .5rem .65rem .5rem .55rem;
+  background: var(--card-bg);
+  border: 1px solid var(--card-stroke-solid);
+  border-radius: 999px;
+  box-shadow: var(--shadow-card);
+}
+.pro-note__icon {
+  width: 40px; height: 40px; flex: none; border-radius: 13px;
+  background: var(--card-bg-2);
+  display: grid; place-items: center;
+}
+.pro-note__icon img { width: 23px; height: auto; }
+.pro-note__text { display: flex; flex-direction: column; min-width: 0; margin-right: auto; }
+.pro-note__text b { font-size: .9375rem; font-weight: 700; color: var(--text-1); line-height: 1.25; }
+.pro-note__text i { font-style: normal; font-size: .8125rem; color: var(--text-2); line-height: 1.3; }
+.pro-note__badge { width: 61px; height: 24px; flex: none; }
+
+/* The same badge inline in running copy, wherever the free text promises
+   something that is actually behind Pro. */
+/* The global img rule is display:block; height:auto, which would put this on a
+   line of its own and ignore the height. Both have to be overridden here. */
+.pro-tag {
+  display: inline-block;
+  width: 44px; height: 17px;
+  vertical-align: -2px; margin-left: .38em;
+}
+/* Keeps the badge welded to the words it qualifies, so it can never strand on
+   a line of its own and leave the following comma orphaned. */
+.pro-tagged { white-space: nowrap; }
+
 .addthings {
   margin: clamp(2rem, 4vw, 3rem) auto 0;
   max-width: 720px;
