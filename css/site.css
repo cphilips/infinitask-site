@@ -1096,7 +1096,10 @@ html.js .seg { display: inline-flex; }
   position: relative;
   height: 240px;                      /* the same on every sheet */
   display: grid; place-items: center;
-  padding: 0 1.5rem;
+  /* The top padding is deliberate: several pieces of art carry almost no
+     transparent margin of their own, so centring alone left them reading as
+     clipped against the sheet's top edge. */
+  padding: 16px 1.5rem 0;
   border-radius: 26px 26px 0 0;
   background: var(--hero-bg, linear-gradient(to bottom, #CBF0F9 0%, #E0F6FB 35%, #FBFEFF 80%));
   background-size: cover;
@@ -1122,7 +1125,7 @@ html.js .seg { display: inline-flex; }
   --hero-bg: url('../img/art/hero-beach.webp'); --hero-w: 70%;
 }
 .ps__panel[data-sheet='notes'] .ps__hero {
-  --hero-bg: url('../img/art/hero-beach.webp'); --hero-w: 47%;
+  --hero-bg: url('../img/art/hero-beach.webp'); --hero-w: 70%;
 }
 .ps__panel[data-sheet='backdrop'] .ps__hero {
   --hero-bg: url('../img/art/hero-forest.webp'); --hero-w: 62%;
@@ -1131,7 +1134,9 @@ html.js .seg { display: inline-flex; }
   --hero-bg: linear-gradient(100deg, #F1A2AB 0%, #F3C892 52%, #F2D791 100%);
   --hero-w: 70%;
 }
-.ps__panel[data-sheet='secrets'] .ps__hero { --hero-w: 30%; }
+.ps__panel[data-sheet='secrets'] .ps__hero {
+  --hero-w: 40%;
+}
 .ps__panel[data-sheet='support'] .ps__hero { --hero-w: 28%; }
 .ps__panel[data-sheet='stats'] .ps__hero {
   --hero-bg: linear-gradient(100deg, #C588E9 0%, #DFE1EA 48%, #75C7F2 100%);
