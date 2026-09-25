@@ -39,6 +39,8 @@
   --purple: #9A61ED;
   --purple-dark: #534AB7;
   --blue: #008DF1;
+  --folder-blue-top: #10D3FE;      /* FolderColor.blue gradientTop */
+  --folder-blue-bottom: #008DF1;   /* FolderColor.blue gradientBottom */
   --teal: #1D9E75;
   --coral: #FF0060;
   --pink: #D4537E;
@@ -746,6 +748,27 @@ body.has-bottom-nav {
 }
 .capture + .feature { margin-top: var(--band); }
 .capture__lede { max-width: 48ch; margin-inline: auto; }
+
+/* The intro sits on the app's own Blue folder gradient, run full width and
+   stopping where the Add Things card begins. It is a wrapper rather than a
+   measured pseudo-element on .capture, because only a wrapper knows where the
+   copy ends without hard-coding a height that the headline would outgrow. */
+.capture__intro {
+  position: relative;
+  padding-block: clamp(2.5rem, 6vw, 4.5rem) clamp(2.25rem, 5vw, 3.5rem);
+}
+.capture__intro::before {
+  content: '';
+  position: absolute; top: 0; bottom: 0; left: 50%;
+  width: 100vw; transform: translateX(-50%);
+  background: linear-gradient(172deg, var(--folder-blue-top), var(--folder-blue-bottom));
+}
+/* Lift the copy above the absolutely-positioned gradient. */
+.capture__intro > * { position: relative; }
+.capture__intro h3 { color: #fff; }
+.capture__intro .section-label { color: rgba(255, 255, 255, .82); }
+.capture__intro .lede { color: rgba(255, 255, 255, .92); }
+
 
 .addthings {
   margin: clamp(2rem, 4vw, 3rem) auto 0;
