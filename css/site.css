@@ -1062,8 +1062,8 @@ html.js .seg { display: inline-flex; }
    title, subtitle, then benefit rows. Six panels live in one dialog and are
    swapped rather than rebuilt, so Prev and Next cycle without reopening. */
 .ps {
-  width: min(460px, calc(100vw - 28px));
-  max-height: min(760px, calc(100vh - 40px));
+  width: min(700px, calc(100vw - 28px));
+  max-height: min(800px, calc(100vh - 40px));
   padding: 0; border: 0; overflow: visible;
   border-radius: 26px;
   background: var(--card-bg);
@@ -1072,7 +1072,8 @@ html.js .seg { display: inline-flex; }
 }
 .ps::backdrop { background: rgba(19, 19, 22, .42); backdrop-filter: blur(3px); }
 .ps__scroll {
-  max-height: min(660px, calc(100vh - 128px));
+  /* 800 less the nav strip, so the sheet never grows past its ceiling */
+  max-height: min(736px, calc(100vh - 104px));
   overflow-y: auto; overscroll-behavior: contain;
   border-radius: 26px 26px 0 0;
 }
@@ -1094,15 +1095,22 @@ html.js .seg { display: inline-flex; }
    The fade goes to --card-bg, not white, so it resolves in dark mode too. */
 .ps__hero {
   position: relative;
-  padding: 2.3rem 1.5rem 2.2rem;
+  height: 240px;                      /* the same on every sheet */
+  display: grid; place-items: center;
+  padding: 0 1.5rem;
   border-radius: 26px 26px 0 0;
   background: var(--hero-bg, linear-gradient(to bottom, #CBF0F9 0%, #E0F6FB 35%, #FBFEFF 80%));
   background-size: cover;
   background-position: center 40%;
 }
+/* Constrain by max-width AND max-height with auto dimensions, so each piece of
+   art scales to fit the fixed hero without being squashed. Setting width and
+   letting height follow would push the taller pieces straight out of it. */
 .ps__hero img {
   position: relative; z-index: 0;
-  width: var(--hero-w, 52%); height: auto; margin-inline: auto;
+  width: auto; height: auto;
+  max-width: var(--hero-w, 52%);
+  max-height: 184px;
 }
 .ps__hero::after {
   content: ''; position: absolute; inset: 0; z-index: 1;
@@ -1112,7 +1120,7 @@ html.js .seg { display: inline-flex; }
 
 /* Per-sheet sky and art size, both off the references. */
 .ps__panel[data-sheet='folders'] .ps__hero {
-  --hero-bg: url('../img/art/hero-beach.webp'); --hero-w: 54%;
+  --hero-bg: url('../img/art/hero-beach.webp'); --hero-w: 70%;
 }
 .ps__panel[data-sheet='notes'] .ps__hero {
   --hero-bg: url('../img/art/hero-forest.webp'); --hero-w: 47%;
@@ -1234,8 +1242,13 @@ html.js .seg { display: inline-flex; }
 }
 .pro__head h2 { margin: .3rem 0 0; }
 
+@media (max-height: 640px) {
+  .ps__hero { height: 190px; }
+  .ps__hero img { max-height: 148px; }
+}
+
 @media (max-width: 460px) {
-  .ps__hero { padding: 2rem 1.2rem 1rem; }
+  .ps__hero { padding-inline: 1.1rem; }
   .ps__title { font-size: 1.45rem; }
   .ps__rows { padding-inline: .75rem; }
 }
