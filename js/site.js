@@ -307,12 +307,15 @@
       Array.prototype.forEach.call(segBtns, function (b) {
         b.setAttribute('aria-pressed', String(b.getAttribute('data-mode') === mode));
       });
+      // The band paints the sky for whichever theme is on show.
+      if (band) { band.setAttribute('data-mode', mode); }
     }
 
+    var band = seg.closest('.daynight-band');
     setMode(mq && mq.matches ? 'dark' : 'light');
 
     if (mq) {
-      var follow = function (e) { if (!chosen) { setMode(e.matches ? 'dark' : 'light'); } };
+      var follow = function (e) { if (!chosen) { setMode(e.matches ? 'dark' : 'light'); } };   // Black is a deliberate choice only
       if (mq.addEventListener) { mq.addEventListener('change', follow); }
       else if (mq.addListener) { mq.addListener(follow); }   // older Safari
     }

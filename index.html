@@ -13,7 +13,7 @@
 <meta property="og:image" content="img/icon/icon-512.png">
 <meta property="og:type" content="website">
 <script>document.documentElement.className += ' js';</script>
-<link rel="stylesheet" href="css/site.css?v=20260925123410">
+<link rel="stylesheet" href="css/site.css?v=20260925124624">
 </head>
 <body>
 
@@ -228,7 +228,7 @@
   </section>
 
   <!-- ============================================ day or night -->
-  <section class="band">
+  <section class="band daynight-band" data-mode="light">
     <div class="wrap wrap--wide center reveal">
       <p class="section-label">Light, dark and black</p>
       <h2>Looks great, day or night.</h2>
@@ -237,12 +237,14 @@
       <div class="seg" role="group" aria-label="Preview appearance">
         <button type="button" class="seg__btn" data-mode="light" aria-pressed="false">Light</button>
         <button type="button" class="seg__btn" data-mode="dark" aria-pressed="false">Dark</button>
+        <button type="button" class="seg__btn" data-mode="black" aria-pressed="false">Black</button>
       </div>
 
       <div class="device device--lg daynight">
         <div class="daynight__stack">
-          <img class="daynight__shot is-active" data-mode="light" src="img/shots/01-today-light.webp" alt="The InfiniTask Today screen in light mode." width="960" height="2087" loading="lazy">
-          <img class="daynight__shot" data-mode="dark" src="img/shots/02-today-dark.webp" alt="The same Today screen in dark mode." width="960" height="2087" loading="lazy">
+          <img class="daynight__shot is-active" data-mode="light" src="img/shots/daynight-light.webp" alt="The InfiniTask Today screen in the Light theme." width="860" height="1870" loading="lazy">
+          <img class="daynight__shot" data-mode="dark" src="img/shots/daynight-dark.webp" alt="The same Today screen in the Dark theme." width="860" height="1870" loading="lazy">
+          <img class="daynight__shot" data-mode="black" src="img/shots/daynight-black.webp" alt="The same Today screen in the Black theme, on pure black." width="860" height="1870" loading="lazy">
         </div>
       </div>
     </div>
@@ -504,6 +506,6 @@
   </div>
 </dialog>
 
-<script src="js/site.js?v=20260925123410"></script>
+<script src="js/site.js?v=20260925124624"></script>
 </body>
 </html>

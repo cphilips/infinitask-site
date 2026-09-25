@@ -884,6 +884,43 @@ body.has-bottom-nav {
    One device, two stacked screenshots crossfaded by a segmented control that
    mirrors the app's own. Starts on whichever the visitor's OS is set to, and
    keeps following the OS until they pick a side themselves. */
+/* -------------------------------------------------- day / night band
+   The band paints the sky for whichever theme is being previewed, so the page
+   around the phone changes with it. Stops are sampled from Craig's references:
+   each holds its top colour for the first 40% and turns over the rest, which
+   is what keeps it reading as a sky rather than a two-colour wash.
+
+   These are fixed per mode, not per page theme: the band is showing you the
+   app's Light theme even when you are browsing in dark, so its own text has to
+   be pinned to the sky it sits on rather than to the page's tokens. */
+.daynight-band {
+  transition: background 550ms ease, color 550ms ease;
+}
+.daynight-band[data-mode='light'] {
+  --dn-ink: #1C1C1C; --dn-ink-2: #4A4E63; --dn-label: #6B6E8A;
+  background: linear-gradient(to bottom,
+    #E5ECF5 0%, #E5ECF5 40%, #DDEFFC 62%, #E5F0F5 75%, #F7F1E3 88%, #FFF2DC 100%);
+}
+.daynight-band[data-mode='dark'] {
+  --dn-ink: #F0F0F5; --dn-ink-2: rgba(240, 240, 245, .82); --dn-label: #9DA0C4;
+  background: linear-gradient(to bottom,
+    #343757 0%, #343757 40%, #392550 62%, #3C1949 75%, #410A3C 88%, #440336 100%);
+}
+.daynight-band[data-mode='black'] {
+  --dn-ink: #F2F2F2; --dn-ink-2: rgba(242, 242, 242, .78); --dn-label: #8E8E93;
+  background: linear-gradient(to bottom,
+    #000000 0%, #000000 40%, #0B061D 62%, #0D0A2D 75%, #061339 88%, #02173F 100%);
+}
+.daynight-band h2 { color: var(--dn-ink); }
+.daynight-band .lede { color: var(--dn-ink-2); }
+.daynight-band .section-label { color: var(--dn-label); }
+
+/* The control keeps one appearance across all three skies, as in the
+   references, so it never has to fight the background it is sitting on. */
+.daynight-band .seg { background: rgba(233, 235, 243, .92); }
+.daynight-band .seg__btn { color: #1C1C1C; }
+.daynight-band .seg__btn[aria-pressed='true'] { background: #fff; }
+
 .seg {
   display: none;                       /* JS drives it, so hide it without JS */
   margin: clamp(1.75rem, 4vw, 2.5rem) auto 0;
