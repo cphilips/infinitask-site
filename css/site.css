@@ -736,8 +736,9 @@ body.has-bottom-nav {
   position: relative;
   max-width: 860px; margin-inline: auto;
   /* Extra over the standard band: the reel is a full-bleed visual and needs
-     more air under it than a block of copy would. */
-  padding-bottom: calc(var(--band) * 1.45);
+     more air under it than a block of copy would. The reel carries 48px of its
+     own below the phones for the shadow, so this is trimmed to suit. */
+  padding-bottom: calc(var(--band) * 1.1);
   text-align: center;
 }
 .capture h3 { font-size: clamp(1.9rem, 4.6vw, 2.9rem); font-weight: 600; }   /* hero scale, kept above the feature h3s */
@@ -763,7 +764,9 @@ body.has-bottom-nav {
 .capture__sky { position: relative; }
 .capture__sky::before {
   content: '';
-  position: absolute; top: 0; bottom: 0; left: 50%;
+  /* Up through the band's own top padding and its 1px edge, so the blue meets
+     the section above with no strip of band background showing between. */
+  position: absolute; top: calc(var(--band) * -1 - 1px); bottom: 0; left: 50%;
   width: 100vw; transform: translateX(-50%);
   background: linear-gradient(to bottom,
     var(--sky-blue) 0%,
@@ -1063,6 +1066,9 @@ html.js .seg { display: inline-flex; }
 .marquee {
   position: relative; left: 50%; transform: translateX(-50%);
   width: 100vw; margin-top: clamp(2rem, 4vw, 3rem);
+  /* The clip has to stay, or a track several thousand pixels wide escapes the
+     viewport. So the shadow needs room inside it rather than outside. */
+  padding-block: 20px 48px;
   overflow: hidden;
   -webkit-mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
           mask-image: linear-gradient(to right, transparent, #000 7%, #000 93%, transparent);
@@ -1076,6 +1082,15 @@ html.js .seg { display: inline-flex; }
   width: clamp(168px, 22vw, 232px);
   margin-inline: 0;
   border-radius: 34px; padding: 7px;
+  /* --shadow-device is built for a 300px device and throws 124px below it,
+     which the reel's overflow clip cut clean off. Keep the bezel's inset rims,
+     scale the cast shadow to the size these actually render at. */
+  box-shadow:
+    inset 0 1.5px 1px rgba(255, 255, 255, .26),
+    inset 0 -1.5px 1px rgba(0, 0, 0, .45),
+    0 0 0 1px rgba(0, 0, 0, .3),
+    0 3px 8px rgba(14, 16, 30, .12),
+    0 12px 28px rgba(14, 16, 30, .18);
 }
 .device--reel img { border-radius: 28px; }
 @keyframes marquee-drift { from { transform: translateX(0); } to { transform: translateX(-50%); } }
