@@ -1076,6 +1076,14 @@ html.js .seg { display: inline-flex; }
 }
 .ps__hero img { width: min(280px, 78%); height: auto; margin-inline: auto; }
 
+/* A sheet can carry its own backdrop photo instead of the default sky. It fades
+   into the card before the badge so the art is never sitting on a hard edge. */
+.ps__panel[data-sheet='notes'] .ps__hero {
+  background:
+    linear-gradient(to bottom, rgba(0, 0, 0, .12) 0%, rgba(0, 0, 0, 0) 38%, var(--card-bg) 97%),
+    url('../img/art/hero-forest.webp') center 38% / cover no-repeat;
+}
+
 .ps__badge { display: block; width: 61px; height: 24px; margin: -.2rem auto 0; }
 .ps__title {
   margin: .7rem 0 0; text-align: center;
