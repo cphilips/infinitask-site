@@ -1142,6 +1142,49 @@ html.js .seg { display: inline-flex; }
   .marquee__track.is-running { animation: none; }
 }
 
+/* -------------------------------------------------- QuickStats field
+   A field of out-of-focus tiles running off both edges behind the section, so
+   the twelve sharp ones read as a window onto something that carries on past
+   them. Same column rhythm and row height as the real grid, so the blur sits
+   on the same beat rather than looking like unrelated wallpaper.
+
+   The blur is on the container, not the tiles, so neighbours bleed into each
+   other instead of staying twelve separate soft rectangles. Sampled off the
+   reference: the strongest blob there is only about a quarter of the way from
+   the page ground to full colour, hence the low opacity. */
+.qs-feature { position: relative; }
+.qs-feature > .feature__text,
+.qs-feature > .feature__art { position: relative; z-index: 1; }
+
+.qs-field {
+  position: absolute;
+  top: -8%; bottom: -8%; left: 50%;
+  width: 100vw; transform: translateX(-50%);
+  z-index: 0; pointer-events: none;
+  display: grid; gap: .6rem;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-auto-rows: 104px;
+  filter: blur(34px);
+  opacity: .32;
+}
+.qs-field i { display: block; border-radius: 16px; }
+.qs-field .qf--blue    { background: linear-gradient(160deg, #10D3FE, #008DF1); }
+.qs-field .qf--teal    { background: linear-gradient(160deg, #00D4B8, #01BABA); }
+.qs-field .qf--purple  { background: linear-gradient(160deg, #BD74FF, #9A61ED); }
+.qs-field .qf--pink    { background: linear-gradient(160deg, #F371C5, #D05EA8); }
+.qs-field .qf--manilla { background: linear-gradient(160deg, #F9E1AA, #EAB578); }
+.qs-field .qf--forest  { background: linear-gradient(160deg, #5FB87E, #2F7A4C); }
+.qs-field .qf--sage    { background: linear-gradient(160deg, #B7C9A8, #93A982); }
+.qs-field .qf--blush   { background: linear-gradient(160deg, #FAD2DA, #F1A9B8); }
+
+/* Dark grounds need less of it, or the blobs turn into glare. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .qs-field { opacity: .20; }
+}
+:root[data-theme='dark'] .qs-field { opacity: .20; }
+
+@media (prefers-reduced-motion: reduce) { .qs-field { opacity: .18; } }
+
 /* -------------------------------------------------- QuickStats grid
    Twelve tiles standing in for the sort of insight a Pro user accumulates.
    Deliberately mixed: half carry a folder gradient, half are plain cards. An
