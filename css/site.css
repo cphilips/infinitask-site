@@ -735,7 +735,9 @@ body.has-bottom-nav {
 .capture {
   position: relative;
   max-width: 860px; margin-inline: auto;
-  padding-bottom: var(--band);
+  /* Extra over the standard band: the reel is a full-bleed visual and needs
+     more air under it than a block of copy would. */
+  padding-bottom: calc(var(--band) * 1.45);
   text-align: center;
 }
 .capture h3 { font-size: clamp(1.9rem, 4.6vw, 2.9rem); font-weight: 600; }   /* hero scale, kept above the feature h3s */
