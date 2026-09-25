@@ -41,6 +41,7 @@
   --blue: #008DF1;
   --folder-blue-top: #10D3FE;      /* FolderColor.blue gradientTop */
   --folder-blue-bottom: #008DF1;   /* FolderColor.blue gradientBottom */
+  --sky-blue: #1696F1;             /* top of the Capture sky fade */
   --teal: #1D9E75;
   --coral: #FF0060;
   --pink: #D4537E;
@@ -179,9 +180,9 @@ h1, h2, h3, h4 {
   text-wrap: balance;          /* stops a single word orphaning on the last line */
 }
 p, li { text-wrap: pretty; }   /* same idea, lighter touch, for prose */
-h1 { font-size: clamp(2.1rem, 6vw, 3.6rem); font-weight: 800; }
-h2 { font-size: clamp(1.9rem, 4.6vw, 2.9rem); font-weight: 800; }
-h3 { font-size: clamp(1.5rem, 3.3vw, 2.25rem); font-weight: 700; }   /* caps at 36px ~1090px vw */
+h1 { font-size: clamp(2.1rem, 6vw, 3.6rem); font-weight: 600; }
+h2 { font-size: clamp(1.9rem, 4.6vw, 2.9rem); font-weight: 600; }
+h3 { font-size: clamp(1.5rem, 3.3vw, 2.25rem); font-weight: 600; }   /* caps at 36px ~1090px vw */
 h4 { font-size: 1.0625rem; font-weight: 600; }
 p  { margin: 0 0 1.1em; }
 p:last-child { margin-bottom: 0; }
@@ -537,7 +538,7 @@ body.has-bottom-nav {
 .hero__wordmark {
   display: block;
   margin: 72px auto clamp(1.1rem, 2.4vw, 1.6rem);   /* clear space under the icon */
-  color: #fff; font-size: clamp(2rem, 7vw, 3rem); font-weight: 800;
+  color: #fff; font-size: clamp(2rem, 7vw, 3rem); font-weight: 600;
   letter-spacing: -.02em; line-height: 1;
 }
 @supports ((-webkit-mask-image: url('')) or (mask-image: url(''))) {
@@ -737,7 +738,7 @@ body.has-bottom-nav {
   padding-bottom: var(--band);
   text-align: center;
 }
-.capture h3 { font-size: clamp(1.9rem, 4.6vw, 2.9rem); font-weight: 800; }   /* hero weight, kept above the feature h3s */
+.capture h3 { font-size: clamp(1.9rem, 4.6vw, 2.9rem); font-weight: 600; }   /* hero scale, kept above the feature h3s */
 /* Full-bleed rule closing the section, matching the band--edge line under the
    hero. Sits on a pseudo-element because .capture is width-constrained.
    Safe against a scrollbar because body sets overflow-x: hidden. */
@@ -749,25 +750,32 @@ body.has-bottom-nav {
 .capture + .feature { margin-top: var(--band); }
 .capture__lede { max-width: 48ch; margin-inline: auto; }
 
-/* The intro sits on the app's own Blue folder gradient, run full width and
-   stopping where the Add Things card begins. It is a wrapper rather than a
-   measured pseudo-element on .capture, because only a wrapper knows where the
-   copy ends without hard-coding a height that the headline would outgrow. */
-.capture__intro {
-  position: relative;
-  padding-block: clamp(2.5rem, 6vw, 4.5rem) clamp(2.25rem, 5vw, 3.5rem);
-}
-.capture__intro::before {
+/* Sky gradient. Starts hard blue where the hero ends and dissolves into
+   whatever is behind it, reaching nothing about two thirds down, so it is still
+   faintly there behind the top of the Add Things card and gone by its bottom.
+
+   It fades to rgba(...,0) of its own colour rather than to `transparent`: the
+   keyword interpolates through transparent BLACK, which greys the middle of the
+   fade. Fading to a zero-alpha blue also means it works on any ground, so dark
+   mode needs no second definition. */
+.capture__sky { position: relative; }
+.capture__sky::before {
   content: '';
   position: absolute; top: 0; bottom: 0; left: 50%;
   width: 100vw; transform: translateX(-50%);
-  background: linear-gradient(172deg, var(--folder-blue-top), var(--folder-blue-bottom));
+  background: linear-gradient(to bottom,
+    var(--sky-blue) 0%,
+    rgba(22, 150, 241, 0) 66%);
 }
-/* Lift the copy above the absolutely-positioned gradient. */
-.capture__intro > * { position: relative; }
+/* Lift the content above the absolutely-positioned gradient. */
+.capture__sky > * { position: relative; }
+
+.capture__intro { padding-block: clamp(2.5rem, 6vw, 4.5rem) clamp(2.25rem, 5vw, 3.5rem); }
+.capture__intro h3,
+.capture__intro .lede { text-shadow: 0 1px 3px rgba(6, 58, 110, .20); }
 .capture__intro h3 { color: #fff; }
-.capture__intro .section-label { color: rgba(255, 255, 255, .82); }
-.capture__intro .lede { color: rgba(255, 255, 255, .92); }
+.capture__intro .section-label { color: rgba(255, 255, 255, .88); }
+.capture__intro .lede { color: rgba(255, 255, 255, .94); }
 
 
 /* "PRO feature" pill. Sits above the Add Things card to say plainly that
@@ -1221,7 +1229,7 @@ html.js .feature.is-in .prop { opacity: 1; transform: none; }
 
 /* ---- pane */
 .at__pane { background: var(--at-bg); padding: 30px 34px 34px; overflow-y: auto; overscroll-behavior: contain; }
-.at__title { margin: 0 0 1.1rem; font-size: 1.5rem; font-weight: 700; letter-spacing: -.015em; color: var(--at-ink); }
+.at__title { margin: 0 0 1.1rem; font-size: 1.5rem; font-weight: 600; letter-spacing: -.015em; color: var(--at-ink); }
 .at__pane p { margin: 0 0 .9rem; font-size: 1rem; line-height: 1.55; color: var(--at-ink); max-width: 56ch; }
 .at__pane p:last-child { margin-bottom: 0; }
 
