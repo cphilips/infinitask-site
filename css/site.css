@@ -1122,9 +1122,17 @@ html.js .seg { display: inline-flex; }
   backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
   text-align: center; cursor: pointer; font: inherit; color: inherit;
   overflow: hidden;
-  transition: transform .2s ease, background .2s ease;
+  transition: transform .2s ease, box-shadow .2s ease;
 }
-.pro__card:hover { transform: translateY(-3px); background: rgba(255, 255, 255, .16); }
+/* Hover lifts and casts, and leaves the fill alone: the glare is what gives the
+   card its shape, and brightening the whole surface flattens it. The inset rim
+   is repeated because a second box-shadow would otherwise replace it. */
+.pro__card:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .34),
+    0 14px 30px rgba(14, 16, 30, .12);
+}
 .pro__card:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
 
 .pro__media { display: block; width: 100%; }
