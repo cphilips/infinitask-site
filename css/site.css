@@ -1311,14 +1311,16 @@ html.js .feature.is-in .prop { opacity: 1; transform: none; }
 }
 
 /* ---- Project and Notebook covers */
-.props--covers { gap: 1rem; }
+.props--covers { gap: 2rem; }
 .cover { display: flex; flex-direction: column; flex: 0 1 104px; min-width: 0; }
 .cover img {
   width: 100%; height: auto; border-radius: 3px;
   filter: drop-shadow(0 7px 16px rgba(20, 22, 40, .2));
 }
-.cover__name { margin-top: .55rem; font-size: .875rem; font-weight: 700; color: var(--text-1); }
-.cover__meta { font-size: .75rem; color: var(--text-2); }
+/* 6px nudges the label off the cover's own transparent left margin, so the
+   text lines up with the printed edge rather than the file's edge. */
+.cover__name { margin-top: .55rem; font-size: .875rem; font-weight: 700; color: var(--text-1); padding-left: 6px; }
+.cover__meta { font-size: .75rem; color: var(--text-2); padding-left: 6px; }
 
 @media (max-width: 560px) {
   .props--tasks { max-width: none; }
