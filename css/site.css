@@ -1113,7 +1113,7 @@ html.js .seg { display: inline-flex; }
   position: relative;
   display: flex; flex-direction: column; align-items: center;
   width: 100%; padding: 1.4rem 1.25rem 3.1rem;
-  border-radius: 44px;
+  border-radius: 32px;
   border: 1px solid rgba(255, 255, 255, .17);
   background:
     linear-gradient(to bottom, rgba(255, 255, 255, .13) 0%, rgba(255, 255, 255, 0) 22%),
@@ -1145,7 +1145,7 @@ html.js .seg { display: inline-flex; }
   width: calc(100% + 2.5rem); max-width: none;
   margin: -1.4rem -1.25rem 1rem;
   aspect-ratio: 16 / 11; object-fit: cover;
-  border-radius: 43px 43px 0 0;
+  border-radius: 31px 31px 0 0;   /* one less than the card, to sit inside its 1px border */
 }
 .pro__copy { display: flex; flex-direction: column; gap: .3rem; }
 .pro__copy b { font-size: 1.1rem; font-weight: 600; color: #fff; letter-spacing: -.01em; }
