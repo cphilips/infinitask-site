@@ -1062,7 +1062,7 @@ html.js .seg { display: inline-flex; }
    title, subtitle, then benefit rows. Six panels live in one dialog and are
    swapped rather than rebuilt, so Prev and Next cycle without reopening. */
 .ps {
-  width: min(700px, calc(100vw - 28px));
+  width: min(550px, calc(100vw - 28px));
   max-height: min(800px, calc(100vh - 40px));
   padding: 0; border: 0; overflow: visible;
   border-radius: 26px;
