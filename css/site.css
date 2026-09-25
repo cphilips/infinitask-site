@@ -1018,6 +1018,45 @@ html.js .seg { display: inline-flex; }
 .pro__card p { color: rgba(255, 255, 255, .8); font-size: .95rem; margin: 0; }
 .pro__note { color: rgba(255, 255, 255, .82); }
 
+/* -------------------------------------------------- modal motion
+   Both dialogs rise 15px as they fade in and settle back down as they go.
+
+   A <dialog> leaves the top layer the instant close() runs, so an exit
+   animation needs the discrete properties transitioned too: overlay and
+   display. Without allow-discrete the element simply vanishes and only the
+   opening half would ever be seen. @starting-style supplies the state to
+   animate from, since there is no previous state on first paint.
+
+   Browsers without allow-discrete ignore all of this and open and close
+   instantly, which is a fair degradation. */
+.at, .ps {
+  opacity: 0;
+  transform: translateY(15px);
+  transition:
+    opacity .26s ease,
+    transform .26s cubic-bezier(.2, .7, .3, 1),
+    overlay .26s ease allow-discrete,
+    display .26s ease allow-discrete;
+}
+.at[open], .ps[open] { opacity: 1; transform: translateY(0); }
+@starting-style {
+  .at[open], .ps[open] { opacity: 0; transform: translateY(15px); }
+}
+
+.at::backdrop, .ps::backdrop {
+  opacity: 0;
+  transition: opacity .26s ease, overlay .26s ease allow-discrete, display .26s ease allow-discrete;
+}
+.at[open]::backdrop, .ps[open]::backdrop { opacity: 1; }
+@starting-style {
+  .at[open]::backdrop, .ps[open]::backdrop { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .at, .ps { transition: opacity .01s; transform: none; }
+  .at[open], .ps[open] { transform: none; }
+}
+
 /* -------------------------------------------------- Pro sheets
    Each Pro card opens an explainer built to the app's own pattern: hero, badge,
    title, subtitle, then benefit rows. Six panels live in one dialog and are
