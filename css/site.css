@@ -1011,32 +1011,10 @@ html.js .seg { display: inline-flex; }
   display: grid; gap: 1rem; margin-top: 2.5rem;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 }
-.pro__card {
-  background: rgba(255, 255, 255, .09);
-  border: 1px solid rgba(255, 255, 255, .16);
-  border-radius: var(--r-card);
-  padding: 1.5rem;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-.pro__card {
-  display: flex; flex-direction: column;
-}
-/* The source illustrations have different aspect ratios, so normalise the
-   image box and let each one sit inside it. Keeps every heading on one line. */
-.pro__card img {
-  width: 100%; aspect-ratio: 16 / 10; object-fit: contain; object-position: center;
-  border-radius: 12px; margin-bottom: 1.1rem;
-}
-/* This one is a full-bleed gradient rather than an illustration on nothing, so
-   it fills its box instead of sitting inside it, and takes a rounder corner to
-   settle into the card. */
-.pro__card img.pro__card-img--bleed {
-  object-fit: cover;
-  border-radius: 18px;
-}
 
-.pro__card h4 { font-size: 1.1rem; margin-bottom: .3em; }
+
+
+
 .pro__card p { color: rgba(255, 255, 255, .8); font-size: .95rem; margin: 0; }
 .pro__note { color: rgba(255, 255, 255, .82); }
 
@@ -1127,19 +1105,61 @@ html.js .seg { display: inline-flex; }
 .ps__nav button:hover { background: color-mix(in srgb, var(--blue) 10%, transparent); }
 .ps__nav button:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
 
-/* ---- the cards that open them */
+/* ---- the cards that open them
+   Sampled off Craig's design: the fill is about 11% white over the band and the
+   very top edge about 30%, which is the glare. So it is a soft gradient over
+   the top of the card plus a crisp inset rim, rather than one flat tint. */
 .pro__card {
-  width: 100%; text-align: left; cursor: pointer; font: inherit; color: inherit;
-  transition: transform .18s ease, background .18s ease;
+  position: relative;
+  display: flex; flex-direction: column; align-items: center;
+  width: 100%; padding: 1.4rem 1.25rem 3.1rem;
+  border-radius: 44px;
+  border: 1px solid rgba(255, 255, 255, .17);
+  background:
+    linear-gradient(to bottom, rgba(255, 255, 255, .13) 0%, rgba(255, 255, 255, 0) 22%),
+    rgba(255, 255, 255, .11);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .34);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  text-align: center; cursor: pointer; font: inherit; color: inherit;
+  overflow: hidden;
+  transition: transform .2s ease, background .2s ease;
 }
-.pro__card:hover { transform: translateY(-2px); background: rgba(255, 255, 255, .14); }
+.pro__card:hover { transform: translateY(-3px); background: rgba(255, 255, 255, .16); }
 .pro__card:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
-.pro__more {
-  display: inline-flex; align-items: center; gap: .3rem; margin-top: auto; padding-top: .7rem;
-  font-size: .875rem; font-weight: 600; color: #fff; opacity: .82;
+
+.pro__media { display: block; width: 100%; }
+.pro__card-img {
+  width: 100%; aspect-ratio: 16 / 11; object-fit: contain; object-position: center;
+  margin-bottom: 1rem;
 }
-.pro__more svg { width: 7px; height: 12px; }
-.pro__card:hover .pro__more { opacity: 1; }
+/* Bleed media runs to the card's own edges, under the rounded corner. */
+.pro__card-img--bleed {
+  width: calc(100% + 2.5rem); max-width: none;
+  margin: -1.4rem -1.25rem 1rem;
+  aspect-ratio: 16 / 11; object-fit: cover;
+  border-radius: 43px 43px 0 0;
+}
+.pro__copy { display: flex; flex-direction: column; gap: .3rem; }
+.pro__copy b { font-size: 1.1rem; font-weight: 600; color: #fff; letter-spacing: -.01em; }
+.pro__copy i { font-style: normal; font-size: .875rem; line-height: 1.4; color: rgba(255, 255, 255, .78); }
+
+.pro__plus {
+  position: absolute; right: 1.15rem; bottom: 1.15rem;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(255, 255, 255, .2);
+  color: #fff; display: grid; place-items: center;
+  transition: background .2s ease;
+}
+.pro__plus svg { width: 15px; height: 15px; }
+.pro__card:hover .pro__plus { background: rgba(255, 255, 255, .34); }
+
+/* ---- the section header: heading left, the promise beside it */
+.pro__head { display: grid; gap: 1rem 3rem; align-items: start; }
+@media (min-width: 820px) {
+  .pro__head { grid-template-columns: 1fr 1fr; }
+  .pro__head .pro__note { margin-top: 2.6rem; }
+}
+.pro__head h2 { margin: .3rem 0 0; }
 
 @media (max-width: 460px) {
   .ps__hero { padding: 2rem 1.2rem 1rem; }
