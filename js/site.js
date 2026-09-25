@@ -550,6 +550,56 @@
     });
   })();
 
+  /* ---------------------------------------------- Pro sheets
+     Six explainers in one <dialog>, swapped rather than rebuilt, so Prev and
+     Next cycle through them without the dialog closing and reopening. Wraps at
+     both ends: there is no first or last, just six. */
+  (function () {
+    var dlg = document.getElementById('proSheet');
+    if (!dlg || typeof dlg.showModal !== 'function') { return; }
+
+    var panels = [].slice.call(dlg.querySelectorAll('.ps__panel'));
+    var keys = panels.map(function (p) { return p.getAttribute('data-sheet'); });
+    var scroll = dlg.querySelector('.ps__scroll');
+    var at = 0, opener = null;
+
+    var show = function (i) {
+      at = (i + panels.length) % panels.length;      // wrap both ways
+      panels.forEach(function (p, n) { p.hidden = n !== at; });
+      dlg.setAttribute('aria-label', panels[at].querySelector('.ps__title').textContent + ', Pro feature');
+      if (scroll) { scroll.scrollTop = 0; }
+    };
+
+    document.addEventListener('click', function (e) {
+      var card = e.target.closest('.pro__card');
+      if (!card) { return; }
+      e.preventDefault();
+      opener = card;
+      var i = keys.indexOf(card.getAttribute('data-sheet'));
+      show(i < 0 ? 0 : i);
+      dlg.showModal();
+    });
+
+    dlg.addEventListener('click', function (e) {
+      if (e.target.closest('.ps__close')) { dlg.close(); return; }
+      if (e.target.closest('.ps__prev')) { show(at - 1); return; }
+      if (e.target.closest('.ps__next')) { show(at + 1); return; }
+      // the dialog element fills the viewport, so a hit on it is the backdrop
+      if (e.target === dlg) { dlg.close(); }
+    });
+
+    // Left and right arrows move between sheets, as the buttons do.
+    dlg.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); show(at - 1); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); show(at + 1); }
+    });
+
+    dlg.addEventListener('close', function () {
+      if (opener && document.contains(opener)) { opener.focus(); }
+      opener = null;
+    });
+  })();
+
   /* ---------------------------------------------- veil tuner
      Add ?tune to any URL to get live sliders for the scroll veil. Never loads
      otherwise, so it costs visitors nothing and there is nothing to strip out
