@@ -1143,7 +1143,14 @@ html.js .seg { display: inline-flex; }
   --hero-w: 46%;
 }
 
-.ps__badge { display: block; width: 61px; height: 24px; margin: -.2rem auto 0; }
+/* The badge is tucked .2rem up into the hero, so it has to be lifted above the
+   hero's fade. .ps__hero is position: relative and its ::after sits at z-index
+   1, painting solid --card-bg at the foot, which sliced the top 3px clean off
+   a static badge. */
+.ps__badge {
+  display: block; width: 61px; height: 24px; margin: -.2rem auto 0;
+  position: relative; z-index: 3;
+}
 .ps__title {
   margin: .7rem 0 0; text-align: center;
   font-size: 1.65rem; font-weight: 600; letter-spacing: -.015em; color: var(--text-1);
