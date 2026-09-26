@@ -488,18 +488,27 @@
      top edge touches the bottom of the viewport, and 1 once the whole stage is
      in view. Travel is capped at the viewport height so a stage taller than the
      window (a short laptop, a phone in landscape) still reaches 100%, at the
-     point where it is as visible as it can get, rather than never finishing. */
+     point where it is as visible as it can get, rather than never finishing.
+     data-lead and data-tail then hold each end of that range on a single frame,
+     so the device sits folded, unfolds, and sits open. */
   (function () {
     var stage = document.querySelector('[data-unfold]');
     if (!stage) { return; }
 
     var count = parseInt(stage.getAttribute('data-frames'), 10);
     var pattern = stage.getAttribute('data-src');
-    // A lead-in hold, as a fraction of the travel. The device stays folded for
-    // this much of the scroll before the unfold starts, so it reads as an
-    // object sitting there rather than one already mid-move on arrival.
+    // Holds at each end, as fractions of the travel: the device sits folded for
+    // the lead-in and open flat for the tail, and the unfold itself runs across
+    // whatever is left between them. Holding both ends is what makes it read as
+    // an object that was sitting there and then settles, rather than something
+    // permanently mid-move.
     var lead = parseFloat(stage.getAttribute('data-lead')) || 0;
+    var tail = parseFloat(stage.getAttribute('data-tail')) || 0;
     if (!(lead >= 0 && lead < 1)) { lead = 0; }
+    if (!(tail >= 0 && tail < 1)) { tail = 0; }
+    // Leave the sequence somewhere to actually run, whatever the markup says.
+    if (lead + tail > 0.9) { lead = 0; tail = 0; }
+    var span = 1 - lead - tail;
     var canvas = stage.querySelector('.unfold__canvas');
     if (!count || !pattern || !canvas || !canvas.getContext) { return; }
 
@@ -511,6 +520,7 @@
     var frames = new Array(count);
     var loaded = 0;
     var ready = false;
+    var revealed = false;
     var shown = -1;
     var queued = false;
     var dpr = 1;
@@ -540,21 +550,40 @@
       if (travel <= 0) { return 0; }
       var p = (vh - r.top) / travel;
       p = p < 0 ? 0 : p > 1 ? 1 : p;
-      // Spend the lead-in on frame 0, then run the whole sequence across what
-      // is left, so the unfold still finishes exactly when the stage is fully
-      // in view.
-      return lead ? (p <= lead ? 0 : (p - lead) / (1 - lead)) : p;
+      if (span >= 1) { return p; }
+      if (p <= lead) { return 0; }
+      if (p >= 1 - tail) { return 1; }
+      return (p - lead) / span;
+    };
+
+    var usable = function (i) {
+      var img = frames[i];
+      return !!(img && img.complete && img.naturalWidth);
+    };
+
+    // Never bail on a frame that is not ready. Bailing leaves `shown` pointing
+    // at the last good frame with nothing queued to try again, so a single
+    // frame that arrives late or badly freezes the whole scrub until the next
+    // scroll event, and freezes it for good once the reader stops scrolling.
+    // Walking outward to the nearest usable frame keeps the sequence moving,
+    // and the late arrival repaints over it.
+    var nearest = function (i) {
+      if (usable(i)) { return i; }
+      for (var d = 1; d < count; d++) {
+        if (i - d >= 0 && usable(i - d)) { return i - d; }
+        if (i + d < count && usable(i + d)) { return i + d; }
+      }
+      return -1;
     };
 
     var paint = function () {
       queued = false;
       if (!ready) { return; }
-      var i = Math.round(progress() * (count - 1));
-      if (i === shown) { return; }
-      var img = frames[i];
-      if (!img || !img.complete || !img.naturalWidth) { return; }
+      var want = Math.round(progress() * (count - 1));
+      var i = nearest(want);
+      if (i < 0 || i === shown) { return; }
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      ctx.drawImage(frames[i], 0, 0, canvas.width, canvas.height);
       shown = i;
     };
 
@@ -564,42 +593,86 @@
       requestAnimationFrame(paint);
     };
 
-    var activate = function () {
+    // Reveal the canvas the moment it has something real to draw, and never
+    // before. Revealing on a frame count instead would fade the still out on a
+    // tab that loaded no images at all, leaving an empty canvas where the
+    // device should be. Painting first also stops the swap flashing the folded
+    // frame. Later frames simply repaint over their stand-ins.
+    var reveal = function () {
+      if (revealed) { return; }
       ready = true;
       size();
-      paint();                                   // paint BEFORE the fade, or the
-      stage.classList.add('is-scrubbing');       // swap flashes the folded frame
+      paint();
+      if (shown < 0) { ready = false; return; }  // nothing usable yet, keep the still
+      revealed = true;
+      stage.classList.add('is-scrubbing');
       if (still) { still.setAttribute('aria-hidden', 'true'); }
     };
 
     // Hold the fetch until the section is within a screen of the viewport, so
-    // fifty-odd frames never compete with the hero for bandwidth.
-    var fetchFrames = function () {
-      for (var i = 0; i < count; i++) {
-        (function (i) {
-          var img = new Image();
-          img.decoding = 'async';
-          img.onload = img.onerror = function () {
-            loaded++;
-            if (loaded === count) { activate(); }
-          };
-          img.src = src(i);
-          frames[i] = img;
-        }(i));
-      }
+    // fifty-odd frames never compete with the hero for bandwidth. Then fetch
+    // through a small window rather than firing all of them at once: the whole
+    // burst in one go is what produced Image objects that reported complete
+    // with a zero naturalWidth, and a narrow window costs nothing here because
+    // the reader has a screen's worth of scrolling left before the first frame
+    // is needed.
+    var WINDOW = 12;
+    var next = 0;
+
+    var settle = function (slot) {
+      if (slot.done) { return; }               // a timed-out frame must not count twice
+      slot.done = true;
+      clearTimeout(slot.timer);
+      loaded++;
+      reveal();
+      pump();
     };
 
-    if ('IntersectionObserver' in window) {
-      var io = new IntersectionObserver(function (entries) {
-        if (entries[0].isIntersecting) { io.disconnect(); fetchFrames(); }
-      }, { rootMargin: '100% 0px' });
-      io.observe(stage);
-    } else {
-      fetchFrames();
-    }
+    var load = function (i, attempt) {
+      var img = new Image();
+      var slot = { done: false, timer: 0 };
+      // A window is only as fast as its slowest member, so give every frame a
+      // deadline. Without one, a single request that never settles holds its
+      // slot for good and the sequence never finishes loading. A frame that
+      // turns up after its deadline still repaints, it just stops blocking.
+      slot.timer = setTimeout(function () { settle(slot); }, 8000);
+      img.decoding = 'async';
+      img.onload = function () {
+        if (!img.naturalWidth && attempt < 2) { clearTimeout(slot.timer); load(i, attempt + 1); return; }
+        if (revealed) { shown = -1; schedule(); }  // a late frame repaints over its stand-in
+        settle(slot);
+      };
+      img.onerror = function () {
+        if (attempt < 2) { clearTimeout(slot.timer); load(i, attempt + 1); return; }
+        settle(slot);
+      };
+      img.src = src(i) + (attempt ? '?retry=' + attempt : '');
+      frames[i] = img;
+    };
 
-    window.addEventListener('scroll', schedule, { passive: true });
+    var pump = function () {
+      while (next < count && next - loaded < WINDOW) { load(next++, 0); }
+    };
+
+    // Start fetching once the stage is within a screen of the viewport. This
+    // rides the scroll handler that is here anyway rather than an
+    // IntersectionObserver: one mechanism instead of two, it works on the
+    // first paint for anyone who lands deep-linked or mid-page, and it does
+    // not depend on intersections being computed, which a backgrounded tab
+    // may not do at all.
+    var fetched = false;
+    var maybeFetch = function () {
+      if (fetched) { return; }
+      var r = stage.getBoundingClientRect();
+      var vh = window.innerHeight || document.documentElement.clientHeight;
+      if (r.top < vh * 2 && r.bottom > -vh) { fetched = true; pump(); }
+    };
+
+    var onScroll = function () { maybeFetch(); schedule(); };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', function () { size(); schedule(); }, { passive: true });
+    maybeFetch();
   })();
 
   /* ---------------------------------------------- Add Things modal
