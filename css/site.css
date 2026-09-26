@@ -208,6 +208,39 @@ p:last-child { margin-bottom: 0; }
 
 .band { padding-block: var(--band); }
 .band--tint { background: var(--card-bg-2); }
+/* The bridge: the hero ends on #6858E6 and the Capture sky opens on #1696F1,
+   so this band runs one into the other instead of dropping the page back to
+   grey between two saturated sections. Both ends are within 3/255 of their
+   neighbours, so neither seam is visible.
+   Text is white and at full strength here. .lede carries opacity .82 by
+   default, which is fine on the page ground and quietly eats the contrast on
+   a saturated one. */
+.band--bridge {
+  /* The band already carries a big top padding to clear the hero's phones, so
+     without extra room below it the copy lands in the bottom half of the ramp,
+     which is the blue end. White on #1396F1 is only 3.15:1, under AA for body
+     text, so the copy has to sit high and the blue has to arrive below it. */
+  padding-bottom: clamp(10rem, 26vw, 19rem);
+  /* The hero's showcase carries a negative bottom margin that collapses out of
+     the hero, so the hero's own background paints over this band's top 140 to
+     260px depending on viewport. The first 38% is therefore held flat at the
+     hero's exact final colour: whatever the overhang turns out to be, the
+     hero's last pixel meets an identical one and there is no step. Both ends
+     are taken from the neighbours rather than typed in, so neither seam can
+     drift if either section is retuned. Craig's #6957E5 and #1396F1 are within
+     3/255 of these. */
+  background: linear-gradient(to bottom,
+    #6858E6 0%,                 /* the hero's last gradient stop, exactly */
+    #6858E6 38%,                /* still behind the overhang at its deepest */
+    #4F6AE9 70%,
+    var(--sky-blue) 100%);      /* the Capture sky's first stop, exactly */
+  color: #fff;
+}
+.band--bridge h2,
+.band--bridge .lede { color: #fff; opacity: 1; }
+/* Full white, not the usual dimmed label: at 13px it needs the whole 4.5:1
+   and the .82 alpha alone dropped it to 3.76. */
+.band--bridge .section-label { color: #fff; }
 .band--edge { border-block: 1px solid var(--divider); }
 
 /* -------------------------------------------------- nav
@@ -611,10 +644,6 @@ body.has-bottom-nav {
   font-size: clamp(.8125rem, 1.5vw, .9375rem); font-weight: 600; line-height: 1.25;
   color: rgba(255, 255, 255, .95);
 }
-
-/* The showcase hangs into the band below, so that band needs clearance or the
-   device sits on top of its heading. */
-.hero + .band { padding-top: clamp(190px, 26vw, 300px); }
 
 /* The showcase hangs into the band below, so that band needs clearance or the
    devices sit on top of its heading. */
