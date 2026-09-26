@@ -1277,6 +1277,16 @@ html.js .seg { display: inline-flex; }
   align-items: center; justify-content: center;
   gap: clamp(1rem, 2.5vw, 1.5rem);
 }
+/* The Pro caveats, wherever a free-looking feature is actually gated. One type
+   treatment so the two of them read as the same kind of note rather than two
+   different asides. */
+.pro-caveat {
+  margin: 1.1rem 0 0;
+  font-size: .875rem; line-height: 1.5; color: var(--text-2);
+}
+.pro-caveat a { color: var(--blue); text-decoration: underline; }
+.pro-caveat a:hover { text-decoration: underline; }
+
 /* Rides inside the pin rather than sitting after the track, so the caveat is
    next to the screen it is caveating the whole way through. */
 .unfold__note {
