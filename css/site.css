@@ -1281,7 +1281,10 @@ html.js .seg { display: inline-flex; }
    treatment so the two of them read as the same kind of note rather than two
    different asides. */
 .pro-caveat {
-  margin: 1.1rem 0 0;
+  /* Sits at the foot of the block, after the art, with real space above it:
+     it is a disclaimer rather than a third paragraph, and running it tight to
+     the copy made it read as part of the pitch. */
+  margin: 2.4rem 0 0;
   font-size: .875rem; line-height: 1.5; color: var(--text-2);
 }
 .pro-caveat a { color: var(--blue); text-decoration: underline; }
