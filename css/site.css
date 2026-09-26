@@ -86,7 +86,7 @@
   --glass-tint: #FFFFFF;      /* the pane itself */
   --glass-rim:  #FFFFFF;      /* specular edge */
   --glass-glow: #FFFFFF;      /* light caught inside */
-  --glass-keyline: rgba(14, 16, 30, .33);  /* the dark hairline outside the rim */
+  --glass-keyline: rgba(14, 16, 31, 0.12); /* the dark hairline outside the rim */
   --glass-bright: 1.08;
   --nav-pill-h: 46px;   /* both nav pills share this */
   --nav-h: 52px;   /* measured: nav mark 28px + .7rem padding block */
