@@ -478,6 +478,121 @@
     track.classList.add('is-running');
   })();
 
+  /* ---------------------------------------------- device unfold
+     A scroll-scrubbed frame sequence, not a <video>. Seeking a video with
+     currentTime is the obvious approach and the wrong one: the seeks are async,
+     and unless every frame is a keyframe the decoder lurches between the ones
+     it has, which reads as stutter under the thumb. Frames are deterministic.
+
+     The mapping is Craig's brief exactly. Progress is 0 the moment the stage's
+     top edge touches the bottom of the viewport, and 1 once the whole stage is
+     in view. Travel is capped at the viewport height so a stage taller than the
+     window (a short laptop, a phone in landscape) still reaches 100%, at the
+     point where it is as visible as it can get, rather than never finishing. */
+  (function () {
+    var stage = document.querySelector('[data-unfold]');
+    if (!stage) { return; }
+
+    var count = parseInt(stage.getAttribute('data-frames'), 10);
+    var pattern = stage.getAttribute('data-src');
+    var canvas = stage.querySelector('.unfold__canvas');
+    if (!count || !pattern || !canvas || !canvas.getContext) { return; }
+
+    var still = document.querySelector('.unfold__still');
+    var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (calm && calm.matches) { return; }        // the still already shows the unfolded state
+
+    var ctx = canvas.getContext('2d', { alpha: true });
+    var frames = new Array(count);
+    var loaded = 0;
+    var ready = false;
+    var shown = -1;
+    var queued = false;
+    var dpr = 1;
+
+    var src = function (i) {
+      return pattern.replace('%d', i < 10 ? '0' + i : '' + i);
+    };
+
+    var size = function () {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var w = canvas.clientWidth;
+      if (!w) { return false; }
+      var h = Math.round(w * canvas.height / canvas.width) || Math.round(w * 0.799);
+      var cw = Math.round(w * dpr);
+      if (canvas.width !== cw) {
+        canvas.width = cw;
+        canvas.height = Math.round(h * dpr);
+        shown = -1;                              // the surface was cleared, force a redraw
+      }
+      return true;
+    };
+
+    var progress = function () {
+      var r = stage.getBoundingClientRect();
+      var vh = window.innerHeight || document.documentElement.clientHeight;
+      var travel = Math.min(r.height, vh);
+      if (travel <= 0) { return 0; }
+      var p = (vh - r.top) / travel;
+      return p < 0 ? 0 : p > 1 ? 1 : p;
+    };
+
+    var paint = function () {
+      queued = false;
+      if (!ready) { return; }
+      var i = Math.round(progress() * (count - 1));
+      if (i === shown) { return; }
+      var img = frames[i];
+      if (!img || !img.complete || !img.naturalWidth) { return; }
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      shown = i;
+    };
+
+    var schedule = function () {
+      if (queued) { return; }
+      queued = true;
+      requestAnimationFrame(paint);
+    };
+
+    var activate = function () {
+      ready = true;
+      size();
+      paint();                                   // paint BEFORE the fade, or the
+      stage.classList.add('is-scrubbing');       // swap flashes the folded frame
+      if (still) { still.setAttribute('aria-hidden', 'true'); }
+    };
+
+    // Hold the fetch until the section is within a screen of the viewport, so
+    // fifty-odd frames never compete with the hero for bandwidth.
+    var fetchFrames = function () {
+      for (var i = 0; i < count; i++) {
+        (function (i) {
+          var img = new Image();
+          img.decoding = 'async';
+          img.onload = img.onerror = function () {
+            loaded++;
+            if (loaded === count) { activate(); }
+          };
+          img.src = src(i);
+          frames[i] = img;
+        }(i));
+      }
+    };
+
+    if ('IntersectionObserver' in window) {
+      var io = new IntersectionObserver(function (entries) {
+        if (entries[0].isIntersecting) { io.disconnect(); fetchFrames(); }
+      }, { rootMargin: '100% 0px' });
+      io.observe(stage);
+    } else {
+      fetchFrames();
+    }
+
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', function () { size(); schedule(); }, { passive: true });
+  })();
+
   /* ---------------------------------------------- Add Things modal
      Tapping a tile in the Add Things grid opens the explainer at that feature.
      A native <dialog> does the heavy lifting: Esc, focus trapping and the

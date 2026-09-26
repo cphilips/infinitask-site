@@ -707,14 +707,6 @@ body.has-bottom-nav {
 }
 .device img { border-radius: 37px; display: block; width: 100%; }
 .device--lg { width: clamp(250px, 70vw, 340px); }
-.device__pair { display: flex; gap: clamp(1rem, 4vw, 3rem); justify-content: center; flex-wrap: wrap; }
-/* for pairs whose screenshots differ in aspect (an iPhone beside a foldable),
-   line them up by the top rather than stretching either one */
-.device__pair--top { align-items: flex-start; }
-/* A foldable's inner display really is physically wider than a phone, so show
-   it wider. It also keeps its denser screen legible at this size. */
-.device--foldable { width: clamp(280px, 42vw, 400px); border-radius: 34px; }
-.device--foldable img { border-radius: 26px; }
 
 /* -------------------------------------------------- feature bands */
 .feature {
@@ -964,40 +956,31 @@ html.js .seg { display: inline-flex; }
 .daynight__shot.is-active { opacity: 1; }
 @media (prefers-reduced-motion: reduce) { .daynight__shot { transition: none; } }
 
-/* ---------------------------------------- unfolded (landscape) device
-   For foldable captures taken from simctl, which give clean screen content
-   with no bezel. If a framed window capture is dropped in later, use a plain
-   <img> instead and drop this frame entirely. */
-.device-wide {
+/* ---------------------------------------- the unfold, scrubbed on scroll
+   A canvas over a still. The still is the last frame, so with JS off, with
+   reduced motion, or before the sequence has downloaded, the section still
+   shows the thing it is describing: the device open flat. The canvas fades in
+   over it only once every frame is decoded, and it is painted before the fade
+   starts, so the swap never flashes the folded frame. */
+.unfold {
   position: relative;
   width: min(100%, 860px);
   margin: clamp(2.5rem, 5vw, 3.5rem) auto 0;
-  padding: 12px;
-  border-radius: 28px;
-  background: linear-gradient(148deg,
-    #5b6178 0%, #3c4155 22%, #262a37 55%, #191b24 78%, #101219 100%);
-  box-shadow:
-    inset 0 1.5px 1px rgba(255, 255, 255, .26),
-    inset 0 -1.5px 1px rgba(0, 0, 0, .45),
-    0 0 0 1px rgba(0, 0, 0, .3),
-    var(--shadow-device);
 }
-.device-wide__screen { border-radius: 18px; overflow: hidden; }
-.device-wide__screen img { display: block; width: 100%; height: auto; }
-
-/* the fold, suggested rather than drawn: a soft seam down the centre */
-.device-wide__crease {
-  position: absolute; top: 12px; bottom: 12px; left: 50%;
-  width: 34px; transform: translateX(-50%);
-  pointer-events: none;
-  background: linear-gradient(to right,
-    rgba(0,0,0,0) 0%, rgba(0,0,0,.055) 42%, rgba(0,0,0,.085) 50%,
-    rgba(0,0,0,.055) 58%, rgba(0,0,0,0) 100%);
+.unfold__still,
+.unfold__canvas {
+  display: block; width: 100%; height: auto;
+  aspect-ratio: 1000 / 799;
 }
-@media (max-width: 640px) {
-  .device-wide { padding: 7px; border-radius: 18px; }
-  .device-wide__screen { border-radius: 12px; }
-  .device-wide__crease { top: 7px; bottom: 7px; width: 20px; }
+.unfold__canvas {
+  position: absolute; inset: 0;
+  opacity: 0; transition: opacity .35s ease;
+}
+.unfold__still { transition: opacity .35s ease; }
+.unfold.is-scrubbing .unfold__canvas { opacity: 1; }
+.unfold.is-scrubbing .unfold__still { opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  .unfold__canvas, .unfold__still { transition: none; }
 }
 
 /* -------------------------------------------------- Pro band */

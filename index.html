@@ -13,7 +13,7 @@
 <meta property="og:image" content="img/icon/icon-512.png">
 <meta property="og:type" content="website">
 <script>document.documentElement.className += ' js';</script>
-<link rel="stylesheet" href="css/site.css?v=20260925184739">
+<link rel="stylesheet" href="css/site.css?v=20260926102305">
 </head>
 <body>
 
@@ -273,11 +273,9 @@
       <h2>Room to spread out.</h2>
       <p class="lede" style="max-width:48ch;margin-inline:auto;">Unfold, and InfiniTask follows. The tab bar becomes a sidebar, your grids gain columns, and more of the day fits on screen at once. Nothing to set up.</p>
 
-      <div class="device-wide">
-        <div class="device-wide__screen">
-          <img src="img/shots/20-duo-today-unfolded.webp" alt="InfiniTask on an unfolded foldable iPhone, showing the Today screen in landscape with a vertical sidebar and five QuickStats tiles across." width="1800" height="1266" loading="lazy">
-        </div>
-        <span class="device-wide__crease" aria-hidden="true"></span>
+      <div class="unfold" data-unfold data-frames="56" data-src="img/unfold/unfold-%d.webp">
+        <img class="unfold__still" src="img/unfold/unfold-55.webp" alt="A foldable iPhone opened flat, showing InfiniTask's Today screen in landscape with a vertical sidebar and QuickStats tiles across." width="1000" height="799" loading="lazy">
+        <canvas class="unfold__canvas" width="1000" height="799" aria-hidden="true"></canvas>
       </div>
     </div>
   </section>
@@ -329,17 +327,6 @@
           <span class="pro__copy"><b>Support Me.</b><i>I'm just a designer with a dream, not a big corporation.</i></span>
           <span class="pro__plus" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M8 3.6v8.8M3.6 8h8.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span>
         </button>
-      </div>
-
-      <div class="center reveal" style="margin-top:3rem;">
-        <div class="device__pair device__pair--top">
-          <div class="device">
-            <img src="img/shots/14-app-icons-light.webp" alt="The App Icon picker showing a grid of gradient InfiniTask icons in orange, green, magenta, blue, purple and grey." width="960" height="2087" loading="lazy">
-          </div>
-          <div class="device device--foldable">
-            <img src="img/shots/21-project-backdrop.webp" alt="The Home Project with a photo of beach grass as its backdrop, a green folder, and Stacks named Garden, Shopping and Repairs." width="1000" height="1421" loading="lazy">
-          </div>
-        </div>
       </div>
     </div>
   </section>
@@ -616,6 +603,6 @@
   </div>
 </dialog>
 
-<script src="js/site.js?v=20260925181834"></script>
+<script src="js/site.js?v=20260926102305"></script>
 </body>
 </html>
