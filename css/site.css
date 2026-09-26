@@ -618,7 +618,16 @@ body.has-bottom-nav {
       #6858E6 100%);   /* same hues, deepened where the copy sits */
   color: #fff;
   padding-top: calc(var(--nav-h) + 12px);
-  overflow: visible;             /* the showcase peeks out of the bottom */
+  /* The showcase has to spill DOWNWARD into the band below, which is what the
+     bridge gradient's flat hold is built around. But the fan's right-hand card
+     swings past the viewport on a narrow screen and took the whole document
+     with it: 143px of horizontal scroll at 414px wide.
+     clip, not hidden. hidden on one axis forces the other to auto, which would
+     kill the downward spill. clip leaves overflow-y visible.
+     And it belongs HERE, not on body: overflow-x on body would make it a
+     scroll container and break the position: sticky that pins the unfold. */
+  overflow-x: clip;
+  overflow-y: visible;
 }
 .hero__inner { position: relative; z-index: 2; padding-block: clamp(2.5rem, 7vw, 4.5rem) 0; text-align: center; }
 
