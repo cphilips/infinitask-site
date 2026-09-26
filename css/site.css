@@ -840,6 +840,44 @@ body.has-bottom-nav {
 .device--tilt {
   transform: perspective(1200px) rotateX(30deg) rotateY(-19deg) rotateZ(17deg);
   transform-origin: 50% 50%;
+  /* The body, so it reads as a phone rather than a pane of glass.
+     At this angle the RIGHT and BOTTOM faces are the ones turned toward you,
+     and a point 1px behind the front face lands 0.3234px right and 0.4696px
+     down on screen. Those two numbers came from projecting (0,0,-1) through
+     the live matrix, not from guesswork, and they set the direction of every
+     layer below.
+     Depth is 23px, which is 5.6mm of iPhone Air against a 72mm body at the
+     300px this renders. Eighteen layers at that step read solid without
+     banding, and they follow the 46px radius because a box-shadow is clipped
+     to the border curve. A pseudo-element face could not: a flat quad would
+     poke out at every corner.
+     Front of the band is lit and the back falls away, matching the front
+     face's own gradient. */
+  box-shadow:
+    inset 0 1.5px 1px rgba(255, 255, 255, .26),
+    inset 0 -1.5px 1px rgba(0, 0, 0, .45),
+    0 0 0 1px rgba(0, 0, 0, .3),
+    0.41px 0.60px 0 rgb(82, 87, 108),
+    0.83px 1.20px 0 rgb(78, 84, 103),
+    1.24px 1.80px 0 rgb(74, 80, 99),
+    1.65px 2.40px 0 rgb(71, 76, 94),
+    2.07px 3.00px 0 rgb(68, 72, 90),
+    2.48px 3.60px 0 rgb(64, 69, 86),
+    2.89px 4.20px 0 rgb(60, 65, 81),
+    3.31px 4.80px 0 rgb(57, 61, 77),
+    3.72px 5.40px 0 rgb(54, 58, 72),
+    4.13px 6.00px 0 rgb(50, 54, 68),
+    4.55px 6.60px 0 rgb(46, 50, 64),
+    4.96px 7.20px 0 rgb(43, 46, 59),
+    5.37px 7.80px 0 rgb(40, 43, 55),
+    5.79px 8.40px 0 rgb(36, 39, 51),
+    6.20px 9.00px 0 rgb(32, 35, 46),
+    6.61px 9.60px 0 rgb(29, 31, 42),
+    7.02px 10.20px 0 rgb(26, 28, 37),
+    7.44px 10.80px 0 rgb(22, 24, 33),
+    /* and a cast off the back of the body, so it sits in the scene rather
+       than hovering in front of it */
+    14px 26px 40px rgba(10, 12, 28, .42);
 }
 /* A ground shadow that does NOT rotate with the device, so it reads as a cast
    on the floor rather than a glow stuck to the phone. */
