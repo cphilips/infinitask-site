@@ -1367,6 +1367,7 @@ html:not(.js) .unfold { margin-block: clamp(2.5rem, 5vw, 3.5rem) 0; }
     rgba(255, 255, 255, .14) 100%);
   box-shadow:
     0 0 0 1px rgba(0, 0, 0, .5),          /* the keyline, measured at 52% black */
+    0 5px 14px rgba(10, 12, 28, .18),     /* a resting cast, Craig's addition */
     inset 0 1px 0 rgba(255, 255, 255, .34);
   /* Deliberately NO backdrop-filter. It flickered on hover, and it was doing
      nothing to earn that: the only thing behind these cards is the band's own
@@ -1381,12 +1382,15 @@ html:not(.js) .unfold { margin-block: clamp(2.5rem, 5vw, 3.5rem) 0; }
 /* Hover lifts and casts, and leaves the fill alone: the glare is what gives the
    card its shape, and brightening the whole surface flattens it. The inset rim
    is repeated because a second box-shadow would otherwise replace it. */
+/* Hover keeps its geometry exactly, 14px down and 30px of blur. Only the alpha
+   goes up, from .12 to .26, because the card now casts .18 at rest and a hover
+   lighter than the resting state reads as the card sinking rather than lifting. */
 .pro__card:hover {
   transform: translateY(-3px);
   box-shadow:
     0 0 0 1px rgba(0, 0, 0, .5),
-    inset 0 1px 0 rgba(255, 255, 255, .34),
-    0 14px 30px rgba(14, 16, 30, .12);
+    0 14px 30px rgba(10, 12, 28, .26),
+    inset 0 1px 0 rgba(255, 255, 255, .34);
 }
 .pro__card:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
 
