@@ -1453,8 +1453,12 @@ html:not(.js) .unfold { margin-block: clamp(2.5rem, 5vw, 3.5rem) 0; }
 .ps__panel[data-sheet='notes'] .ps__hero {
   --hero-bg: url('../img/art/hero-beach.webp'); --hero-w: 70%;
 }
+/* A single Sage notebook on the forest, rather than a photo of a notebook on a
+   photo of a forest sitting on the forest. The background is untouched.
+   34% lets the 184px height cap bind rather than the width, so the notebook
+   renders about 148px wide, in line with the other single-object sheets. */
 .ps__panel[data-sheet='backdrop'] .ps__hero {
-  --hero-bg: url('../img/art/hero-forest.webp'); --hero-w: 62%;
+  --hero-bg: url('../img/art/hero-forest.webp'); --hero-w: 34%;
 }
 .ps__panel[data-sheet='icons'] .ps__hero {
   --hero-bg: linear-gradient(100deg, #F1A2AB 0%, #F3C892 52%, #F2D791 100%);
