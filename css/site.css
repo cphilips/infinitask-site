@@ -782,6 +782,10 @@ body.has-bottom-nav {
    keyword interpolates through transparent BLACK, which greys the middle of the
    fade. Fading to a zero-alpha blue also means it works on any ground, so dark
    mode needs no second definition. */
+/* Deliberately not a .reveal. The reveal sets opacity 0 and translateY(18px)
+   on whatever carries it, and here that would be the sky itself, so the
+   gradient would fade and slide in rather than continuing the band above it.
+   The bridge only reads as one move if this end of it is already there. */
 .capture__sky { position: relative; }
 .capture__sky::before {
   content: '';
