@@ -962,10 +962,41 @@ html.js .seg { display: inline-flex; }
    shows the thing it is describing: the device open flat. The canvas fades in
    over it only once every frame is decoded, and it is painted before the fade
    starts, so the swap never flashes the folded frame. */
+/* The track is the scroll budget and the pin is the stage. Holding the device
+   still at both ends needs more scroll than the section's own height, so the
+   stage sticks to the middle of the viewport and the animation plays out
+   against the track's extra height instead. It also means the device is fully
+   on screen for the whole sequence rather than part-way in. */
+.unfold-track {
+  position: relative;
+  height: calc(100vh + var(--unfold-scroll, 130vh));
+}
+.unfold-pin {
+  position: sticky; top: 0;
+  height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: clamp(1rem, 2.5vw, 1.5rem);
+}
+/* Rides inside the pin rather than sitting after the track, so the caveat is
+   next to the screen it is caveating the whole way through. */
+.unfold__note {
+  margin: 0; max-width: 52ch; text-align: center;
+  font-size: .875rem; line-height: 1.5; color: var(--text-2);
+}
 .unfold {
   position: relative;
   width: min(100%, 860px);
-  margin: clamp(2.5rem, 5vw, 3.5rem) auto 0;
+  margin-inline: auto;
+}
+/* Without the scrub there is nothing to scroll through, so collapse the track
+   rather than leaving two screens of empty band behind a single still. */
+html:not(.js) .unfold-track,
+html:not(.js) .unfold-pin { height: auto; position: static; }
+html:not(.js) .unfold { margin-block: clamp(2.5rem, 5vw, 3.5rem) 0; }
+@media (prefers-reduced-motion: reduce) {
+  .unfold-track, .unfold-pin { height: auto; position: static; }
+  .unfold { margin-block: clamp(2.5rem, 5vw, 3.5rem) 0; }
 }
 .unfold__still,
 .unfold__canvas {

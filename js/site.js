@@ -484,16 +484,19 @@
      and unless every frame is a keyframe the decoder lurches between the ones
      it has, which reads as stutter under the thumb. Frames are deterministic.
 
-     The mapping is Craig's brief exactly. Progress is 0 the moment the stage's
-     top edge touches the bottom of the viewport, and 1 once the whole stage is
-     in view. Travel is capped at the viewport height so a stage taller than the
-     window (a short laptop, a phone in landscape) still reaches 100%, at the
-     point where it is as visible as it can get, rather than never finishing.
-     data-lead and data-tail then hold each end of that range on a single frame,
-     so the device sits folded, unfolds, and sits open. */
+     Progress is measured against the TRACK, not the stage. The stage sticks to
+     the middle of the viewport, so it does not move to measure against; the
+     track's spare height is the scroll budget. Progress is 0 when the track's
+     top reaches the top of the viewport, which is the moment the stage pins,
+     and 1 when the track has been scrolled through, which is the moment it
+     releases. data-lead and data-tail then hold each end of that range on a
+     single frame, so the device sits folded, unfolds in place, and sits open.
+     Holding both ends is why this is pinned at all: the holds need more scroll
+     than the stage's own height could ever provide. */
   (function () {
     var stage = document.querySelector('[data-unfold]');
     if (!stage) { return; }
+    var track = document.querySelector('[data-unfold-track]');
 
     var count = parseInt(stage.getAttribute('data-frames'), 10);
     var pattern = stage.getAttribute('data-src');
@@ -544,11 +547,20 @@
     };
 
     var progress = function () {
-      var r = stage.getBoundingClientRect();
       var vh = window.innerHeight || document.documentElement.clientHeight;
-      var travel = Math.min(r.height, vh);
-      if (travel <= 0) { return 0; }
-      var p = (vh - r.top) / travel;
+      var p;
+      if (track) {
+        var tr = track.getBoundingClientRect();
+        var range = tr.height - vh;
+        // A collapsed track (reduced motion, or a viewport taller than the
+        // track) has nothing to scroll through, so settle on the open device.
+        p = range > 0 ? (-tr.top) / range : 1;
+      } else {
+        var r = stage.getBoundingClientRect();
+        var travel = Math.min(r.height, vh);
+        if (travel <= 0) { return 0; }
+        p = (vh - r.top) / travel;
+      }
       p = p < 0 ? 0 : p > 1 ? 1 : p;
       if (span >= 1) { return p; }
       if (p <= lead) { return 0; }
@@ -663,7 +675,7 @@
     var fetched = false;
     var maybeFetch = function () {
       if (fetched) { return; }
-      var r = stage.getBoundingClientRect();
+      var r = (track || stage).getBoundingClientRect();
       var vh = window.innerHeight || document.documentElement.clientHeight;
       if (r.top < vh * 2 && r.bottom > -vh) { fetched = true; pump(); }
     };
