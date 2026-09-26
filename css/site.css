@@ -820,6 +820,42 @@ body.has-bottom-nav {
 .device img { border-radius: 37px; display: block; width: 100%; }
 .device--lg { width: clamp(250px, 70vw, 340px); }
 
+/* The Today hero, tilted in 3D so the run opens on something with movement in
+   it rather than a flat mock-up.
+
+   Mirrored from Craig's reference. Measuring that image's green screen gives a
+   long axis leaning about 30 degrees with the top edge foreshortened to .84 of
+   the bottom, and its LEFT long edge longer than its right, so the left is the
+   side turned toward you. Facing left instead means flipping both: rotateZ
+   goes positive so the top leans right, and rotateY goes negative so the right
+   edge is the one that comes forward.
+
+   The LEAN is pulled back from the reference's 30 degrees to 17, because this
+   screenshot has to stay legible and a green rectangle in a stock image does
+   not. The other two axes are matched to it: solved by sweeping rotateX and
+   measuring the projected corners, 30 degrees lands the top edge at .845 of
+   the bottom against the reference's .843, with the side ratio at 1.09 against
+   1.074. A shorter perspective reaches the same foreshortening but overshoots
+   the sides badly, 1.18, so the rotation is what carries it. */
+.device--tilt {
+  transform: perspective(1200px) rotateX(30deg) rotateY(-19deg) rotateZ(17deg);
+  transform-origin: 50% 50%;
+}
+/* A ground shadow that does NOT rotate with the device, so it reads as a cast
+   on the floor rather than a glow stuck to the phone. */
+.device--tilt::after {
+  content: '';
+  position: absolute; left: 50%; bottom: -7%;
+  width: 66%; height: 8%;
+  transform: translateX(-50%) rotateZ(-17deg);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(14, 16, 30, .34), rgba(14, 16, 30, 0) 78%);
+  filter: blur(9px);
+  pointer-events: none;
+  z-index: -1;
+}
+@media (prefers-reduced-motion: reduce) { .device--tilt { transform: none; } }
+
 /* -------------------------------------------------- feature bands */
 .feature {
   display: grid; gap: clamp(2rem, 5vw, 4rem); align-items: center;
