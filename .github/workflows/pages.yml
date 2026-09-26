@@ -1,0 +1,60 @@
+# Publishes the site to GitHub Pages.
+#
+# This replaces the classic "deploy from a branch" mode, which failed silently:
+# the site sat thirteen hours behind main across two pushes with no error
+# anywhere either of us would look. An Actions deploy gives every push a build
+# log, a green tick or a real message, and a re-run button.
+#
+# One-time switch needed in the repo: Settings -> Pages -> Build and deployment
+# -> Source -> GitHub Actions. Until that is changed this workflow will run and
+# then fail at the deploy step, because Pages is still listening to the branch.
+
+name: Deploy site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:        # so you can redeploy by hand without an empty commit
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never let two deploys race. Queue rather than cancel, so a push mid-deploy
+# still ends up published rather than dropped.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      # Assemble explicitly rather than publishing the repo root, so the build
+      # tooling in tools/ and the editor config in .claude/ stay out of the
+      # public site. Anything new that needs serving has to be added here.
+      - name: Assemble the site
+        run: |
+          mkdir -p _site
+          cp -R index.html support.html privacy.html css js fonts img .nojekyll _site/
+          echo "Published files:"
+          find _site -type f | wc -l
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
