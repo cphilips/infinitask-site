@@ -260,12 +260,31 @@ p:last-child { margin-bottom: 0; }
 .nav > * { pointer-events: auto; }
 
 /* Liquid Glass, approximated.
-   Four things together sell it, and the blur is the least important:
-   1. backdrop blur + saturation, so colour behind bleeds through richer
+
+   The thing that separates glass from frosting is REFRACTION, not blur. A
+   thick pane bends light most where it curves, at the rim, and barely at all
+   through the flat middle. Frosting blurs evenly and reads as plastic.
+
+   Craig found a WebGL shader that does this properly, by displacing a texture
+   through a rounded-box lens. It cannot drive this pill: the shader owns its
+   texture, and the nav sits over live scrolling page content that no browser
+   will hand to WebGL per frame. backdrop-filter: url(#displacement) would do
+   real refraction, but Safari parses the syntax and then applies nothing, so
+   it cannot even be feature-detected, and Safari is where this gets judged.
+
+   So the lensing is faked the way the scroll veil fakes progressive blur: the
+   pane carries a light blur, and a second masked layer stacks more blur on top
+   of it in a ring hugging the rim. Cumulative, because a backdrop-filter on a
+   child filters what the parent already filtered. The middle stays legible,
+   the edge goes soft and bright, and the eye reads thickness.
+
+   Five layers in total:
+   1. a light backdrop blur + saturation through the middle, so colour behind
+      bleeds through richer and stays READABLE, which heavy frosting kills
    2. a faint top-down tint, because real glass is not uniformly transparent
-   3. a SPECULAR RIM — bright along the top edge, dimmer at the bottom. This is
-      the part that reads as glass rather than as frosting.
-   4. an inner glow, as if light were caught inside the pane.
+   3. the edge lens: extra blur and brightness masked to a ring at the rim
+   4. a SPECULAR RIM, bright along the top edge, dimmer at the bottom
+   5. an inner glow, as if light were caught inside the pane
    The rim is a gradient border, which CSS cannot do directly, so it is a
    masked pseudo-element ring. */
 .nav__pill {
@@ -276,8 +295,10 @@ p:last-child { margin-bottom: 0; }
     linear-gradient(to bottom,
       color-mix(in srgb, var(--glass-tint) 62%, transparent),
       color-mix(in srgb, var(--glass-tint) 40%, transparent));
-  backdrop-filter: blur(18px) saturate(185%) brightness(var(--glass-bright));
-  -webkit-backdrop-filter: blur(18px) saturate(185%) brightness(var(--glass-bright));
+  /* Deliberately lighter than it was. 18px frosted the pane flat; glass this
+     thick should still let you read what is behind it. */
+  backdrop-filter: blur(7px) saturate(190%) brightness(var(--glass-bright));
+  -webkit-backdrop-filter: blur(7px) saturate(190%) brightness(var(--glass-bright));
   border: 0;
   box-shadow:
     inset 0 0 18px color-mix(in srgb, var(--glass-glow) 14%, transparent),
@@ -285,10 +306,31 @@ p:last-child { margin-bottom: 0; }
     0 8px 26px rgba(14, 16, 30, .09);
 }
 
-/* the specular rim */
-.nav__pill::before {
+/* the edge lens — the refraction stand-in.
+   farthest-side keeps the ellipse inscribed in the box, so on a wide pill it
+   follows the shape instead of pinching into a circle. The blur here lands ON
+   TOP of the pane's own, so the rim ends up at roughly 22px against 7px in the
+   middle: a gradient of thickness across the pane, which is what a lens is. */
+.nav__pill::after {
   content: '';
   position: absolute; inset: 0;
+  border-radius: inherit;
+  backdrop-filter: blur(15px) brightness(1.06) saturate(120%);
+  -webkit-backdrop-filter: blur(15px) brightness(1.06) saturate(120%);
+  -webkit-mask: radial-gradient(farthest-side at 50% 50%,
+    rgba(0, 0, 0, 0) 42%, rgba(0, 0, 0, .55) 74%, #000 100%);
+          mask: radial-gradient(farthest-side at 50% 50%,
+    rgba(0, 0, 0, 0) 42%, rgba(0, 0, 0, .55) 74%, #000 100%);
+  pointer-events: none;
+}
+
+/* Anything inside a glass pill has to clear the same two layers. */
+.nav__pill > * { position: relative; z-index: 2; }
+
+/* the specular rim, above the lens layer */
+.nav__pill::before {
+  content: '';
+  position: absolute; inset: 0; z-index: 1;
   border-radius: inherit;
   padding: 1px;
   background: linear-gradient(150deg,
@@ -337,6 +379,9 @@ p:last-child { margin-bottom: 0; }
   border-radius: 999px;                /* links pill is fully rounded */
 }
 .nav__links a {
+  /* above the pane's lens and rim layers, both of which are positioned and
+     would otherwise paint over in-flow text */
+  position: relative; z-index: 2;
   padding: .42rem .85rem;
   border-radius: 999px;
   font-weight: 600; font-size: .9375rem;
