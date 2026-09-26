@@ -495,6 +495,11 @@
 
     var count = parseInt(stage.getAttribute('data-frames'), 10);
     var pattern = stage.getAttribute('data-src');
+    // A lead-in hold, as a fraction of the travel. The device stays folded for
+    // this much of the scroll before the unfold starts, so it reads as an
+    // object sitting there rather than one already mid-move on arrival.
+    var lead = parseFloat(stage.getAttribute('data-lead')) || 0;
+    if (!(lead >= 0 && lead < 1)) { lead = 0; }
     var canvas = stage.querySelector('.unfold__canvas');
     if (!count || !pattern || !canvas || !canvas.getContext) { return; }
 
@@ -534,7 +539,11 @@
       var travel = Math.min(r.height, vh);
       if (travel <= 0) { return 0; }
       var p = (vh - r.top) / travel;
-      return p < 0 ? 0 : p > 1 ? 1 : p;
+      p = p < 0 ? 0 : p > 1 ? 1 : p;
+      // Spend the lead-in on frame 0, then run the whole sequence across what
+      // is left, so the unfold still finishes exactly when the stage is fully
+      // in view.
+      return lead ? (p <= lead ? 0 : (p - lead) / (1 - lead)) : p;
     };
 
     var paint = function () {
