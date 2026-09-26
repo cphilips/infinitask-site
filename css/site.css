@@ -1351,11 +1351,23 @@ html:not(.js) .unfold { margin-block: clamp(2.5rem, 5vw, 3.5rem) 0; }
   display: flex; flex-direction: column; align-items: center;
   width: 100%; padding: 1.4rem 1.25rem 3.1rem;
   border-radius: 32px;
-  border: 1px solid rgba(255, 255, 255, .17);
-  background:
-    linear-gradient(to bottom, rgba(255, 255, 255, .13) 0%, rgba(255, 255, 255, 0) 22%),
-    rgba(255, 255, 255, .11);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .34);
+  /* All four numbers below are sampled off Craig's reference, scanning inward
+     across the card's edge and down its face. The edge reads band 61 ->
+     keyline 28 -> rim 142 -> fill 105, so there are three lines, not one: a
+     dark keyline OUTSIDE a bright rim. The keyline was the piece missing
+     entirely, and it is what gives the card its cut-out edge. */
+  border: 1px solid rgba(255, 255, 255, .28);
+  /* One ramp down the whole face, not a glare over the top fifth. Measured
+     white-over-band runs .29 at a tenth down to .14 at the foot, a continuous
+     fall the old two-layer fill could not describe. */
+  background: linear-gradient(to bottom,
+    rgba(255, 255, 255, .30) 0%,
+    rgba(255, 255, 255, .22) 35%,
+    rgba(255, 255, 255, .18) 65%,
+    rgba(255, 255, 255, .14) 100%);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, .5),          /* the keyline, measured at 52% black */
+    inset 0 1px 0 rgba(255, 255, 255, .34);
   /* Deliberately NO backdrop-filter. It flickered on hover, and it was doing
      nothing to earn that: the only thing behind these cards is the band's own
      linear-gradient, and blurring a linear ramp returns the same linear ramp.
@@ -1372,6 +1384,7 @@ html:not(.js) .unfold { margin-block: clamp(2.5rem, 5vw, 3.5rem) 0; }
 .pro__card:hover {
   transform: translateY(-3px);
   box-shadow:
+    0 0 0 1px rgba(0, 0, 0, .5),
     inset 0 1px 0 rgba(255, 255, 255, .34),
     0 14px 30px rgba(14, 16, 30, .12);
 }
@@ -1393,15 +1406,18 @@ html:not(.js) .unfold { margin-block: clamp(2.5rem, 5vw, 3.5rem) 0; }
 .pro__copy b { font-size: 1.1rem; font-weight: 600; color: #fff; letter-spacing: -.01em; }
 .pro__copy i { font-style: normal; font-size: .875rem; line-height: 1.4; color: rgba(255, 255, 255, .78); }
 
+/* Inverted, off the reference: a near-solid light disc with a DARK glyph, not
+   a translucent disc with a white one. Sampled at rgb(232,230,242) for the
+   disc and rgb(70,70,70) for the plus. */
 .pro__plus {
   position: absolute; right: 1.15rem; bottom: 1.15rem;
   width: 28px; height: 28px; border-radius: 50%;
-  background: rgba(255, 255, 255, .2);
-  color: #fff; display: grid; place-items: center;
+  background: rgba(255, 255, 255, .9);
+  color: #3F3F46; display: grid; place-items: center;
   transition: background .2s ease;
 }
 .pro__plus svg { width: 15px; height: 15px; }
-.pro__card:hover .pro__plus { background: rgba(255, 255, 255, .34); }
+.pro__card:hover .pro__plus { background: #fff; }
 
 /* ---- the section header: heading left, the promise beside it */
 .pro__head { display: grid; gap: 1rem 3rem; align-items: start; }
