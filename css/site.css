@@ -907,6 +907,23 @@ body.has-bottom-nav {
   border: 1px solid var(--card-stroke-solid);
   border-radius: 999px;
   box-shadow: var(--shadow-card);
+  /* It is an <a> now, jumping to the Pro band. The global a:hover underline has
+     to go: this is a card, and underlining the whole pill's text on hover
+     looks like a mistake. The lift and the shadow carry the affordance
+     instead, matching the Pro cards it links to. */
+  text-decoration: none;
+  transition: transform .18s cubic-bezier(.2, .7, .3, 1), box-shadow .18s ease;
+}
+.pro-note:hover,
+.pro-note:focus-visible {
+  text-decoration: none;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card-hover);
+}
+.pro-note:active { transform: translateY(0); }
+@media (prefers-reduced-motion: reduce) {
+  .pro-note { transition: box-shadow .18s ease; }
+  .pro-note:hover, .pro-note:focus-visible { transform: none; }
 }
 .pro-note__icon {
   width: 40px; height: 40px; flex: none; border-radius: 13px;
