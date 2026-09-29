@@ -1467,10 +1467,16 @@ html:not(.js) .unfold { margin-block: clamp(2.5rem, 5vw, 3.5rem) 0; }
 .ps__panel[data-sheet='secrets'] .ps__hero {
   --hero-w: 40%;
 }
-.ps__panel[data-sheet='support'] .ps__hero { --hero-w: 28%; }
+/* Pink rather than the shared blue fallback, to sit with the heart. Set on
+   the panel rather than by editing .ps__hero's fallback, which Secrets also
+   falls back to and whose navy notebook wants the blue. */
+.ps__panel[data-sheet='support'] .ps__hero {
+  --hero-bg: linear-gradient(180deg, #F8CBD5 0%, #FBE0E9 35%, #FBFEFF 80%);
+  --hero-w: 28%;
+}
 .ps__panel[data-sheet='stats'] .ps__hero {
   --hero-bg: linear-gradient(100deg, #C588E9 0%, #DFE1EA 48%, #75C7F2 100%);
-  --hero-w: 46%;
+  --hero-w: 42%;
 }
 
 /* The badge is tucked .2rem up into the hero, so it has to be lifted above the
@@ -1490,7 +1496,7 @@ html:not(.js) .unfold { margin-block: clamp(2.5rem, 5vw, 3.5rem) 0; }
   font-size: .95rem; line-height: 1.4; color: var(--section-header);
 }
 
-.ps__rows { list-style: none; margin: 1.3rem 0 0; padding: 0 1rem 1.4rem; display: grid; gap: .55rem; }
+.ps__rows { list-style: none; margin: 1.3rem 0 0; padding: 0 2rem 1.4rem; display: grid; gap: .55rem; }
 .ps__rows li {
   display: flex; align-items: flex-start; gap: .8rem;
   padding: .85rem .9rem;

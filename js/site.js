@@ -687,6 +687,60 @@
     maybeFetch();
   })();
 
+  /* ---------------------------------------------- modal scroll lock
+     A native dialog opened with showModal() takes focus and blocks clicks
+     behind it, but it does NOT stop the page scrolling: wheel over the
+     backdrop and the whole site slides around underneath. Measured before
+     writing this, the page moved 400px behind an open sheet.
+
+     Watching the open attribute rather than patching every showModal and
+     close call: there is no "open" event to listen for, there are two dialogs
+     today, and anything added later is covered without remembering to wire it.
+
+     The scrollbar's width is held in reserve while locked, or hiding it
+     reflows the whole page a few pixels wider for as long as the modal is up.
+     macOS overlay scrollbars measure 0 and skip it; Windows does not. */
+  (function () {
+    var dialogs = document.querySelectorAll('dialog');
+    if (!dialogs.length || !('MutationObserver' in window)) { return; }
+
+    var root = document.documentElement;
+    var locked = false;
+    var savedY = 0;
+
+    var anyOpen = function () {
+      for (var i = 0; i < dialogs.length; i++) {
+        if (dialogs[i].open) { return true; }
+      }
+      return false;
+    };
+
+    var sync = function () {
+      if (anyOpen()) {
+        if (locked) { return; }
+        locked = true;
+        savedY = window.scrollY;
+        var gap = window.innerWidth - root.clientWidth;
+        if (gap > 0) { root.style.paddingRight = gap + 'px'; }
+        root.style.overflow = 'hidden';
+      } else {
+        if (!locked) { return; }
+        locked = false;
+        root.style.overflow = '';
+        root.style.paddingRight = '';
+        // instant, because html carries scroll-behavior: smooth and restoring
+        // the position should not look like a scroll the reader did not ask for
+        window.scrollTo({ top: savedY, behavior: 'instant' });
+      }
+    };
+
+    var mo = new MutationObserver(sync);
+    Array.prototype.forEach.call(dialogs, function (d) {
+      mo.observe(d, { attributes: true, attributeFilter: ['open'] });
+      d.addEventListener('close', sync);
+    });
+  })();
+
   /* ---------------------------------------------- Add Things modal
      Tapping a tile in the Add Things grid opens the explainer at that feature.
      A native <dialog> does the heavy lifting: Esc, focus trapping and the
