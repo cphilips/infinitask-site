@@ -994,6 +994,48 @@ body.has-bottom-nav {
 @media (min-width: 860px) {
   .feature { grid-template-columns: 1fr 1fr; }
   .feature--flip .feature__art { order: -1; }
+
+  /* The phone holds on screen for a beat as the row goes past.
+     There is no natural room for it: the phone is the tallest thing in the
+     row, so the row is exactly as tall as the phone and sticky has nowhere to
+     travel.
+
+     The room has to come from CONTENT, not padding. A sticky box is clamped
+     to its containing block's CONTENT box, so padding-bottom on the parent
+     buys nothing: it grows the padding box and leaves the content box exactly
+     as tall as the phone. An empty ::after does grow it, and the negative
+     margin takes the same 140 back out of the row's height, so the hold costs
+     no layout and nothing below moves. */
+  .feature__art {
+    align-self: start;
+    margin-bottom: -140px;
+  }
+  .feature__art::after {
+    content: '';
+    display: block;
+    height: 140px;
+  }
+  .feature__art > .device {
+    position: sticky;
+    top: clamp(72px, 14vh, 150px);
+  }
+}
+
+/* Comes up into place as it arrives, a little after the copy.
+   translate rather than transform, because transform already holds the 3D
+   angle and this has to compose with it rather than replace it. */
+.feature [class*='device--tilt'] {
+  opacity: 0;
+  translate: 0 48px;
+  transition: opacity .75s ease .1s, translate .75s cubic-bezier(.2, .7, .3, 1) .1s;
+}
+.feature.is-in [class*='device--tilt'] {
+  opacity: 1;
+  translate: 0 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .feature [class*='device--tilt'] { opacity: 1; translate: 0 0; transition: none; }
+  .feature__art > .device { position: static; }
 }
 .feature + .feature { margin-top: var(--band); }
 .feature__text { max-width: 46ch; }
