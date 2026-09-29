@@ -41,6 +41,29 @@
     }
   }
 
+  /* ---------------------------------------------- device entrances
+     Each tilted phone fades and lifts on ITS OWN visibility rather than its
+     row's. Three of the rows carry prop clusters under the copy and so are
+     taller, and a taller row trips the reveal at a different moment relative
+     to the phone inside it, which made two of the five look like they were
+     not animating at all. Watching the phone itself makes every section
+     behave the same whatever is stacked beside it. */
+  (function () {
+    var tilts = document.querySelectorAll('.feature [class*="device--tilt"]');
+    if (!tilts.length) { return; }
+    var reveal = function (el) { el.classList.add('is-shown'); };
+    if (!('IntersectionObserver' in window)) {
+      Array.prototype.forEach.call(tilts, reveal);
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { reveal(e.target); io.unobserve(e.target); }
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.18 });
+    Array.prototype.forEach.call(tilts, function (el) { io.observe(el); });
+  }());
+
   /* ---------------------------------------------- signup */
   var form = document.getElementById('signup');
   var msg = document.getElementById('formMsg');
