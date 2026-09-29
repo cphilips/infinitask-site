@@ -7,9 +7,14 @@
 <meta name="description" content="Help and support for InfiniTask: getting started, core concepts, working well, and what Pro includes.">
 <link rel="icon" href="img/icon/favicon-32.png" sizes="32x32">
 <link rel="apple-touch-icon" href="img/icon/apple-touch-icon.png">
-<meta name="theme-color" content="#9A61ED">
+<!-- Split by scheme. One flat purple meant the chrome matched neither the
+     light page nor the dark one, and on iOS the status bar sits directly on
+     top of the page as the address bar minimises. These are --app-bg, so it
+     meets the page ground wherever the reader has scrolled to. -->
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#E8EBF2">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1E2030">
 <script>document.documentElement.className += ' js';</script>
-<link rel="stylesheet" href="css/site.css?v=20260929195133">
+<link rel="stylesheet" href="css/site.css?v=20260929195820">
 </head>
 <body>
 
@@ -301,6 +306,6 @@
   </div>
 </footer>
 
-<script src="js/site.js?v=20260929195133"></script>
+<script src="js/site.js?v=20260929195820"></script>
 </body>
 </html>
