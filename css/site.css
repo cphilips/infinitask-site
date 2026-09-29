@@ -995,30 +995,9 @@ body.has-bottom-nav {
   .feature { grid-template-columns: 1fr 1fr; }
   .feature--flip .feature__art { order: -1; }
 
-  /* The phone holds on screen for a beat as the row goes past.
-     There is no natural room for it: the phone is the tallest thing in the
-     row, so the row is exactly as tall as the phone and sticky has nowhere to
-     travel.
-
-     The room has to come from CONTENT, not padding. A sticky box is clamped
-     to its containing block's CONTENT box, so padding-bottom on the parent
-     buys nothing: it grows the padding box and leaves the content box exactly
-     as tall as the phone. An empty ::after does grow it, and the negative
-     margin takes the same 140 back out of the row's height, so the hold costs
-     no layout and nothing below moves. */
-  .feature__art {
-    align-self: start;
-    margin-bottom: -140px;
-  }
-  .feature__art::after {
-    content: '';
-    display: block;
-    height: 140px;
-  }
-  .feature__art > .device {
-    position: sticky;
-    top: clamp(72px, 14vh, 150px);
-  }
+  /* Deliberately no sticky on the art. It was tried and taken out: holding the
+     phone while the row scrolled read as scroll-jacking. The devices move on
+     the way in and then travel with the page like everything else. */
 }
 
 /* Comes up into place as it arrives, a little after the copy.
@@ -1035,7 +1014,6 @@ body.has-bottom-nav {
 }
 @media (prefers-reduced-motion: reduce) {
   .feature [class*='device--tilt'] { opacity: 1; translate: 0 0; transition: none; }
-  .feature__art > .device { position: static; }
 }
 .feature + .feature { margin-top: var(--band); }
 .feature__text { max-width: 46ch; }
