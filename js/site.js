@@ -811,6 +811,11 @@
       if (opener && document.contains(opener)) { opener.focus(); }
       opener = null;
     });
+
+    // The cap moves with the viewport, and so does how much a panel wraps.
+    window.addEventListener('resize', function () {
+      if (dlg.open) { equalise(); } else { sized = false; }
+    }, { passive: true });
   })();
 
   /* ---------------------------------------------- Pro sheets
@@ -825,6 +830,32 @@
     var keys = panels.map(function (p) { return p.getAttribute('data-sheet'); });
     var scroll = dlg.querySelector('.ps__scroll');
     var at = 0, opener = null;
+
+    /* Hold every sheet at the same height, so cycling does not make the dialog
+       jump. The height is the TALLEST panel's natural one, capped by the same
+       ceiling the CSS uses, and the CSS hands the slack on a shorter sheet to
+       the hero rather than to the rows.
+
+       Measured by unhiding each panel, reading it and re-hiding, all in one
+       synchronous pass so the browser never paints an intermediate state. The
+       height has to be cleared first or each measurement would just return the
+       height set last time. */
+    var sized = false;
+    var equalise = function () {
+      if (!scroll) { return; }
+      scroll.style.height = '';
+      var tallest = 0;
+      panels.forEach(function (p) {
+        var was = p.hidden;
+        p.hidden = false;
+        if (p.offsetHeight > tallest) { tallest = p.offsetHeight; }
+        p.hidden = was;
+      });
+      if (!tallest) { return; }
+      var cap = Math.min(736, window.innerHeight - 104);
+      scroll.style.height = Math.min(tallest, cap) + 'px';
+      sized = true;
+    };
 
     var show = function (i) {
       at = (i + panels.length) % panels.length;      // wrap both ways
@@ -841,6 +872,7 @@
       var i = keys.indexOf(card.getAttribute('data-sheet'));
       show(i < 0 ? 0 : i);
       dlg.showModal();
+      if (!sized) { equalise(); }      // panels have no layout until it opens
     });
 
     dlg.addEventListener('click', function (e) {
@@ -861,6 +893,11 @@
       if (opener && document.contains(opener)) { opener.focus(); }
       opener = null;
     });
+
+    // The cap moves with the viewport, and so does how much a panel wraps.
+    window.addEventListener('resize', function () {
+      if (dlg.open) { equalise(); } else { sized = false; }
+    }, { passive: true });
   })();
 
   /* ---------------------------------------------- veil tuner

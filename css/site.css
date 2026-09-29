@@ -1398,10 +1398,20 @@ html:not(.js) .unfold { margin-block: clamp(2.5rem, 5vw, 3.5rem) 0; }
 }
 .ps::backdrop { background: rgba(19, 19, 22, .42); backdrop-filter: blur(3px); }
 .ps__scroll {
-  /* 800 less the nav strip, so the sheet never grows past its ceiling */
+  /* 800 less the nav strip, so the sheet never grows past its ceiling. JS sets
+     --ps-h to the TALLEST panel's natural height, capped by the same ceiling,
+     so every sheet is the same height as you cycle rather than the dialog
+     jumping between them. */
+  height: var(--ps-h, auto);
   max-height: min(736px, calc(100vh - 104px));
   overflow-y: auto; overscroll-behavior: contain;
   border-radius: 26px 26px 0 0;
+}
+/* Scoped off [hidden], or display: flex would override it and every panel
+   would show at once. */
+.ps__panel:not([hidden]) {
+  display: flex; flex-direction: column;
+  min-height: 100%;
 }
 .ps__close {
   position: absolute; top: 14px; right: 14px; z-index: 3;
@@ -1420,7 +1430,11 @@ html:not(.js) .unfold { margin-block: clamp(2.5rem, 5vw, 3.5rem) 0; }
    The fade goes to --card-bg, not white, so it resolves in dark mode too. */
 .ps__hero {
   position: relative;
-  height: 240px;                      /* the same on every sheet */
+  /* 240px is the floor, not the height. When a sheet's content is shorter than
+     the tallest one, the spare goes HERE rather than padding the rows out or
+     stranding the footer: the art is what the reader came to look at. */
+  flex: 1 1 auto;
+  min-height: 240px;
   display: grid; place-items: center;
   /* The top padding is deliberate: several pieces of art carry almost no
      transparent margin of their own, so centring alone left them reading as
@@ -1438,7 +1452,10 @@ html:not(.js) .unfold { margin-block: clamp(2.5rem, 5vw, 3.5rem) 0; }
   position: relative; z-index: 2;      /* above the fade, never washed by it */
   width: auto; height: auto;
   max-width: var(--hero-w, 52%);
-  max-height: 184px;
+  /* A share of the hero rather than a fixed 184px, so a hero that grew gets
+     bigger art instead of the same art floating in more sky. 82% of the 224px
+     content box at the 240px floor is the 184px this replaces. */
+  max-height: 82%;
 }
 .ps__hero::after {
   content: ''; position: absolute; inset: 0; z-index: 1;
@@ -1619,8 +1636,9 @@ html:not(.js) .unfold { margin-block: clamp(2.5rem, 5vw, 3.5rem) 0; }
 .pro__head h2 { margin: .3rem 0 0; }
 
 @media (max-height: 640px) {
-  .ps__hero { height: 190px; }
-  .ps__hero img { max-height: 148px; }
+  /* min-height, to match the floor above. The img cap is a percentage now, so
+     it follows the shorter hero without needing its own number. */
+  .ps__hero { min-height: 190px; }
 }
 
 @media (max-width: 460px) {
