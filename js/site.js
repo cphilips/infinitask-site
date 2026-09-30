@@ -835,10 +835,9 @@
       opener = null;
     });
 
-    // The cap moves with the viewport, and so does how much a panel wraps.
-    window.addEventListener('resize', function () {
-      if (dlg.open) { equalise(); } else { sized = false; }
-    }, { passive: true });
+    // No resize handler here on purpose. Add Things sizes itself from its own
+    // content and the CSS cap; the equal-height pass belongs to the Pro sheets,
+    // which cycle between panels and would otherwise jump.
   })();
 
   /* ---------------------------------------------- Pro sheets

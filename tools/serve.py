@@ -36,6 +36,13 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 class Server(socketserver.ThreadingMixIn, socketserver.TCPServer):
     daemon_threads = True
     allow_reuse_address = True
+    # Threading alone was not enough. TCPServer's listen backlog defaults to 5,
+    # so when the page opens its connections in a burst the kernel refuses the
+    # ones that do not fit and the browser reports them as ERR_CONNECTION_RESET
+    # or ERR_SOCKET_NOT_CONNECTED. Measured: 2 of 40 parallel requests for the
+    # same existing file failed at 5, and 0 of 200 at 128. Same symptom as the
+    # single-threaded bug above, different cause, so both fixes are needed.
+    request_queue_size = 128
 
 
 with Server(('127.0.0.1', PORT), Handler) as httpd:
