@@ -30,6 +30,11 @@
   --text-2: #9195BB;
   --text-3: #AEAEB2;
   --section-header: #6B6E8A;
+  /* QuickStats tile ink, sampled from the app: the labels and sub-copy
+     are a distinctly indigo grey, not the neutral --section-header. */
+  --qs-ink: #555B8E;
+  --qs-mute: #5F5F64;
+  --qs-row: var(--card-bg-2);
   --card-grad-a: #FFFFFF;
   --card-grad-b: #FAFAFA;
   --card-stroke: rgba(0, 0, 0, .05);
@@ -104,6 +109,8 @@
     --text-1: #F0F0F5;
     --text-2: #9195BB;
     --text-3: #6B6D88;
+  --qs-ink: #A7ABD4;
+  --qs-mute: #9093A8;
     --section-header: #8487A8;
     --card-grad-a: #3C3F58;
     --card-grad-b: #292B40;
@@ -138,6 +145,8 @@
   --text-1: #F0F0F5;
   --text-2: #9195BB;
   --text-3: #6B6D88;
+  --qs-ink: #A7ABD4;
+  --qs-mute: #9093A8;
   --section-header: #8487A8;
   --card-grad-a: #3C3F58;
   --card-grad-b: #292B40;
@@ -237,19 +246,29 @@ p:last-child { margin-bottom: 0; }
      The hold is a bigger FRACTION of a shorter band, which is why it went from
      38% to 44%: 260px of overhang is 39% of this band against 30% of the old
      one. */
+  /* The 44% flat hold that used to be here is gone with the hero it was built
+     for: the old showcase overhung into this band and the hold kept the seam
+     from stepping. The start screen keeps its devices inside itself, so this
+     band can start on colour straight away.
+     The start screen now rises into purple (Craig, 2026-10-24), so this band
+     opens on that same purple and holds it for the whole of the copy: the
+     page reads light, then purple, then out to the Capture sky at the foot.
+     Both ends are still taken from the neighbours rather than typed, so
+     neither seam can drift. */
   background: linear-gradient(to bottom,
-    #6858E6 0%,                 /* the hero's last gradient stop, exactly */
-    #6858E6 44%,                /* still behind the overhang at its deepest */
-    /* Anchored to the bottom, not to a percentage of the band. The copy always
-       ends well clear of the band's foot (the padding floor is 104px), and the
-       blue always starts 64px above it, so the copy clears the fast part of
-       the ramp by at least 24px at EVERY size. A percentage cannot promise
-       that: it drifts with the band's height, and on a short band it put the
-       lede at 4.38:1, under AA. */
-    #4F6AE9 calc(100% - 64px),
+    #6657DE 0%,                 /* the start screen's last colour, exactly */
+    #6657DE 72%,                /* and held there for the whole of the copy */
+    /* Anchored to the bottom, not to a percentage: the copy always ends clear
+       of the foot, and a percentage drifts with the band's height. That is
+       what put the lede at 4.38:1 on a short band once before. */
+    #4F6AE9 calc(100% - 72px),
     var(--sky-blue) 100%);      /* the Capture sky's first stop, exactly */
   color: #fff;
 }
+/* The morphing icon starts here now rather than in the hero, so the slot needs
+   air under it before the label. */
+.band--bridge .brand-slot { margin-bottom: clamp(1rem, 2.5vw, 1.6rem); }
+.band--bridge .pillars { margin-top: clamp(2.5rem, 5vw, 3.5rem); }
 .band--bridge h2,
 .band--bridge .lede { color: #fff; opacity: 1; }
 /* Full white, not the usual dimmed label: at 13px it needs the whole 4.5:1
@@ -623,6 +642,186 @@ body.has-bottom-nav {
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .35);
 }
 
+/* -------------------------------------------------- start screen
+   The first thing anyone sees, built to feel like the app's own first screen:
+   light, quiet, one thing to look at. Everything that used to shout here (the
+   positioning paragraph, the four pillars) moved down into the band below,
+   which is where Learn more lands. */
+.start {
+  position: relative;
+  isolation: isolate;
+  /* A screenful, like the app's own first screen, and it keeps the seam with
+     the band below off the fold so the blue has somewhere to arrive from. */
+  min-height: 100svh;
+  display: grid; align-content: center;
+  background: var(--app-bg);
+  padding-top: calc(var(--nav-h) + clamp(.5rem, 3vw, 2rem));
+  padding-bottom: clamp(3rem, 8vw, 6rem);
+  /* clip, not hidden: hidden on one axis forces the other to auto, and the
+     devices lean past the grid edge on a narrow window. */
+  overflow-x: clip;
+  overflow-y: visible;
+}
+
+/* The blue is a layer rather than a background, so its opacity can be driven
+   from scroll: the page opens on the flat app ground and the colour rises into
+   view on the way down. By the time the seam with the band below is anywhere
+   near the viewport the ramp is finished, so the two meet on the same value. */
+.start__blue {
+  position: absolute; inset: 0; z-index: -1;
+  /* What moves is how far UP the blue reaches, not the whole layer's opacity.
+     Fading a flat layer in from zero leaves the section's last pixel light
+     while the band below is already #6657DE, and the seam steps the moment you
+     scroll one pixel. Anchoring the final stop at 100% means the two always
+     meet on the same value, whatever the reach happens to be. */
+  --reach: 15%;
+  /* Purple, Craig's #6657DE (2026-10-24); it used to rise into blue. The
+     class keeps its old name because site.js finds it by that. */
+  background: linear-gradient(to bottom,
+    rgba(102, 87, 222, 0)   calc(100% - var(--reach)),
+    rgba(102, 87, 222, .55) calc(100% - var(--reach) * .34),
+    #6657DE 100%);
+  pointer-events: none;
+}
+html:not(.js) .start__blue { --reach: 70%; }   /* no JS, no scroll ramp */
+
+.start__inner {
+  display: grid;
+  gap: clamp(2.25rem, 5vw, 3.5rem);
+  grid-template-columns: 1fr;
+  align-items: center;
+}
+@media (min-width: 900px) {
+  /* Wider than the page grid, and most of it goes to the devices. */
+  .start__inner {
+    max-width: 1320px;
+    grid-template-columns: minmax(290px, .55fr) 1.45fr;
+    gap: clamp(2rem, 4vw, 3.5rem);
+  }
+}
+
+.start__copy { text-align: center; }
+@media (min-width: 900px) { .start__copy { text-align: left; } }
+
+.start__mark {
+  display: block; width: clamp(68px, 8.5vw, 96px); height: auto;
+  margin: 0 auto clamp(.8rem, 1.6vw, 1.1rem);
+}
+.start__wordmark {
+  margin: 0 auto .45rem;
+  color: var(--text-1);
+  font-size: clamp(2.3rem, 6vw, 3.5rem); font-weight: 600;
+  letter-spacing: -.02em; line-height: 1;
+}
+/* Same masked wordmark the old hero used, but taking its colour from the text
+   token rather than a hardcoded white, so it inverts with the theme. */
+@supports ((-webkit-mask-image: url('')) or (mask-image: url(''))) {
+  .start__wordmark {
+    width: clamp(196px, 25vw, 240px);   /* 240 at full size, per Craig */
+    aspect-ratio: 900 / 170;
+    text-indent: -200vw; overflow: hidden; white-space: nowrap;
+    background-color: currentColor;
+    -webkit-mask: url('../img/logo/wordmark-white.png') no-repeat center / contain;
+            mask: url('../img/logo/wordmark-white.png') no-repeat center / contain;
+  }
+}
+.start__sub {
+  margin: 0 0 clamp(1.3rem, 2.6vw, 1.8rem);
+  color: var(--section-header);
+  font-size: clamp(1rem, 1.7vw, 1.15rem); font-weight: 500;
+}
+
+.start__actions {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: 1.15rem; margin: 0 0 1.05rem;
+}
+/* Inverts with the theme, which is also what Apple's own badge does: there is
+   a black one for light backgrounds and a white one for dark, and you pick per
+   background rather than shipping one of them everywhere. On the dark page the
+   black pill all but vanished into it. */
+/* Apple's own badge artwork, used as supplied. Their Marketing Resources and
+   Identity Guidelines govern it, so this rule deliberately does almost nothing:
+   no background, no border, no radius, no shadow, and nothing on hover or
+   active, because "don't modify, angle, or animate the badge" rules out the
+   lift every other button on this page has.
+   The black badge carries Apple's own #a6a6a6 border, which is what keeps it
+   legible on the dark theme, so one unmodified file serves both.
+   Height is above the 40px onscreen minimum, and .start__actions' 1.15rem gap
+   clears the required quarter-of-the-height of free space on every side. */
+.start__store {
+  display: inline-block;
+  line-height: 0;              /* no descender gap under the artwork */
+  border-radius: 8px;          /* focus ring only; the badge is not clipped */
+}
+.start__store img {
+  display: block;
+  width: auto; height: 46px;   /* minimum is 40px */
+}
+.start__store:hover { text-decoration: none; }
+.start__store:focus-visible { outline: 2px solid var(--blue); outline-offset: 4px; }
+
+.start__more { color: var(--blue); font-weight: 600; font-size: 1.02rem; }
+.start__more:hover { text-decoration: underline; }
+
+.start__req { margin: 0; color: var(--section-header); font-size: .78rem; line-height: 1.5; }
+
+@media (min-width: 900px) {
+  .start__mark, .start__wordmark { margin-inline: 0; }
+  .start__wordmark { -webkit-mask-position: left center; mask-position: left center; }
+  .start__actions { justify-content: flex-start; }
+}
+
+/* ---------------- the device cluster
+   Laid out from Craig's mock (2026-10-24). The Duo and the iPhone stand
+   together on the stage's bottom edge, the iPhone overlapping the Duo's right
+   end. The iPad stands taller behind both, its top well above theirs and its
+   foot hidden behind them. The Duo is the point of it: it is in front, arrives
+   last on load and travels furthest, so the eye finishes there.
+
+   Every % below is measured off the mock, as a share of the stage's width
+   (left, width) or height (top): stage 759 x 728, iPad 450 wide at 231 / 0,
+   Duo 610 wide at 0, iPhone 222 wide at 537. Heights follow from each frame's
+   own proportions. The stage is capped so the whole cluster, the iPad's top
+   included, still fits a short laptop screen under the nav. */
+.start__stage {
+  position: relative;
+  width: min(100%, 760px, calc((100svh - 13rem) * 1.0426));
+  aspect-ratio: 1.0426 / 1;
+  margin-inline: auto;
+}
+
+/* Frames, screen insets and corners come from the shared device frame rules
+   (see "device frame"); this block only places the three. */
+.start__dev {
+  position: absolute; bottom: 0;
+  box-shadow: 0 26px 54px rgba(16, 18, 32, .24);
+}
+
+.start__dev--pad   { z-index: 1; width: 59.29%; left: 30.43%; top: 0; bottom: auto; }
+.start__dev--duo   { z-index: 2; width: 80.37%; left: 0; }
+.start__dev--phone { z-index: 3; width: 29.25%; left: 70.75%; }
+
+/* They come in together, a beat apart, and settle. Duo last and furthest. */
+.start__dev {
+  opacity: 0; translate: 0 26px; scale: .965;
+  transition: opacity .85s ease, translate .85s cubic-bezier(.2, .7, .3, 1),
+              scale .85s cubic-bezier(.2, .7, .3, 1);
+}
+.start__dev--duo { translate: 0 42px; scale: .94; }
+.start.is-ready .start__dev { opacity: 1; translate: 0 0; scale: 1; }
+.start.is-ready .start__dev--pad   { transition-delay: .08s; }
+.start.is-ready .start__dev--phone { transition-delay: .20s; }
+.start.is-ready .start__dev--duo   { transition-delay: .34s; }
+
+html:not(.js) .start__dev { opacity: 1; translate: 0 0; scale: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .start__dev { opacity: 1; translate: 0 0; scale: 1; transition: none; }
+}
+
+@media (max-width: 899px) {
+  .start__stage { max-width: 580px; }
+}
+
 /* -------------------------------------------------- hero */
 .hero {
   position: relative;
@@ -823,23 +1022,68 @@ body.has-bottom-nav {
 }
 
 /* -------------------------------------------------- device frame */
-/* The gradient and rim highlights sit on the frame itself, so the gloss lives
-   in the bezel and never washes over the screenshot. */
+/* Craig's licensed device frames (img/frames, 2026-10-24), laid over the
+   screenshot. Each frame PNG has a see-through screen, so the screenshot sits
+   underneath and the bezel masks its corners.
+
+   The element's own box is the device BODY, not the whole PNG: that way the
+   cast shadow and the tilted devices' stacked extrusion shadows still hug the
+   metal, and the frame PNG overhangs it a little for the side buttons. All the
+   numbers below are pixels measured in the frame PNG, so a new frame only
+   needs new measurements:
+     --fw/--fh  the PNG       --bx/--by/--bw/--bh/--br  the body and its corner
+     --sx/--sy/--sw/--sh/--sr  where the screenshot goes (a few px into the
+                               bezel, so no hairline of background shows) */
+.device, .start__dev {
+  --frame: url('../img/frames/iphone.webp');
+  --fw: 980; --fh: 2000;
+  --bx: 19; --by: 13; --bw: 942; --bh: 1973; --br: 200;
+  --sx: 46; --sy: 40; --sw: 887; --sh: 1919; --sr: 150;
+}
+.start__dev--pad {
+  --frame: url('../img/frames/ipad.webp');
+  --fw: 1478; --fh: 2000;
+  --bx: 62; --by: 62; --bw: 1354; --bh: 1876; --br: 116;
+  --sx: 141; --sy: 141; --sw: 1195; --sh: 1717; --sr: 30;
+}
+.start__dev--duo {
+  --frame: url('../img/frames/duo.webp');
+  --fw: 2000; --fh: 1453;
+  --bx: 38; --by: 38; --bw: 1930; --bh: 1377; --br: 146;
+  --sx: 74; --sy: 74; --sw: 1851; --sh: 1304; --sr: 95;
+}
+
 .device {
   position: relative;
   width: clamp(230px, 62vw, 300px);
   margin-inline: auto;
-  border-radius: 46px;
-  padding: 10px;
-  background: linear-gradient(148deg,
-    #5b6178 0%, #3c4155 22%, #262a37 55%, #191b24 78%, #101219 100%);
-  box-shadow:
-    inset 0 1.5px 1px rgba(255, 255, 255, .26),   /* top rim catches the light */
-    inset 0 -1.5px 1px rgba(0, 0, 0, .45),        /* bottom rim falls away */
-    0 0 0 1px rgba(0, 0, 0, .3),
-    var(--shadow-device);
+  box-shadow: var(--shadow-device);
 }
-.device img { border-radius: 37px; display: block; width: 100%; }
+.device, .start__dev {
+  aspect-ratio: var(--bw) / var(--bh);
+  padding: 0;
+  border-radius: calc(var(--br) / var(--bw) * 100%) / calc(var(--br) / var(--bh) * 100%);
+  background: #000;
+}
+.device::after, .start__dev::after {
+  content: ''; position: absolute; z-index: 2;
+  left: calc(var(--bx) / var(--bw) * -100%);
+  top: calc(var(--by) / var(--bh) * -100%);
+  width: calc(var(--fw) / var(--bw) * 100%);
+  height: calc(var(--fh) / var(--bh) * 100%);
+  transform: none; border-radius: 0; min-height: 0;
+  background: var(--frame) 0 0 / 100% 100% no-repeat;
+  pointer-events: none;
+}
+.device > img, .device > .daynight__stack, .start__dev > img {
+  position: absolute; display: block;
+  left: calc((var(--sx) - var(--bx)) / var(--bw) * 100%);
+  top: calc((var(--sy) - var(--by)) / var(--bh) * 100%);
+  width: calc(var(--sw) / var(--bw) * 100%);
+  height: calc(var(--sh) / var(--bh) * 100%);
+  object-fit: cover; object-position: top;
+  border-radius: calc(var(--sr) / var(--sw) * 100%) / calc(var(--sr) / var(--sh) * 100%);
+}
 .device--lg { width: clamp(250px, 70vw, 340px); }
 
 /* The feature devices, each turned to its own angle so the run does not read
@@ -1169,7 +1413,7 @@ body.has-bottom-nav {
 
 .addthings {
   margin: clamp(2rem, 4vw, 3rem) auto 0;
-  max-width: 720px;
+  max-width: 880px;               /* six across at full width, per Craig's mock */
   background: var(--card-bg-2);
   border: 1px solid var(--divider);
   border-radius: var(--r-large);
@@ -1183,7 +1427,10 @@ body.has-bottom-nav {
   display: grid; gap: .75rem;
   grid-template-columns: repeat(2, 1fr);   /* the app's own 2-column sheet */
 }
-@media (min-width: 640px) { .addthings__grid { grid-template-columns: repeat(5, 1fr); } }
+/* Twelve things, so 2, 4 or 6 across always fills its rows. Six only once the
+   card is wide enough that "Attachments" still fits its tile on one line. */
+@media (min-width: 640px) { .addthings__grid { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 880px) { .addthings__grid { grid-template-columns: repeat(6, 1fr); } }
 
 .addthings__grid li {
   display: flex; flex-direction: column; align-items: center; gap: .6rem;
@@ -1229,79 +1476,140 @@ body.has-bottom-nav {
   grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
 }
 
-/* ---------------------------------------- day / night preview
-   One device, two stacked screenshots crossfaded by a segmented control that
-   mirrors the app's own. Starts on whichever the visitor's OS is set to, and
-   keeps following the OS until they pick a side themselves. */
-/* -------------------------------------------------- day / night band
-   The band paints the sky for whichever theme is being previewed, so the page
-   around the phone changes with it. Stops are sampled from Craig's references:
-   each holds its top colour for the first 40% and turns over the rest, which
-   is what keeps it reading as a sky rather than a two-colour wash.
+/* -------------------------------------------------- themes band
+   Split in two, as in Craig's mocks (2026-10-24): the copy and the theme
+   swatches on a plain page on the left, the phone on that theme's sky on the
+   right. Picking a swatch repaints both halves, so the left page turns dark for
+   Dark, Moon Grey and Pure Black, just as the app does.
 
-   These are fixed per mode, not per page theme: the band is showing you the
-   app's Light theme even when you are browsing in dark, so its own text has to
-   be pinned to the sky it sits on rather than to the page's tokens. */
+   Colours are fixed per theme, not per page theme: the band is showing you the
+   app's Matcha even when you are browsing in dark, so its text is pinned to
+   the page it sits on rather than to the page's tokens. Page and sky colours
+   come from Theme.swift (appBackground, swatchGradient); the light, dark and
+   black skies are the ones sampled from Craig's earlier day/night references. */
 .daynight-band {
-  transition: background 550ms ease, color 550ms ease;
+  --dn-page: #FFFFFF; --dn-ink: #1C1C1C; --dn-ink-2: #63668A; --dn-label: #6B6E8A;
+  --dn-ring: #9B5DF0;
+  display: grid;
+  grid-template-columns: 1fr;
+  background: var(--dn-page);
+  transition: background 550ms ease;
 }
-.daynight-band[data-mode='light'] {
-  --dn-ink: #1C1C1C; --dn-ink-2: #4A4E63; --dn-label: #6B6E8A;
+@media (min-width: 860px) {
+  .daynight-band { grid-template-columns: 1fr 1fr; }
+}
+.daynight-band[data-mode='dark'],
+.daynight-band[data-mode='grey'],
+.daynight-band[data-mode='black'] {
+  --dn-page: #131316; --dn-ink: #F0F0F5; --dn-ink-2: #A9ACCF; --dn-label: #A1A2B4;
+}
+
+.daynight-band__copy {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: var(--band) var(--gutter) clamp(2.5rem, 6vw, 3.5rem);
+  width: 100%; max-width: 560px;
+  margin-inline: auto;
+}
+@media (min-width: 860px) {
+  .daynight-band__copy { padding-block: var(--band); padding-inline: clamp(2rem, 6vw, 5rem); margin-inline: auto 0; }
+}
+.daynight-band h2 { color: var(--dn-ink); margin-bottom: .35em; transition: color 550ms ease; }
+.daynight-band .lede { color: var(--dn-ink-2); opacity: 1; font-weight: 500; max-width: 36ch; transition: color 550ms ease; }
+.daynight-band .section-label { color: var(--dn-label); font-weight: 500; transition: color 550ms ease; }
+
+.daynight-band__sky {
+  display: grid; place-items: center;
+  padding: clamp(3rem, 8vw, var(--band)) var(--gutter);
+  transition: background 550ms ease;
+}
+.daynight-band[data-mode='light'] .daynight-band__sky {
   background: linear-gradient(to bottom,
     #E5ECF5 0%, #E5ECF5 40%, #DDEFFC 62%, #E5F0F5 75%, #F7F1E3 88%, #FFF2DC 100%);
 }
-.daynight-band[data-mode='dark'] {
-  --dn-ink: #F0F0F5; --dn-ink-2: rgba(240, 240, 245, .82); --dn-label: #9DA0C4;
+.daynight-band[data-mode='dark'] .daynight-band__sky {
   background: linear-gradient(to bottom,
     #343757 0%, #343757 40%, #392550 62%, #3C1949 75%, #410A3C 88%, #440336 100%);
 }
-.daynight-band[data-mode='black'] {
-  --dn-ink: #F2F2F2; --dn-ink-2: rgba(242, 242, 242, .78); --dn-label: #8E8E93;
+.daynight-band[data-mode='black'] .daynight-band__sky {
   background: linear-gradient(to bottom,
     #000000 0%, #000000 40%, #0B061D 62%, #0D0A2D 75%, #061339 88%, #02173F 100%);
 }
-.daynight-band h2 { color: var(--dn-ink); }
-.daynight-band .lede { color: var(--dn-ink-2); }
-.daynight-band .section-label { color: var(--dn-label); }
-
-/* The control keeps one appearance across all three skies, as in the
-   references, so it never has to fight the background it is sitting on. */
-.daynight-band .seg { background: rgba(233, 235, 243, .92); }
-.daynight-band .seg__btn { color: #1C1C1C; }
-.daynight-band .seg__btn[aria-pressed='true'] { background: #fff; }
-
-.seg {
-  display: none;                       /* JS drives it, so hide it without JS */
-  margin: clamp(1.75rem, 4vw, 2.5rem) auto 0;
-  padding: 4px;
-  gap: 4px;
-  background: var(--seg-track);
-  border-radius: 999px;
+.daynight-band[data-mode='taupe'] .daynight-band__sky {
+  background: linear-gradient(to bottom, #EDEBE9 0%, #EBDECD 50%, #CDBB9C 100%);
 }
-html.js .seg { display: inline-flex; }
-
-.seg__btn {
-  appearance: none; border: 0; cursor: pointer;
-  font: inherit; font-size: .9375rem; font-weight: 600;
-  color: var(--text-1); opacity: .6;
-  background: transparent;
-  padding: .5rem 1.4rem;
-  border-radius: 999px;
-  transition: background .2s ease, opacity .2s ease, box-shadow .2s ease;
+.daynight-band[data-mode='rose'] .daynight-band__sky {
+  background: linear-gradient(to bottom, #EDEAEC 0%, #F1DADC 50%, #D2B2AD 100%);
 }
-.seg__btn:hover { opacity: .85; }
-.seg__btn[aria-pressed='true'] {
-  background: var(--card-bg);
-  opacity: 1;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, .12);
+.daynight-band[data-mode='matcha'] .daynight-band__sky {
+  background: linear-gradient(to bottom, #E9EAEC 0%, #E7EDD6 50%, #C6CFB5 100%);
+}
+.daynight-band[data-mode='grey'] .daynight-band__sky {
+  background: linear-gradient(to bottom, #2D2F34 0%, #4F525B 50%, #8E8F91 100%);
 }
 
-.daynight { margin-top: clamp(1.75rem, 4vw, 2.5rem); }
+/* The app's Appearance circles, with its purple selection ring. Fills are
+   AppTheme.swatchGradient. Hidden without JS, since they only drive the preview. */
+.themes { display: none; margin-top: clamp(1.75rem, 4vw, 2.5rem); }
+html.js .themes { display: block; }
+.themes__row { display: flex; flex-wrap: wrap; gap: 1.5rem; }
+/* Same gap as the row above it. It used to be fluid, which made the pro
+   circles sit closer together than the Light/Dark pair on most screens. */
+.themes__row--pro { flex-wrap: nowrap; gap: 1.5rem; }
+/* Below 360px five 44px circles plus four 24px gaps (316px) no longer fit the
+   ~288px of content width. The gap gives way rather than the circles, because
+   44px is Apple's minimum touch target and these are the only control here.
+   Both rows shrink together, so they still match each other at every width. */
+@media (max-width: 359px) {
+  .themes__row, .themes__row--pro { gap: 1rem; }
+}
+
+/* The selected theme's name sits centred under its own circle (Craig,
+   2026-10-24). It is drawn from the swatch's aria-label, so it can never drift
+   from what the control announces, and it is absolutely placed so picking a
+   theme never shifts the rows. The padding keeps room for it under the Pro row. */
+.themes { padding-bottom: 2rem; }
+.swatch { position: relative; font-family: inherit; }
+.swatch[aria-checked='true']::after {
+  content: attr(aria-label);
+  position: absolute; left: 50%; top: calc(100% + 14px);   /* clear of the 9px ring */
+  transform: translateX(-50%);
+  white-space: nowrap; pointer-events: none;
+  font-size: 12px; font-weight: 400;     /* regular, as asked */
+  line-height: 1.4;
+  color: var(--dn-label);                 /* follows the band's theme repaint */
+  transition: color 550ms ease;
+}
+.themes__pro {
+  display: flex; align-items: center; gap: 1.25rem;
+  margin: clamp(2.5rem, 7vw, 5.5rem) 0 1.25rem;
+  font-size: 1.1875rem; font-weight: 500;
+}
+.themes__pro img { width: 69px; height: auto; display: block; }
+
+.swatch {
+  appearance: none; border: 0; padding: 0; cursor: pointer;
+  width: clamp(44px, 12vw, 58px); aspect-ratio: 1; flex: none;   /* 44px floor: Apple's minimum touch target */
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .12), inset 0 0 0 1px rgba(0, 0, 0, .06);
+  transition: box-shadow .2s ease, transform .2s ease;
+}
+.swatch:hover { transform: scale(1.05); }
+.swatch[aria-checked='true'] {
+  box-shadow: 0 0 0 5px var(--dn-page), 0 0 0 9px var(--dn-ring);
+}
+.swatch:focus-visible { outline: 2px solid var(--dn-ring); outline-offset: 12px; }
+
+.swatch--light  { background: linear-gradient(#FFFFFF, #E8EBF2); }
+.swatch--dark   { background: linear-gradient(#3C3F58, #1E2030); }
+.swatch--taupe  { background: linear-gradient(#EBDECD, #B5A280); }
+.swatch--rose   { background: linear-gradient(#F1DADC, #B89889); }
+.swatch--matcha { background: linear-gradient(#D6DCC3, #A0A076); }
+.swatch--grey   { background: linear-gradient(#959595, #595959); }
+.swatch--black  { background: linear-gradient(#363636, #000000); }
+
+.daynight { margin: 0; }
 .daynight__stack {
-  position: relative;
-  aspect-ratio: 620 / 1348;            /* the screenshots' own proportions */
-  border-radius: 37px;
-  overflow: hidden;
+  overflow: hidden;                    /* placed and rounded by the device frame */
 }
 .daynight__shot {
   position: absolute; inset: 0;
@@ -1311,7 +1619,11 @@ html.js .seg { display: inline-flex; }
   transition: opacity .4s ease;
 }
 .daynight__shot.is-active { opacity: 1; }
-@media (prefers-reduced-motion: reduce) { .daynight__shot { transition: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .daynight-band, .daynight-band__sky, .daynight-band h2, .daynight-band .lede,
+  .daynight-band .section-label, .daynight__shot, .swatch { transition: none; }
+  .swatch:hover { transform: none; }
+}
 
 /* ---------------------------------------- the unfold, scrubbed on scroll
    A canvas over a still. The still is the last frame, so with JS off, with
@@ -1820,7 +2132,6 @@ html:not(.js) .unfold { margin-block: clamp(2.5rem, 5vw, 3.5rem) 0; }
 .device--reel {
   width: clamp(168px, 22vw, 232px);
   margin-inline: 0;
-  border-radius: 34px; padding: 7px;
   /* --shadow-device is built for a 300px device and throws 124px below it,
      which the reel's overflow clip cut clean off. Keep the bezel's inset rims,
      scale the cast shadow to the size these actually render at. */
@@ -1831,7 +2142,6 @@ html:not(.js) .unfold { margin-block: clamp(2.5rem, 5vw, 3.5rem) 0; }
     0 3px 8px rgba(14, 16, 30, .12),
     0 12px 28px rgba(14, 16, 30, .18);
 }
-.device--reel img { border-radius: 28px; }
 @keyframes marquee-drift { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
 /* Pause on hover, but only where hovering is a real thing. On a touch screen
@@ -1855,6 +2165,9 @@ html:not(.js) .unfold { margin-block: clamp(2.5rem, 5vw, 3.5rem) 0; }
    reference: the strongest blob there is only about a quarter of the way from
    the page ground to full colour, hence the low opacity. */
 .qs-feature { position: relative; }
+/* Copy on the left, tiles on the right, as in Craig's reference. The tiles
+   went full width for a while to make the section taller; the reference puts
+   them back beside the copy, which is the layout this now follows. */
 .qs-feature > .feature__text,
 .qs-feature > .feature__art { position: relative; z-index: 1; }
 
@@ -1904,80 +2217,121 @@ html:not(.js) .unfold { margin-block: clamp(2.5rem, 5vw, 3.5rem) 0; }
    Every colour here was sampled from that screen and then matched back to a
    FolderColor case, so the tokens are the app's own rather than near misses:
    the Notebooks tile is blurple (Lavender), not purple. */
+/* NOTE on the cqw numbers below: they are scaled by 1/0.84, because cqw
+   resolves against the CONTAINER'S CONTENT BOX and the tile carries 8% padding
+   each side. The ratios they encode are against the full card, as measured off
+   the app (icon 22% of the card, figure ~25%, label 7.4%). Change the padding
+   and these all need rescaling. */
 .qs-grid {
-  display: grid; gap: .6rem;
+  display: grid;
+  gap: clamp(.55rem, 1.4vw, 1rem);
   grid-template-columns: repeat(2, 1fr);
 }
-@media (min-width: 560px) { .qs-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 620px) { .qs-grid { grid-template-columns: repeat(3, 1fr); } }
 
+/* Every size in a tile is a share of the TILE's own width, not the viewport,
+   so the proportions hold whatever the grid does with them. The ratios were
+   measured off the app: a 401px card has a 40px radius (10%), a 90px icon
+   (22%) and a figure about a quarter of the card across. Guessing these got
+   the icon half the size it should be. */
 .qs {
-  display: flex; flex-direction: column; gap: .18rem;
-  padding: .7rem .75rem .8rem;
-  border-radius: 16px;
-  min-height: 138px;        /* squarer than the old tiles: these carry rows and a gauge */
+  /* Makes the tile a container for its CHILDREN. Its own padding and radius
+     must NOT be in cqw: an element cannot query itself, and asking it to
+     resolved the whole container to about 2px, which collapsed every child
+     font to a fraction of a pixel. Percentages here instead, which on a square
+     tile come to the same thing. */
+  container-type: inline-size;
+  aspect-ratio: 1;                       /* the app's tiles are square */
+  display: flex; flex-direction: column;
+  padding: 8% 8% 7%;
+  border-radius: 10%;
   text-align: left;
   overflow: hidden;
 }
 
-/* label and its badge share the top line */
-.qs__top { display: flex; align-items: flex-start; justify-content: space-between; gap: .4rem; }
-.qs__icon {
-  flex: none; display: grid; place-items: center;
-  width: 18px; height: 18px; border-radius: 6px;
-  background: var(--blue); color: #fff;
+.qs__top { display: flex; align-items: flex-start; justify-content: space-between; gap: 3.6cqw; }
+.qs__label {
+  font-size: 8.8cqw; font-weight: 600; letter-spacing: 0;
+  line-height: 1.15; color: var(--qs-ink);
 }
-.qs__icon svg { width: 11px; height: 11px; display: block; }
-.qs__icon--grey { background: color-mix(in srgb, var(--text-2) 22%, transparent); color: var(--text-1); }
-/* on a gradient tile the badge inverts: white chip, tile-coloured mark */
-.qs__icon--onlight { background: rgba(255, 255, 255, .92); color: #9A61ED; }
+.qs__val {
+  font-size: 29.8cqw; font-weight: 700; line-height: 1.02;
+  margin-top: 2.4cqw; letter-spacing: -.02em; color: var(--text-1);
+}
+.qs__sub {
+  font-size: 8.3cqw; font-weight: 600; line-height: 1.2;
+  margin-top: 1.8cqw; color: var(--qs-ink);
+}
+/* the quieter third line, e.g. Whenever you're ready. */
+.qs__note { font-size: 7.9cqw; line-height: 1.25; margin-top: 2.4cqw; color: var(--qs-mute); }
 
-/* Top Stacks: name on the left, count pill on the right, three deep */
-.qs__rows { display: flex; flex-direction: column; gap: .22rem; margin-top: .4rem; }
-.qs__row { display: flex; align-items: center; gap: .35rem; font-size: .75rem; font-weight: 600; }
-.qs__row-emoji { flex: none; font-size: .8rem; line-height: 1; }
+/* The badge is an app-style rounded square, and it is big: nearly a quarter of
+   the tile. It reads as part of the app rather than as a tacked-on glyph. */
+.qs__icon { flex: none; width: 26.2cqw; height: 26.2cqw; border-radius: 26%; }
+.qs__icon svg { display: block; width: 100%; height: 100%; }
+.qs__icon--blue {
+  background: linear-gradient(160deg, #36C6FF, #008DF2);
+  color: #fff;
+  box-shadow: inset 0 0.7cqw 0 rgba(255, 255, 255, .34);
+}
+.qs__icon--plain { background: #fff; color: #fff; box-shadow: 0 0.4cqw 1cqw rgba(14, 16, 30, .14); }
+.qs__icon--ghost { background: none; color: var(--qs-ink); border-radius: 0; }
+
+/* Rows sit on their own pill, which is what makes Top Stacks read as a list
+   of things rather than three lines of text. */
+.qs__rows { display: flex; flex-direction: column; gap: 2.9cqw; margin-top: 4.8cqw; }
+.qs__row {
+  display: flex; align-items: center; gap: 3.1cqw;
+  padding: 3.3cqw 3.1cqw 3.3cqw 4cqw;
+  border-radius: 5.2cqw;
+  background: var(--qs-row);
+  font-size: 8.6cqw; font-weight: 600; color: var(--text-1);
+}
+.qs__row-emoji { flex: none; font-size: 9cqw; line-height: 1; }
 .qs__row-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .qs__row-n {
-  flex: none; min-width: 18px; padding: .05rem .3rem;
+  flex: none; min-width: 10.7cqw; padding: 0.7cqw 2.6cqw;
   border-radius: 999px; background: var(--blue); color: #fff;
-  font-size: .6875rem; text-align: center;
+  font-size: 7.6cqw; font-weight: 600; text-align: center;
 }
 
-/* Showing up: the count and its wording share a line, as they do in the app */
-.qs__val--inline { display: flex; align-items: baseline; gap: .35rem; }
+/* Showing up: figure and wording share a line, gauge underneath */
+.qs__val--inline { display: flex; align-items: baseline; gap: 3.1cqw; }
 .qs__val--inline em {
-  font-style: normal; font-size: .6875rem; font-weight: 600;
-  line-height: 1.25; color: var(--text-2);
+  font-style: normal; font-size: 8.3cqw; font-weight: 600;
+  line-height: 1.18; color: var(--qs-ink);
 }
-.qs__gauge { display: block; width: 72px; height: 40px; margin: auto auto -.15rem; }
-
-/* the small aside under a figure, e.g. Nice work. */
-.qs__note { font-size: .6875rem; font-weight: 600; opacity: .78; margin-top: .15rem; }
-.qs__label { font-size: .6875rem; font-weight: 600; letter-spacing: .3px; opacity: .78; }
-.qs__val { font-size: 1.3rem; font-weight: 600; line-height: 1.1; margin-top: .1rem; letter-spacing: -.01em; }
-.qs__val--quote { font-size: .8125rem; font-weight: 600; line-height: 1.3; }
-/* Sits straight under its figure, the way the app groups them. What goes to
-   the bottom of a tile is the artwork (the day run, the gauge), not the words,
-   and those claim the slack with their own auto margin. */
-.qs__sub { font-size: .6875rem; line-height: 1.3; opacity: .72; }
+/* Sized by HEIGHT, not width. Driving it off the width made it 135px tall in
+   a 350px tile that already held a 77px header and a 111px figure, and the
+   tile overflowed by 28px. Height is the dimension actually in short supply. */
+.qs__gauge { display: block; margin: auto auto 0; height: 30%; }
+.qs__gauge svg { display: block; height: 100%; width: auto; margin-inline: auto; }
 
 /* plain card, takes the page's own surface */
 .qs--flat {
   background: var(--card-bg);
   border: 1px solid var(--card-stroke-solid);
   box-shadow: var(--shadow-card);
-  color: var(--text-1);
 }
-.qs--flat .qs__label { color: var(--section-header); opacity: 1; }
-.qs--flat .qs__sub { color: var(--text-2); opacity: 1; }
+
+/* Top Projects is the one dark tile, and its rows darken with it. */
+.qs--dark {
+  --qs-ink: #C7CAE4;
+  --qs-row: #5A5D78;
+  background: #484B63;
+  box-shadow: var(--shadow-card);
+}
+.qs--dark .qs__val, .qs--dark .qs__row { color: #fff; }
 
 /* gradient tiles, straight off FolderColor in Theme.swift */
-.qs--blue,
-.qs--purple,
-.qs--blurple,
-.qs--teal,
-.qs--pink,
-.qs--manilla,
-.qs--forest { color: #fff; }
+.qs--blue, .qs--purple, .qs--blurple, .qs--teal,
+.qs--pink, .qs--manilla, .qs--forest {
+  --qs-ink: rgba(255, 255, 255, .88);
+  --qs-mute: rgba(255, 255, 255, .72);
+  color: #fff;
+}
+.qs--blue .qs__val, .qs--purple .qs__val, .qs--blurple .qs__val,
+.qs--teal .qs__val, .qs--pink .qs__val, .qs--forest .qs__val { color: #fff; }
 .qs--blue    { background: linear-gradient(160deg, #10D3FE, #008DF1); }
 .qs--purple  { background: linear-gradient(160deg, #BD74FF, #9A61ED); }
 /* FolderColor.blurple, shown to customers as Lavender */
@@ -1988,18 +2342,30 @@ html:not(.js) .unfold { margin-block: clamp(2.5rem, 5vw, 3.5rem) 0; }
 /* Manilla is a pale gradient, so it keeps dark ink rather than white. */
 .qs--manilla { background: linear-gradient(160deg, #F9E1AA, #EAB578); color: #4A3410; }
 
-/* Tasks Created carries a run of days: a dot for each quiet one, a bar for the
-   two that were not. Same shape the app draws under that figure. */
+/* the notebook's spine, down the right edge as it is in the app */
+.qs--notebook { position: relative; }
+/* The app's own Belly-band asset rather than a drawn approximation.
+   Geometry measured off Craig's reference: 7.3% of the tile across, the full
+   height of it, right edge 18.5% in from the tile's right. The artwork is a
+   tall narrow strip, so it is stretched on the long axis only. */
+.qs--notebook::after {
+  content: ''; position: absolute; top: 0; bottom: 0;
+  right: 18.5%; width: 7.3%;
+  background: url('../img/art/belly-band.webp') no-repeat center / 100% 100%;
+  pointer-events: none;
+}
+
+/* The run of days under a figure: a dot for each quiet one, a bar for the
+   rest. Pinned to the foot of the tile, which is where the app puts it. */
 .qs__spark {
-  display: flex; align-items: flex-end; gap: 3px;
-  height: 18px; margin-top: auto;
+  display: flex; align-items: flex-end; gap: 2.6cqw;
+  height: 14.3cqw; margin-top: auto;
 }
 .qs__spark i {
-  flex: none; width: 4px; height: 4px; border-radius: 50%;
-  background: rgba(255, 255, 255, .5);
+  flex: none; width: 2.9cqw; height: 2.9cqw; border-radius: 50%;
+  background: rgba(255, 255, 255, .55);
 }
-.qs__spark b { flex: none; width: 5px; height: 11px; border-radius: 2px; background: rgba(255, 255, 255, .8); }
-.qs__spark b.is-tall { height: 17px; }
+.qs__spark b { flex: none; width: 3.3cqw; height: 10.7cqw; border-radius: 1.7cqw; background: #fff; }
 
 /* the little bar chart on the Work tile */
 .qs__bars { display: flex; align-items: flex-end; gap: 2px; height: 16px; margin-top: .4rem; }
@@ -2224,6 +2590,20 @@ html.js .feature.is-in .prop { opacity: 1; transform: none; }
 .fp__seg { display: flex; gap: 3px; background: var(--at-pill); border-radius: 10px; padding: 3px; margin: .6rem 0; font-size: .8125rem; font-weight: 600; }
 .fp__seg span { flex: 1; text-align: center; padding: .35rem 0; border-radius: 8px; color: var(--at-muted); }
 .fp__seg .on { background: var(--at-raised); color: var(--at-ink); box-shadow: 0 1px 3px rgba(19, 19, 22, .12); }
+
+/* Selected Tags, from the app's TagChip in a blue Project: a 32pt capsule, an
+   18pt Tags glyph (the app's own asset, white with its panel at half strength),
+   15pt medium, the blue Tag gradient and its glow underneath. Blue in both
+   themes, as in the app. */
+.fp__tags { display: flex; flex-wrap: wrap; gap: 10px; padding: .85rem 0 1rem; }
+.fp__tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 32px; padding: 0 14px 0 12px; border-radius: 999px;
+  background: linear-gradient(to bottom, #229CEC, #2199EF);
+  box-shadow: 0 3px 10px rgba(33, 153, 239, .4);
+  color: #fff; font-size: .9375rem; font-weight: 500;
+}
+.fp__tag img { width: 18px; height: 18px; flex: none; }
 
 
 /* Dark. The light values above are Craig's exact mockup colours, so these are

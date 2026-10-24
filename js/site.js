@@ -264,15 +264,22 @@
                    .getPropertyValue('--nav-pill-h')) || 46;
       var navTop = Math.max(10, Math.min(18, vw * 0.016));
 
-      var travel = Math.max(window.innerHeight * 0.32, 180);
-      var p = Math.min(1, Math.max(0, window.scrollY / travel));
+      var ex = (vw - small) / 2;                        // stays centred when pinned
+      var ey = navTop + (navH - small) / 2;
+      var sx = (vw - big) / 2;                          // centred in its section
+      var sy = slot.getBoundingClientRect().top;
+
+      /* Driven by the SLOT's distance from the pinned spot, not by scrollY.
+         The slot no longer sits in the first screenful: it lives in the band
+         below the start screen, so a scrollY ramp would finish long before the
+         icon was ever on screen and the thing would never be seen at full
+         size. Measuring the gap instead means the morph happens wherever the
+         slot happens to be, and it keeps working if the slot moves again. */
+      var range = Math.max(window.innerHeight * 0.34, 200);
+      var p = Math.min(1, Math.max(0, (range - (sy - ey)) / range));
       var ease = p * p * (3 - 2 * p);                   // smoothstep
 
       var size = big + (small - big) * ease;
-      var sx = (vw - big) / 2;                          // centred in the hero
-      var sy = slot.getBoundingClientRect().top;
-      var ex = (vw - small) / 2;                        // stays centred when pinned
-      var ey = navTop + (navH - small) / 2;
 
       brand.style.transform = 'translate(' +
         (sx + (ex - sx) * ease).toFixed(1) + 'px,' +
@@ -291,6 +298,46 @@
     window.addEventListener('scroll', onBrand, { passive: true });
     window.addEventListener('resize', onBrand, { passive: true });
   }
+
+  /* ---------------------------------------------- start screen
+     Two jobs. The blue rises into view as you scroll, so the page opens on the
+     flat app ground and the colour arrives on the way down; and the three
+     devices settle into place once, on load. */
+  (function () {
+    var start = document.querySelector('.start');
+    if (!start) { return; }
+
+    var blue = start.querySelector('.start__blue');
+    var sTicking = false;
+    var MIN_REACH = 15;    // the hem that is there before you touch anything
+    var MAX_REACH = 88;    // most of the screen by the time you leave it
+
+    var paintBlue = function () {
+      sTicking = false;
+      if (!blue) { return; }
+      var ramp = Math.max(start.offsetHeight * 0.7, 260);
+      var v = Math.min(1, Math.max(0, window.scrollY / ramp));
+      var ease = v * v * (3 - 2 * v);                  // smoothstep
+      blue.style.setProperty('--reach',
+        (MIN_REACH + (MAX_REACH - MIN_REACH) * ease).toFixed(2) + '%');
+    };
+    var onScroll = function () {
+      if (!sTicking) { sTicking = true; window.requestAnimationFrame(paintBlue); }
+    };
+    paintBlue();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+
+    /* One frame's grace so the first paint has the devices in their start
+       position; without it the transition has nothing to run from.
+       The timer is not belt and braces, it is the actual guarantee: rAF does
+       not run at all in a tab that is not painting, and the devices begin at
+       opacity 0, so a page that never gets a frame would sit there empty.
+       Whichever lands first wins; the class is idempotent. */
+    var reveal = function () { start.classList.add('is-ready'); };
+    window.requestAnimationFrame(function () { window.requestAnimationFrame(reveal); });
+    window.setTimeout(reveal, 250);
+  })();
 
   /* ---------------------------------------------- hero fan
      Drives --fan from 0 to 1 across the first screenful of scrolling, so the
@@ -313,13 +360,14 @@
     window.addEventListener('resize', onFanScroll, { passive: true });
   }
 
-  /* ---------------------------------------------- day / night preview
-     Starts on whatever the visitor's OS is set to. Keeps following the OS
-     until they pick a side, after which their choice sticks for the visit. */
-  var seg = document.querySelector('.seg');
-  if (seg) {
-    var shots = document.querySelectorAll('.daynight__shot');
-    var segBtns = seg.querySelectorAll('.seg__btn');
+  /* ---------------------------------------------- themes preview
+     Starts on Light or Dark to match the visitor's OS, and keeps following the
+     OS until they pick a swatch, after which their choice sticks for the visit. */
+  var themes = document.querySelector('.themes');
+  if (themes) {
+    var band = themes.closest('.daynight-band');
+    var shots = band.querySelectorAll('.daynight__shot');
+    var swatches = themes.querySelectorAll('.swatch');
     var mq = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
     var chosen = false;
 
@@ -327,26 +375,39 @@
       Array.prototype.forEach.call(shots, function (s) {
         s.classList.toggle('is-active', s.getAttribute('data-mode') === mode);
       });
-      Array.prototype.forEach.call(segBtns, function (b) {
-        b.setAttribute('aria-pressed', String(b.getAttribute('data-mode') === mode));
+      Array.prototype.forEach.call(swatches, function (b) {
+        var on = b.getAttribute('data-mode') === mode;
+        b.setAttribute('aria-checked', String(on));
+        b.tabIndex = on ? 0 : -1;             // one tab stop; arrows move within
+        // The name under the circle is CSS (::after from aria-label), so the
+        // aria-checked flip above is all it needs.
       });
-      // The band paints the sky for whichever theme is on show.
-      if (band) { band.setAttribute('data-mode', mode); }
+      // The band repaints its page and its sky for whichever theme is on show.
+      band.setAttribute('data-mode', mode);
     }
 
-    var band = seg.closest('.daynight-band');
     setMode(mq && mq.matches ? 'dark' : 'light');
 
     if (mq) {
-      var follow = function (e) { if (!chosen) { setMode(e.matches ? 'dark' : 'light'); } };   // Black is a deliberate choice only
+      var follow = function (e) { if (!chosen) { setMode(e.matches ? 'dark' : 'light'); } };   // the Pro themes are a deliberate choice only
       if (mq.addEventListener) { mq.addEventListener('change', follow); }
       else if (mq.addListener) { mq.addListener(follow); }   // older Safari
     }
 
-    Array.prototype.forEach.call(segBtns, function (b) {
+    Array.prototype.forEach.call(swatches, function (b, i) {
       b.addEventListener('click', function () {
         chosen = true;
         setMode(b.getAttribute('data-mode'));
+      });
+      // Radio-group arrows, as a native radio set would have.
+      b.addEventListener('keydown', function (e) {
+        var step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+        if (!step) { return; }
+        e.preventDefault();
+        var next = swatches[(i + step + swatches.length) % swatches.length];
+        chosen = true;
+        setMode(next.getAttribute('data-mode'));
+        next.focus();
       });
     });
   }

@@ -18,7 +18,7 @@
 <meta property="og:image" content="img/icon/icon-512.png">
 <meta property="og:type" content="website">
 <script>document.documentElement.className += ' js';</script>
-<link rel="stylesheet" href="css/site.css?v=20261007205441">
+<link rel="stylesheet" href="css/site.css?v=20261024160011">
 </head>
 <body>
 
@@ -37,27 +37,63 @@
 
 <main>
 
-  <!-- ============================================ hero -->
+  <!-- The morphing app icon. Fixed, so it can live anywhere in the document;
+       JS places it over .brand-slot, which now sits in the band below rather
+       than in the first screen. -->
   <a class="brand" id="brand" href="#top" aria-label="InfiniTask, back to top">
     <img class="brand__mark" src="img/icon/app-icon.webp" alt="" width="460" height="460">
   </a>
 
-  <section class="hero" id="top" data-veil="#8760D3">
-    <div class="wrap hero__inner">
-      <div class="brand-slot" aria-hidden="true"></div>
-      <span class="hero__wordmark">InfiniTask</span>
-      <h1>Gorgeous task management for everyone.</h1>
-      <p class="hero__lede">Most task apps make you choose between beautiful and simple. InfiniTask doesn't. Every detail's been considered, every interaction smoothed &mdash; so all you have to do is open it and go.</p>
+  <!-- ============================================ start
+       The first screen, built to read like the app's own first screen: light,
+       quiet, one thing to look at. The blue is not painted on; it rises into
+       view as you scroll (see .start__blue), so the page opens clean and the
+       colour arrives on the way down into the band below. -->
+  <section class="start" id="top" data-veil="#E8EBF2">
+    <i class="start__blue" aria-hidden="true"></i>
 
-      <a class="cta" href="#get">
-        <svg class="cta__apple" viewBox="0 0 16 20" aria-hidden="true" focusable="false">
-          <path fill="currentColor" d="M13.29 10.62c.02-2.02 1.65-2.99 1.72-3.04-0.94-1.37-2.4-1.56-2.92-1.58-1.24-.13-2.42.73-3.05.73-.63 0-1.6-.71-2.63-.69-1.35.02-2.6.79-3.29 2-1.4 2.44-.36 6.04 1.01 8.02.67.97 1.47 2.06 2.51 2.02 1.01-.04 1.39-.65 2.61-.65 1.22 0 1.56.65 2.63.63 1.09-.02 1.78-.99 2.44-1.96.77-1.12 1.09-2.21 1.11-2.27-.02-.01-2.13-.82-2.15-3.24zM11.3 4.6c.56-.68.94-1.62.83-2.56-.81.03-1.79.54-2.37 1.21-.52.6-.97 1.56-.85 2.48.9.07 1.83-.46 2.39-1.13z"/>
-        </svg>
-        <span>Coming soon to the App Store</span>
-        <svg class="cta__chev" viewBox="0 0 12 20" aria-hidden="true" focusable="false">
-          <path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M2 2l8 8-8 8"/>
-        </svg>
-      </a>
+    <div class="wrap start__inner">
+      <div class="start__copy">
+        <img class="start__mark" src="img/icon/logo-colour.webp" alt="" width="180" height="180" loading="eager">
+        <h1 class="start__wordmark">InfiniTask</h1>
+        <p class="start__sub">Gorgeous task management for everyone</p>
+
+        <p class="start__actions">
+          <a class="start__store" href="#get">
+            <img src="img/badge/download-on-the-app-store.svg"
+                 alt="Download on the App Store" width="120" height="40">
+          </a>
+          <a class="start__more" href="#point">Learn more</a>
+        </p>
+
+        <p class="start__req">For iPhone, iPhone Duo and iPad. Requires iOS 26.5 or later.</p>
+      </div>
+
+      <!-- Three devices in a row, all standing on one baseline. The Duo is in
+           front because it is the one worth looking at; the iPad and iPhone
+           sit either side of it saying "and these too". -->
+      <div class="start__stage">
+        <div class="start__dev start__dev--pad">
+          <img src="img/shots/40-start-ipad.webp" alt="InfiniTask on iPad in the Moon Grey theme, showing the Home Renovation Project with its Tasks and recent attachments under a waterfall photo." width="1379" height="2000" loading="eager">
+        </div>
+        <div class="start__dev start__dev--duo">
+          <img src="img/shots/42-start-duo.webp" alt="InfiniTask on an opened iPhone Duo, showing Today with Activity on the left and QuickStats on the right." width="2000" height="1407" loading="eager">
+        </div>
+        <div class="start__dev start__dev--phone">
+          <img src="img/shots/41-start-iphone.webp" alt="InfiniTask on iPhone in the Moon Grey theme, showing the Blast Off Project and its two Tasks." width="920" height="2000" loading="eager">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ thesis -->
+  <section class="band band--bridge" id="point" data-veil="#6657DE">
+    <div class="wrap wrap--reading center reveal">
+      <div class="brand-slot" aria-hidden="true"></div>
+      <p class="section-label">The whole point</p>
+      <h2>Meticulously crafted to let you just get things done.</h2>
+      <p class="lede">Most task apps make you choose between beautiful and simple. InfiniTask doesn't. Every detail's been considered, every interaction smoothed, so all you have to do is open it and go.</p>
+      <p class="lede">The whole core app is free. Properly free, not a demo. Pro is a few crafted extras for the people who fancy them, never a gate.</p>
 
       <ul class="pillars">
         <li class="pillar">
@@ -85,29 +121,6 @@
           <span class="pillar__label">Nothing leaves<br>your phone</span>
         </li>
       </ul>
-    </div>
-
-    <div class="hero__showcase" id="showcase">
-      <div class="fan">
-        <div class="device fan__card fan__card--left">
-          <img src="img/shots/32-today-hero-dark.webp" alt="The Today screen in dark mode, with a date carousel, QuickStats tiles and an activity feed." width="760" height="1652" loading="eager">
-        </div>
-        <div class="device fan__card fan__card--right">
-          <img src="img/shots/31-notebook-reading-dark.webp" alt="A Notebook called Reading, with a photo backdrop behind its green cover and two Notes below." width="760" height="1652" loading="eager">
-        </div>
-        <div class="device fan__card fan__card--centre">
-          <img src="img/shots/30-projects-hero-dark.webp" alt="The Projects library in dark mode, showing a grid of coloured Project folders." width="760" height="1652" loading="eager">
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================================ thesis -->
-  <section class="band band--bridge" data-veil="#3E77EB">
-    <div class="wrap wrap--reading center reveal">
-      <p class="section-label">The whole point</p>
-      <h2>Meticulously crafted to let you just get things done.</h2>
-      <p class="lede">The whole core app is free. Properly free, not a demo. Pro is a few crafted extras for the people who fancy them, never a gate.</p>
     </div>
   </section>
 
@@ -140,11 +153,13 @@
               <li><button type="button" class="addthings__tile" data-thing="location"><img src="img/art/feat-location.webp" alt="" width="224" height="224" loading="lazy"><span>Location</span></button></li>
               <li><button type="button" class="addthings__tile" data-thing="website"><img src="img/art/feat-url.webp" alt="" width="224" height="224" loading="lazy"><span>Website</span></button></li>
               <li><button type="button" class="addthings__tile" data-thing="timeframe"><img src="img/art/feat-timeframe.webp" alt="" width="224" height="224" loading="lazy"><span>Timeframe</span></button></li>
+              <li><button type="button" class="addthings__tile" data-thing="tags"><img src="img/art/feat-tags.webp" alt="" width="224" height="224" loading="lazy"><span>Tags</span></button></li>
               <li><button type="button" class="addthings__tile" data-thing="reminder"><img src="img/art/feat-reminder.webp" alt="" width="224" height="224" loading="lazy"><span>Reminder</span></button></li>
               <li><button type="button" class="addthings__tile" data-thing="timer"><img src="img/art/feat-timer.webp" alt="" width="224" height="224" loading="lazy"><span>Timer</span></button></li>
               <li><button type="button" class="addthings__tile" data-thing="checklist"><img src="img/art/feat-checklist.webp" alt="" width="224" height="224" loading="lazy"><span>Checklist</span></button></li>
               <li><button type="button" class="addthings__tile" data-thing="linknote"><img src="img/art/feat-linknote.webp" alt="" width="224" height="224" loading="lazy"><span>Link Note</span></button></li>
               <li><button type="button" class="addthings__tile" data-thing="importance"><img src="img/art/feat-importance.webp" alt="" width="224" height="224" loading="lazy"><span>Importance</span></button></li>
+              <li><button type="button" class="addthings__tile" data-thing="audionote"><img src="img/art/feat-audionote.webp" alt="" width="224" height="224" loading="lazy"><span>Audio Note</span></button></li>
             </ul>
           </div>
         </div>
@@ -221,52 +236,51 @@
         </div>
       </div>
 
-      <div class="feature feature--flip reveal qs-feature">
+      <div class="feature reveal qs-feature">
         <div class="qs-fieldwrap" aria-hidden="true">
           <div class="qs-field"><i></i><i class="qf--forest"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--blush"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--blue"></i><i></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--forest"></i><i></i><i class="qf--sage"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--blue"></i><i></i><i class="qf--purple"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--pink"></i><i></i><i class="qf--forest"></i><i></i><i class="qf--blue"></i><i class="qf--teal"></i><i></i><i class="qf--sage"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--blue"></i><i></i><i class="qf--pink"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--pink"></i><i></i><i class="qf--forest"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--purple"></i><i></i><i class="qf--blush"></i><i></i></div>
         </div>
         <div class="feature__text">
           <p class="section-label section-label--pro"><img src="img/icon/pro-badge.webp" alt="Pro feature" width="61" height="24" loading="lazy"></p>
-          <h3>Know where things actually stand.</h3>
+          <h3>QuickStats. Know where you stand.</h3>
           <p>QuickStats reflects how you're really going. No scores, no streaks, nothing to chase. An insight shows up only when your history genuinely supports it, and says so plainly when it doesn't.</p>
         </div>
         <div class="feature__art">
         <div class="qs-grid" aria-hidden="true">
           <div class="qs qs--blue">
-            <span class="qs__top"><span class="qs__label">Tasks Created</span></span>
-            <span class="qs__val">19</span>
-            <span class="qs__sub">This month</span>
-            <span class="qs__spark"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><b></b><b class="is-tall"></b></span>
+            <span class="qs__top"><span class="qs__label">Kitchen Reno</span><span class="qs__icon qs__icon--plain"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5.4" y="3.6" width="13.2" height="16.8" rx="2.6" fill="#fff"/><rect x="5.4" y="3.6" width="3.1" height="16.8" rx="1.4" fill="#D7DBE6"/></svg></span></span>
+            <span class="qs__val">6</span>
+            <span class="qs__sub">Task Completed</span>
+            <span class="qs__spark"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><b></b><i></i><i></i></span>
+          </div>
+
+          <div class="qs qs--dark">
+            <span class="qs__top"><span class="qs__label">Top Projects</span><span class="qs__icon qs__icon--ghost"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.6" fill="currentColor" opacity=".16"/><path d="M12 17V7.6M7.9 11.7 12 7.6l4.1 4.1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+            <span class="qs__rows"><span class="qs__row"><span class="qs__row-name">Fix Garage</span><span class="qs__row-n">9</span></span><span class="qs__row"><span class="qs__row-emoji">🥗</span><span class="qs__row-name">Get Healt&hellip;</span><span class="qs__row-n">7</span></span><span class="qs__row"><span class="qs__row-name">Launch App</span><span class="qs__row-n">4</span></span></span>
           </div>
 
           <div class="qs qs--flat">
-            <span class="qs__top"><span class="qs__label">Top Stacks</span><span class="qs__icon qs__icon--grey"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 12.4V4.2M4.6 7.6 8 4.2l3.4 3.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
-            <span class="qs__rows"><span class="qs__row"><span class="qs__row-emoji">🏃</span><span class="qs__row-name">Move more</span><span class="qs__row-n">2</span></span><span class="qs__row"><span class="qs__row-emoji">🥦</span><span class="qs__row-name">Diet shakeup</span><span class="qs__row-n">2</span></span><span class="qs__row"><span class="qs__row-emoji">😴</span><span class="qs__row-name">Rest up</span><span class="qs__row-n">2</span></span></span>
+            <span class="qs__top"><span class="qs__label">Heads up</span><span class="qs__icon qs__icon--blue"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.6" fill="#fff"/><path d="M8.2 12.3l2.7 2.7 5-5.1" fill="none" stroke="#008DF2" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+            <span class="qs__val">24</span>
+            <span class="qs__sub">Incomplete Tasks need attention</span>
+            <span class="qs__note">Whenever you&rsquo;re ready.</span>
           </div>
 
           <div class="qs qs--flat">
-            <span class="qs__top"><span class="qs__label">Showing up</span><span class="qs__icon qs__icon--blue"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 13.5S2.2 10 2.2 6.3A3.1 3.1 0 0 1 8 4.6a3.1 3.1 0 0 1 5.8 1.7C13.8 10 8 13.5 8 13.5z" fill="currentColor"/></svg></span></span>
-            <span class="qs__val qs__val--inline">7 <em>Days you&rsquo;ve been active</em></span>
-            <svg class="qs__gauge" viewBox="0 0 64 36" aria-hidden="true"><defs><linearGradient id="qsg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#1D9E75"/><stop offset="1" stop-color="#10D3FE"/></linearGradient></defs><path d="M6 32a26 26 0 0 1 52 0" fill="none" stroke="var(--divider)" stroke-width="7" stroke-linecap="round"/><path d="M6 32a26 26 0 0 1 52 0" fill="none" stroke="url(#qsg)" stroke-width="7" stroke-linecap="round" stroke-dasharray="81.7" stroke-dashoffset="24.5"/></svg>
+            <span class="qs__top"><span class="qs__label">Top Stacks</span><span class="qs__icon qs__icon--ghost"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.6" fill="currentColor" opacity=".16"/><path d="M12 17V7.6M7.9 11.7 12 7.6l4.1 4.1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+            <span class="qs__rows"><span class="qs__row"><span class="qs__row-emoji">🏃</span><span class="qs__row-name">Move more</span><span class="qs__row-n">2</span></span><span class="qs__row"><span class="qs__row-emoji">🥦</span><span class="qs__row-name">Diet shak&hellip;</span><span class="qs__row-n">2</span></span><span class="qs__row"><span class="qs__row-emoji">😴</span><span class="qs__row-name">Rest up</span><span class="qs__row-n">2</span></span></span>
           </div>
 
-          <div class="qs qs--blurple">
+          <div class="qs qs--flat">
+            <span class="qs__top"><span class="qs__label">Showing up</span><span class="qs__icon qs__icon--blue"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-8-4.9-8-10.1A4.4 4.4 0 0 1 12 7.3a4.4 4.4 0 0 1 8 2.6C20 15.1 12 20 12 20z" fill="currentColor"/></svg></span></span>
+            <span class="qs__val qs__val--inline">16 <em>Days you&rsquo;ve been active</em></span>
+            <span class="qs__gauge"><svg viewBox="0 0 120 70" aria-hidden="true"><defs><linearGradient id="qsg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#1D9F75"/><stop offset=".55" stop-color="#12D3FF"/><stop offset="1" stop-color="#12D3FF"/></linearGradient></defs><path d="M14 62a46 46 0 0 1 92 0" fill="none" stroke="#DDE1E8" stroke-width="13" stroke-linecap="round"/><path d="M14 62a46 46 0 0 1 92 0" fill="none" stroke="url(#qsg)" stroke-width="13" stroke-linecap="round" stroke-dasharray="144.5" stroke-dashoffset="46"/></svg></span>
+          </div>
+
+          <div class="qs qs--blurple qs--notebook">
             <span class="qs__top"><span class="qs__label">Notebooks</span></span>
             <span class="qs__val">4</span>
             <span class="qs__sub">Notes taken</span>
-          </div>
-
-          <div class="qs qs--purple">
-            <span class="qs__top"><span class="qs__label">Overall</span><span class="qs__icon qs__icon--onlight"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.8 8.4l2.7 2.7 5.7-5.7" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
-            <span class="qs__val">1</span>
-            <span class="qs__sub">Task Completed</span>
-            <span class="qs__note">Nice work.</span>
-          </div>
-
-          <div class="qs qs--flat">
-            <span class="qs__top"><span class="qs__label">To do</span><span class="qs__icon qs__icon--blue"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 4.9V8l2.2 1.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
-            <span class="qs__val">18</span>
-            <span class="qs__sub">Tasks waiting</span>
           </div>
         </div>
         </div>
@@ -276,23 +290,46 @@
   </section>
 
   <!-- ============================================ day or night -->
-  <section class="band daynight-band" data-mode="light">
-    <div class="wrap wrap--wide center reveal">
-      <p class="section-label">Light, dark and black</p>
-      <h2>Looks great, day or night.</h2>
-      <p class="lede" style="max-width:46ch;margin-inline:auto;">Light, dark, whatever your phone's doing, it follows along. Or pick a mood and stay there.</p>
+  <section class="daynight-band" id="themes" data-mode="light">
+    <div class="daynight-band__copy reveal">
+      <p class="section-label">Gorgeous custom themes</p>
+      <h2>Project your style</h2>
+      <p class="lede">For however you’re feeling, InfiniTask’s gorgeous themes have you covered.</p>
 
-      <div class="seg" role="group" aria-label="Preview appearance">
-        <button type="button" class="seg__btn" data-mode="light" aria-pressed="false">Light</button>
-        <button type="button" class="seg__btn" data-mode="dark" aria-pressed="false">Dark</button>
-        <button type="button" class="seg__btn" data-mode="black" aria-pressed="false">Black</button>
+      <!-- Swatch fills are AppTheme.swatchGradient in Theme.swift, same order as
+           the app's Appearance screen: Light and Dark free, then the Pro row. -->
+      <div class="themes" role="radiogroup" aria-label="Preview a theme">
+        <div class="themes__row">
+          <button type="button" class="swatch swatch--light" data-mode="light" role="radio" aria-checked="false" aria-label="Light" title="Light"></button>
+          <button type="button" class="swatch swatch--dark" data-mode="dark" role="radio" aria-checked="false" aria-label="Dark" title="Dark"></button>
+        </div>
+        <p class="themes__pro">
+          <img src="img/icon/pro-badge.webp" alt="Pro" width="61" height="24" loading="lazy">
+          <a href="#pro">Learn more</a>
+        </p>
+        <div class="themes__row themes__row--pro">
+          <button type="button" class="swatch swatch--taupe" data-mode="taupe" role="radio" aria-checked="false" aria-label="Taupe" title="Taupe"></button>
+          <button type="button" class="swatch swatch--rose" data-mode="rose" role="radio" aria-checked="false" aria-label="Rose" title="Rose"></button>
+          <button type="button" class="swatch swatch--matcha" data-mode="matcha" role="radio" aria-checked="false" aria-label="Matcha" title="Matcha"></button>
+          <button type="button" class="swatch swatch--grey" data-mode="grey" role="radio" aria-checked="false" aria-label="Moon Grey" title="Moon Grey"></button>
+          <button type="button" class="swatch swatch--black" data-mode="black" role="radio" aria-checked="false" aria-label="Pure Black" title="Pure Black"></button>
+        </div>
       </div>
+    </div>
 
+    <div class="daynight-band__sky">
       <div class="device device--lg daynight">
         <div class="daynight__stack">
-          <img class="daynight__shot is-active" data-mode="light" src="img/shots/daynight-light.webp" alt="The InfiniTask Today screen in the Light theme." width="860" height="1870" loading="lazy">
-          <img class="daynight__shot" data-mode="dark" src="img/shots/daynight-dark.webp" alt="The same Today screen in the Dark theme." width="860" height="1870" loading="lazy">
-          <img class="daynight__shot" data-mode="black" src="img/shots/daynight-black.webp" alt="The same Today screen in the Black theme, on pure black." width="860" height="1870" loading="lazy">
+          <!-- All seven are one Today screen (2026-10-24): the five Pro themes are
+               Craig's own captures, Light and Dark were taken to match from the
+               same simulator, so switching changes only the theme. -->
+          <img class="daynight__shot is-active" data-mode="light" src="img/shots/theme-light.webp" alt="The InfiniTask Today screen in the Light theme, with QuickStats showing 7 Tasks to finish and the Pro tile." width="920" height="2000" loading="lazy">
+          <img class="daynight__shot" data-mode="dark" src="img/shots/theme-dark.webp" alt="The same Today screen in the Dark theme." width="920" height="2000" loading="lazy">
+          <img class="daynight__shot" data-mode="taupe" src="img/shots/theme-taupe.webp" alt="The same Today screen in the Taupe theme." width="920" height="2000" loading="lazy">
+          <img class="daynight__shot" data-mode="rose" src="img/shots/theme-rose.webp" alt="The same Today screen in the Rose theme." width="920" height="2000" loading="lazy">
+          <img class="daynight__shot" data-mode="matcha" src="img/shots/theme-matcha.webp" alt="The same Today screen in the Matcha theme." width="920" height="2000" loading="lazy">
+          <img class="daynight__shot" data-mode="grey" src="img/shots/theme-grey.webp" alt="The same Today screen in the Moon Grey theme." width="920" height="2000" loading="lazy">
+          <img class="daynight__shot" data-mode="black" src="img/shots/theme-black.webp" alt="The same Today screen in the Pure Black theme." width="920" height="2000" loading="lazy">
         </div>
       </div>
     </div>
@@ -456,11 +493,13 @@
         <button class="at__tab" role="tab" id="at-tab-location" aria-controls="at-panel-location" aria-selected="false" tabindex="-1" data-key="location"><img src="img/art/feat-location.webp" alt="" width="224" height="224" loading="lazy"><span>Location</span></button>
         <button class="at__tab" role="tab" id="at-tab-website" aria-controls="at-panel-website" aria-selected="false" tabindex="-1" data-key="website"><img src="img/art/feat-url.webp" alt="" width="224" height="224" loading="lazy"><span>Website</span></button>
         <button class="at__tab" role="tab" id="at-tab-timeframe" aria-controls="at-panel-timeframe" aria-selected="false" tabindex="-1" data-key="timeframe"><img src="img/art/feat-timeframe.webp" alt="" width="224" height="224" loading="lazy"><span>Timeframe</span></button>
+        <button class="at__tab" role="tab" id="at-tab-tags" aria-controls="at-panel-tags" aria-selected="false" tabindex="-1" data-key="tags"><img src="img/art/feat-tags.webp" alt="" width="224" height="224" loading="lazy"><span>Tags</span></button>
         <button class="at__tab" role="tab" id="at-tab-reminder" aria-controls="at-panel-reminder" aria-selected="false" tabindex="-1" data-key="reminder"><img src="img/art/feat-reminder.webp" alt="" width="224" height="224" loading="lazy"><span>Reminder</span></button>
         <button class="at__tab" role="tab" id="at-tab-timer" aria-controls="at-panel-timer" aria-selected="false" tabindex="-1" data-key="timer"><img src="img/art/feat-timer.webp" alt="" width="224" height="224" loading="lazy"><span>Timer</span></button>
         <button class="at__tab" role="tab" id="at-tab-checklist" aria-controls="at-panel-checklist" aria-selected="false" tabindex="-1" data-key="checklist"><img src="img/art/feat-checklist.webp" alt="" width="224" height="224" loading="lazy"><span>Checklist</span></button>
         <button class="at__tab" role="tab" id="at-tab-linknote" aria-controls="at-panel-linknote" aria-selected="false" tabindex="-1" data-key="linknote"><img src="img/art/feat-linknote.webp" alt="" width="224" height="224" loading="lazy"><span>Link Note</span></button>
         <button class="at__tab" role="tab" id="at-tab-importance" aria-controls="at-panel-importance" aria-selected="false" tabindex="-1" data-key="importance"><img src="img/art/feat-importance.webp" alt="" width="224" height="224" loading="lazy"><span>Importance</span></button>
+        <button class="at__tab" role="tab" id="at-tab-audionote" aria-controls="at-panel-audionote" aria-selected="false" tabindex="-1" data-key="audionote"><img src="img/art/feat-audionote.webp" alt="" width="224" height="224" loading="lazy"><span>Audio Note</span></button>
     </div>
     <div class="at__pane">
         <div class="at__panel" role="tabpanel" id="at-panel-due" aria-labelledby="at-tab-due">
@@ -508,6 +547,15 @@
           <p>Some work is a stretch rather than a deadline. Give a Task a start and an end and it reads as a run of days, not one date you are already behind on.</p>
           <p>Useful for the things that are genuinely in progress rather than simply late.</p>
         </div>
+        <div class="at__panel" role="tabpanel" id="at-panel-tags" aria-labelledby="at-tab-tags" hidden>
+          <h3 class="at__title">Tags</h3>
+          <div class="fp">
+            <div class="fp__head"><img src="img/art/feat-tags.webp" alt="" width="224" height="224" loading="lazy"><span class="fp__name">TAGS</span></div>
+            <div class="fp__body"><div class="fp__tags"><span class="fp__tag"><img src="img/icon/tag-glyph.png" alt="" width="60" height="60" loading="lazy">Add</span><span class="fp__tag"><img src="img/icon/tag-glyph.png" alt="" width="60" height="60" loading="lazy">As</span><span class="fp__tag"><img src="img/icon/tag-glyph.png" alt="" width="60" height="60" loading="lazy">Many</span><span class="fp__tag"><img src="img/icon/tag-glyph.png" alt="" width="60" height="60" loading="lazy">Tags</span><span class="fp__tag"><img src="img/icon/tag-glyph.png" alt="" width="60" height="60" loading="lazy">As</span><span class="fp__tag"><img src="img/icon/tag-glyph.png" alt="" width="60" height="60" loading="lazy">You</span><span class="fp__tag"><img src="img/icon/tag-glyph.png" alt="" width="60" height="60" loading="lazy">Feel</span></div></div>
+          </div>
+          <p>Tag once, find anywhere. One set of Tags runs across your Tasks and Notes, so searching for a Tag rounds up everything that carries it.</p>
+          <p>Add as many as you like. Each one takes the colour of its Project or Notebook, so it always looks like it belongs.</p>
+        </div>
         <div class="at__panel" role="tabpanel" id="at-panel-reminder" aria-labelledby="at-tab-reminder" hidden>
           <h3 class="at__title">Reminder</h3>
           <div class="fp">
@@ -552,6 +600,15 @@
           </div>
           <p>Low, Medium or High, each with a colour of its own. The Tasks that matter look like they matter, from across the screen, without opening anything.</p>
           <p>Leave it off entirely and the Task carries no flag at all.</p>
+        </div>
+        <div class="at__panel" role="tabpanel" id="at-panel-audionote" aria-labelledby="at-tab-audionote" hidden>
+          <h3 class="at__title">Audio Note</h3>
+          <div class="fp">
+            <div class="fp__head"><img src="img/art/feat-audionote.webp" alt="" width="224" height="224" loading="lazy"><span class="fp__name">AUDIO NOTES</span><span class="fp__remove">Remove all</span></div>
+            <div class="fp__body"><div class="fp__row fp__row--file"><span class="fp__meta"><b>Shelf measurements</b><i>00:00:42 &bull; 24 Oct 2026 at 9:12 am</i></span><span class="fp__btn">View</span><span class="fp__minus">&minus;</span></div><div class="fp__row fp__row--file"><span class="fp__meta"><b>Notes from the builder</b><i>00:02:56 &bull; 22 Oct 2026 at 4:05 pm</i></span><span class="fp__btn">View</span><span class="fp__minus">&minus;</span></div><div class="fp__row fp__add"><span class="fp__plus">+</span>Add</div></div>
+          </div>
+          <p>Say it instead. Record an Audio Note on any Task or Note, give it a name, then play it back and scrub to the exact moment you need.</p>
+          <p>Recordings stay in the app on your device, and the microphone is only on while you&rsquo;re recording.</p>
         </div>
     </div>
   </div>
@@ -644,6 +701,6 @@
   </div>
 </dialog>
 
-<script src="js/site.js?v=20261007205441"></script>
+<script src="js/site.js?v=20261024160011"></script>
 </body>
 </html>
