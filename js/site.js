@@ -312,9 +312,14 @@
     var MIN_REACH = 15;    // the hem that is there before you touch anything
     var MAX_REACH = 88;    // most of the screen by the time you leave it
 
+    // The purple stays hidden until you scroll or press Learn more, then fades
+    // in once (CSS does the fade) and stays.
+    var showBlue = function () { if (blue) { blue.classList.add('is-on'); } };
+
     var paintBlue = function () {
       sTicking = false;
       if (!blue) { return; }
+      if (window.scrollY > 0) { showBlue(); }
       var ramp = Math.max(start.offsetHeight * 0.7, 260);
       var v = Math.min(1, Math.max(0, window.scrollY / ramp));
       var ease = v * v * (3 - 2 * v);                  // smoothstep
@@ -324,6 +329,16 @@
     var onScroll = function () {
       if (!sTicking) { sTicking = true; window.requestAnimationFrame(paintBlue); }
     };
+    // Landing part-way down (a reload, a #link) shows it at once, without the
+    // fade, since you are already past the moment it would have arrived.
+    if (blue && window.scrollY > 0) {
+      blue.style.transition = 'none';
+      showBlue();
+      void blue.offsetWidth;
+      blue.style.transition = '';
+    }
+    var more = start.querySelector('.start__more');
+    if (more) { more.addEventListener('click', showBlue); }
     paintBlue();
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll, { passive: true });

@@ -684,6 +684,15 @@ body.has-bottom-nav {
   pointer-events: none;
 }
 html:not(.js) .start__blue { --reach: 70%; }   /* no JS, no scroll ramp */
+/* Hidden on arrival (Craig, 2026-10-24): the first screen opens on the plain
+   app ground, with no purple hem, and the layer fades in the moment you scroll
+   or press Learn more (site.js adds .is-on). This trades against the seam note
+   above: for the length of the fade the section's foot is lighter than the
+   band below, so the fade is kept short enough to be over within the first
+   scroll. Without JS the layer is simply there. */
+html.js .start__blue { opacity: 0; transition: opacity .8s ease; }
+html.js .start__blue.is-on { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { html.js .start__blue { transition: none; } }
 
 .start__inner {
   display: grid;
