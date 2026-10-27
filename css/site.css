@@ -255,15 +255,57 @@ p:last-child { margin-bottom: 0; }
      page reads light, then purple, then out to the Capture sky at the foot.
      Both ends are still taken from the neighbours rather than typed, so
      neither seam can drift. */
+  position: relative;           /* for the grain layer below */
+  /* A long, eased fade rather than a flat hold and a late ramp (Craig,
+     2026-10-25). It starts at 58%, which is where the first paragraph ends,
+     and eases on a smoothstep so there is no visible line where it begins.
+
+     HOW FAR IT MAY TRAVEL IS SET BY CONTRAST, not by taste. White on this
+     purple is 5.27:1; white on the Capture sky at the foot is only 3.15:1,
+     and the line between them crosses 4.5:1 at 37.5% of the way across. So
+     the colour is allowed 30% of that journey while there is still text on
+     it, which leaves every line at 4.67:1 or better, and spends the rest
+     below the pillars where nothing has to be read.
+     Move the pillars or add a line under them and these stops need redoing. */
   background: linear-gradient(to bottom,
     #6657DE 0%,                 /* the start screen's last colour, exactly */
-    #6657DE 72%,                /* and held there for the whole of the copy */
-    /* Anchored to the bottom, not to a percentage: the copy always ends clear
-       of the foot, and a percentage drifts with the band's height. That is
-       what put the lede at 4.38:1 on a short band once before. */
-    #4F6AE9 calc(100% - 72px),
+    #6657DE 58%,                /* flat until the first paragraph ends */
+    #6458DE 63%,                /* smoothstep from here: 2% of the way */
+    #605CDF 68%,                /* 8% */
+    #5A60E1 73%,                /* 15% */
+    #5465E2 78%,                /* 22% */
+    /* Anchored to the bottom, not to a percentage, and the distance matters:
+       it has to be SMALLER than the gap between the lowest text and the foot,
+       or the text falls into the fast part of the ramp. Measured: the pillars
+       end 102px above the foot at 1440x900 and 86px at 375x760, so 72px keeps
+       them above it at both. At 96px the 375 case came out at 4.49:1, one
+       hundredth under AA. */
+    #4E6AE4 calc(100% - 72px),  /* 30%, the last colour any text sits on */
     var(--sky-blue) 100%);      /* the Capture sky's first stop, exactly */
   color: #fff;
+}
+
+/* A tile of fractal noise over the band. Eight-bit gradients across this much
+   height band visibly, and a little grain breaks the steps up far more
+   cheaply than more colour stops can. Generated rather than an image file, so
+   it costs no request and cannot be evicted.
+   overlay blending means it lightens the light end and darkens the dark end,
+   so the grain reads evenly across the whole ramp instead of fading out. */
+.band--bridge::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: .14;
+  mix-blend-mode: overlay;
+}
+/* The grain is positioned, so without this the copy would paint under it. */
+.band--bridge > .wrap { position: relative; z-index: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  /* nothing animates here; the grain is static and stays */
 }
 /* The morphing icon starts here now rather than in the hero, so the slot needs
    air under it before the label. */
