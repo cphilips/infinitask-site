@@ -26,6 +26,172 @@
     window.addEventListener('scroll', onScroll, { passive: true });
   }
 
+  /* ---------------------------------------------- brand pill
+     The icon-and-wordmark pill top left (wide windows only; CSS does the
+     motion). It shows once the start screen's own logo has gone up under the
+     nav, and hides when it comes back, so the two never show together. That
+     is an observer, so nothing runs on every scroll. Pages without that logo
+     show it as soon as you scroll. On the home page the same .has-brand
+     brings in the links pill as well (.nav--reveal in site.css). */
+  (function () {
+    var navEl = document.getElementById('nav');
+    var pill = navEl && navEl.querySelector('.nav__brand');
+    if (!pill) { return; }
+    var show = function (on) { navEl.classList.toggle('has-brand', on); };
+    var heroBrand = document.querySelector('.start__brand');
+    if (heroBrand && 'IntersectionObserver' in window) {
+      // The top of the "screen" is pulled down to the nav's lower edge, so the
+      // logo counts as gone once it has passed under the pills.
+      new IntersectionObserver(function (entries) {
+        show(!entries[0].isIntersecting);
+      }, { rootMargin: '-64px 0px 0px 0px' }).observe(heroBrand);
+    } else {
+      var onBrandScroll = function () { show(window.scrollY > 40); };
+      onBrandScroll();
+      window.addEventListener('scroll', onBrandScroll, { passive: true });
+    }
+  })();
+
+  /* ---------------------------------------------- Pricing confetti
+     The app's Pro celebration (ConfettiRainView in BolderFoldersSheet.swift),
+     redrawn for the web on the Pricing section only (Craig, 2026-11-15): 240
+     pieces in both gradient stops of every Folder colour, as rectangles, dots
+     and check marks, with the app's sizes, spin, drift and timing. It rains
+     one screen's height down from the top of the section when you arrive
+     there. It belongs to the section, so it scrolls with it and never shows
+     over its neighbours, and it fades away as you scroll on past (or back up
+     away from it). It plays again only once the section has left the screen
+     entirely. Reduce Motion gets the app's still version: pieces fade in where
+     they rest, hold, and fade out. */
+  (function () {
+    var section = document.querySelector('[data-confetti]');
+    var canvas = document.createElement('canvas');
+    if (!section || !canvas.getContext || !('IntersectionObserver' in window)) { return; }
+    canvas.className = 'confetti';
+    canvas.setAttribute('aria-hidden', 'true');
+    section.appendChild(canvas);
+    var ctx = canvas.getContext('2d');
+
+    // FolderColor.gradientTop and .gradientBottom, all fifteen (Theme.swift).
+    var PALETTE = [
+      '#BD74FF', '#9A61ED', '#F371C5', '#D05EA8', '#00D4B8', '#01BABA',
+      '#10D3FE', '#008DF1', '#F9E1AA', '#EAB578', '#FFBC82', '#F08121',
+      '#D85E76', '#A63D53', '#6B6E8A', '#3D4161', '#D0E900', '#B5DC00',
+      '#41E9F4', '#00CDDF', '#FAD2DA', '#F1A9B8', '#5FB87E', '#2F7A4C',
+      '#B7C9A8', '#93A982', '#9C8EFF', '#675AE2', '#C9C1BD', '#9C918D'
+    ];
+    var pieces = [], started = 0, raf = 0, armed = true, still = false;
+    var W = 0, H = 0, dpr = 1;
+    var rand = function (a, b) { return a + Math.random() * (b - a); };
+
+    var size = function () {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = section.clientWidth; H = section.clientHeight;
+      canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+    };
+
+    // SwiftUI's .easeIn is cubic-bezier(.42, 0, 1, 1): solve x for t, return y.
+    var easeIn = function (x) {
+      var lo = 0, hi = 1, t = x;
+      for (var i = 0; i < 20; i++) {
+        t = (lo + hi) / 2;
+        var bx = 3 * (1 - t) * (1 - t) * t * .42 + 3 * (1 - t) * t * t + t * t * t;
+        if (bx < x) { lo = t; } else { hi = t; }
+      }
+      return 3 * (1 - t) * t * t + t * t * t;
+    };
+
+    var draw = function (p, x, y, turn, alpha) {
+      var s = p.size;
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.translate(x, y);
+      ctx.rotate(turn);
+      ctx.fillStyle = ctx.strokeStyle = p.color;
+      ctx.beginPath();
+      if (p.kind === 0) {                       // RoundedRectangle(cornerRadius: 2)
+        if (ctx.roundRect) { ctx.roundRect(-s / 2, -s * .275, s, s * .55, 2); }
+        else { ctx.rect(-s / 2, -s * .275, s, s * .55); }
+        ctx.fill();
+      } else if (p.kind === 1) {                // Circle
+        ctx.arc(0, 0, s / 2, 0, Math.PI * 2);
+        ctx.fill();
+      } else {                                  // the heavy SF checkmark
+        ctx.lineWidth = s * .2; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        ctx.moveTo(-s * .42, s * .02); ctx.lineTo(-s * .12, s * .32); ctx.lineTo(s * .44, -s * .32);
+        ctx.stroke();
+      }
+      ctx.restore();
+    };
+
+    var frame = function (now) {
+      raf = 0;
+      var t = (now - started) / 1000;
+      var r = section.getBoundingClientRect(), vh = window.innerHeight;
+      // Full strength while the section holds the screen; gone as its foot
+      // rises through the top tenth (scrolling on) or its top sinks through
+      // the bottom tenth (scrolling back), over 30% of the screen each way.
+      var fade = Math.max(0, Math.min(1, (r.bottom - vh * .1) / (vh * .3), (vh * .9 - r.top) / (vh * .3)));
+      canvas.style.opacity = fade;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+      var live = false;
+      for (var i = 0; i < pieces.length; i++) {
+        var p = pieces[i];
+        if (still) {
+          var off = p.delay + p.duration * .7;
+          if (t < off + .4) { live = true; }
+          var a = Math.min(1, Math.max(0, (t - p.delay) / .4)) * (1 - Math.min(1, Math.max(0, (t - off) / .4)));
+          if (a > 0 && fade > 0) { draw(p, p.x * W, p.rest, p.spin / 6, a); }
+        } else {
+          var k = (t - p.delay) / p.duration;
+          if (k < 1) { live = true; }
+          if (k <= 0 || k >= 1 || fade === 0) { continue; }
+          var e = easeIn(k);
+          draw(p, p.x * W + p.drift * e, p.from + (p.to - p.from) * e, p.spin * e, 1);
+        }
+      }
+      if (live) { raf = requestAnimationFrame(frame); }
+      else { pieces = []; canvas.width = canvas.height = 0; }  // hand the memory back
+    };
+
+    var fire = function () {
+      still = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+      size();
+      var vh = window.innerHeight;
+      var top = Math.max(0, -section.getBoundingClientRect().top);  // section y at the top of the screen
+      pieces = [];
+      for (var i = 0; i < 240; i++) {
+        pieces.push({
+          x: Math.random(),
+          rest: Math.min(H - 8, top + rand(.04, .96) * vh),
+          from: top - 60, to: top + vh + 60,
+          color: PALETTE[Math.floor(Math.random() * PALETTE.length)],
+          kind: Math.floor(Math.random() * 3),
+          size: rand(8, 15),
+          spin: rand(-420, 420) * Math.PI / 180,
+          // Most drop at once, a few a little later, so it reads less uniform.
+          delay: Math.pow(Math.random(), 1.8) * 1.3,
+          duration: rand(1.5, 2.6),
+          drift: rand(-80, 80)
+        });
+      }
+      started = performance.now();
+      if (!raf) { raf = requestAnimationFrame(frame); }
+    };
+
+    // Arrived: the section's top has come up to a quarter of the way down
+    // the screen (or it was already past that, after a jump).
+    new IntersectionObserver(function (entries) {
+      if (entries[0].isIntersecting && armed) { armed = false; fire(); }
+    }, { rootMargin: '-25% 0px -74% 0px' }).observe(section);
+    // Left: entirely off the screen, so the next visit rains again.
+    new IntersectionObserver(function (entries) {
+      if (!entries[0].isIntersecting) { armed = true; }
+    }).observe(section);
+    window.addEventListener('resize', function () { if (raf) { size(); } }, { passive: true });
+  })();
+
   /* ---------------------------------------------- reveal on scroll */
   var reveals = document.querySelectorAll('.reveal');
   if (reveals.length) {
@@ -244,114 +410,171 @@
     window.__veil = { measure: measure, repaint: paintVeil };
   })();
 
-  /* ---------------------------------------------- morphing app icon
-     One element does two jobs: the big logo in the hero, and a small
-     back-to-top button pinned at the top left once you scroll. Geometry is
-     written in pixels each frame rather than guessed in CSS, so it lands
-     correctly at any viewport width. */
-  var brand = document.getElementById('brand');
-  var slot = document.querySelector('.brand-slot');
-  if (brand && slot) {
-    var mark = brand.querySelector('.brand__mark');
-    var bTicking = false;
+  /* The app icon above the thesis headline used to live here: a fixed element
+     that JS re-placed every frame so it morphed into a pinned corner button on
+     scroll. Removed (Craig, 2026-11-14) — it did nothing useful and its
+     per-frame writes made scrolling worse. It is now a plain <img
+     class="brand-logo"> in the flow, styled entirely in CSS. */
 
-    var paint = function () {
-      bTicking = false;
-      var vw = document.documentElement.clientWidth;
-      var big = Math.max(88, Math.min(124, vw * 0.13));
-      var small = 56;                                   // the size asked for
-      var navH = parseFloat(getComputedStyle(document.documentElement)
-                   .getPropertyValue('--nav-pill-h')) || 46;
-      var navTop = Math.max(10, Math.min(18, vw * 0.016));
+  /* The purple that rose from the foot of the start screen as you scrolled
+     used to be driven from here, on every scroll. Removed with it
+     (Craig, 2026-11-15). */
 
-      var ex = (vw - small) / 2;                        // stays centred when pinned
-      var ey = navTop + (navH - small) / 2;
-      var sx = (vw - big) / 2;                          // centred in its section
-      var sy = slot.getBoundingClientRect().top;
+  /* ---------------------------------------------- start-screen tour
+     The three device cards under the header. The row is a plain scroller with
+     snap points, so swiping, a trackpad and the keyboard already work; this
+     adds the timer, the progress bar and the buttons.
 
-      /* Driven by the SLOT's distance from the pinned spot, not by scrollY.
-         The slot no longer sits in the first screenful: it lives in the band
-         below the start screen, so a scrollY ramp would finish long before the
-         icon was ever on screen and the thing would never be seen at full
-         size. Measuring the gap instead means the morph happens wherever the
-         slot happens to be, and it keeps working if the slot moves again. */
-      var range = Math.max(window.innerHeight * 0.34, 200);
-      var p = Math.min(1, Math.max(0, (range - (sy - ey)) / range));
-      var ease = p * p * (3 - 2 * p);                   // smoothstep
-
-      var size = big + (small - big) * ease;
-
-      brand.style.transform = 'translate(' +
-        (sx + (ex - sx) * ease).toFixed(1) + 'px,' +
-        (sy + (ey - sy) * ease).toFixed(1) + 'px)';
-      mark.style.width = size.toFixed(1) + 'px';
-      mark.style.height = size.toFixed(1) + 'px';
-      brand.classList.toggle('is-pinned', ease > 0.6);
-
-      document.documentElement.style.setProperty('--brand-slot-h', big + 'px');
-    };
-
-    var onBrand = function () {
-      if (!bTicking) { bTicking = true; window.requestAnimationFrame(paint); }
-    };
-    paint();
-    window.addEventListener('scroll', onBrand, { passive: true });
-    window.addEventListener('resize', onBrand, { passive: true });
-  }
-
-  /* ---------------------------------------------- start screen
-     Two jobs. The blue rises into view as you scroll, so the page opens on the
-     flat app ground and the colour arrives on the way down; and the three
-     devices settle into place once, on load. */
+     The timer IS the progress bar's CSS animation: when it ends, the next card
+     comes in. Pausing it (the button, the tab going to the background, the
+     row being scrolled out of view, keyboard focus inside it) pauses the
+     animation itself, so the bar and the timer can never disagree, and none
+     of it costs a script on every frame. Anyone who prefers reduced motion
+     gets no animation, so it never moves on its own for them. */
   (function () {
-    var start = document.querySelector('.start');
-    if (!start) { return; }
+    var tour = document.querySelector('.tour');
+    if (!tour) { return; }
+    var track = tour.querySelector('.tour__track');
+    var cards = [].slice.call(track.querySelectorAll('.tour__card'));
+    var fill = tour.querySelector('.tour__fill');
+    var segs = [].slice.call(tour.querySelectorAll('.tour__seg'));
+    var pauseBtn = tour.querySelector('.tour__pause');
+    var n = cards.length;
+    if (!n || !fill) { return; }
 
-    var blue = start.querySelector('.start__blue');
-    var sTicking = false;
-    var MIN_REACH = 15;    // the hem that is there before you touch anything
-    var MAX_REACH = 88;    // most of the screen by the time you leave it
+    var index = 0;
+    var paused = false;                  // the visitor pressed Pause
+    var holds = { view: false, hidden: false, focus: false };
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-    // The purple stays hidden until you scroll or press Learn more, then fades
-    // in once (CSS does the fade) and stays.
-    var showBlue = function () { if (blue) { blue.classList.add('is-on'); } };
-
-    var paintBlue = function () {
-      sTicking = false;
-      if (!blue) { return; }
-      if (window.scrollY > 0) { showBlue(); }
-      var ramp = Math.max(start.offsetHeight * 0.7, 260);
-      var v = Math.min(1, Math.max(0, window.scrollY / ramp));
-      var ease = v * v * (3 - 2 * v);                  // smoothstep
-      blue.style.setProperty('--reach',
-        (MIN_REACH + (MAX_REACH - MIN_REACH) * ease).toFixed(2) + '%');
+    var held = function () { return paused || holds.view || holds.hidden || holds.focus; };
+    var owed = false;                    // the timer ran out while something held it
+    var applyHold = function () {
+      tour.classList.toggle('is-held', held());
+      if (owed && !held()) { owed = false; go(index + 1); }
+      tour.classList.toggle('is-paused', paused);
+      if (pauseBtn) { pauseBtn.setAttribute('aria-label', paused ? 'Play the tour' : 'Pause the tour'); }
+      // Read changes out only when they are the visitor's doing, not the timer's.
+      track.setAttribute('aria-live', paused ? 'polite' : 'off');
     };
-    var onScroll = function () {
-      if (!sTicking) { sTicking = true; window.requestAnimationFrame(paintBlue); }
+
+    // Start this card's third of the bar from empty.
+    var runFill = function () {
+      tour.style.setProperty('--from', (index / n).toFixed(4));
+      tour.style.setProperty('--to', ((index + 1) / n).toFixed(4));
+      fill.classList.remove('is-running');
+      void fill.offsetWidth;             // restart, not resume
+      fill.classList.add('is-running');
     };
-    // Landing part-way down (a reload, a #link) shows it at once, without the
-    // fade, since you are already past the moment it would have arrived.
-    if (blue && window.scrollY > 0) {
-      blue.style.transition = 'none';
-      showBlue();
-      void blue.offsetWidth;
-      blue.style.transition = '';
+
+    var mark = function () {
+      segs.forEach(function (s, i) {
+        if (i === index) { s.setAttribute('aria-current', 'true'); }
+        else { s.removeAttribute('aria-current'); }
+      });
+    };
+
+    // Where the track has to be for card i to sit on the header's line.
+    var leftFor = function (i) {
+      var pad = parseFloat(getComputedStyle(track).scrollPaddingLeft) || 0;
+      return Math.max(0, cards[i].offsetLeft - pad);
+    };
+
+    var go = function (i, instant) {
+      index = (i + n) % n;
+      // scrollTo on the track, never scrollIntoView: that would also scroll
+      // the page to bring the card into view, every six seconds.
+      track.scrollTo({ left: leftFor(index), behavior: (instant || reduce.matches) ? 'auto' : 'smooth' });
+      mark();
+      runFill();
+    };
+
+    // A hold pauses the animation, so it should not run out while held; but
+    // a hold can land in the very frame it ends. Dropping that end would
+    // leave the tour stuck on this card for good, so it is owed instead and
+    // paid when the hold lifts.
+    fill.addEventListener('animationend', function (e) {
+      if (e.animationName !== 'tour-fill') { return; }
+      if (held()) { owed = true; } else { go(index + 1); }
+    });
+
+    tour.querySelector('.tour__arrow--prev').addEventListener('click', function () { go(index - 1); });
+    tour.querySelector('.tour__arrow--next').addEventListener('click', function () { go(index + 1); });
+    segs.forEach(function (s) {
+      s.addEventListener('click', function () { go(parseInt(s.getAttribute('data-go'), 10) || 0); });
+    });
+    if (pauseBtn) {
+      pauseBtn.addEventListener('click', function () { paused = !paused; applyHold(); });
     }
-    var more = start.querySelector('.start__more');
-    if (more) { more.addEventListener('click', showBlue); }
-    paintBlue();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
 
-    /* One frame's grace so the first paint has the devices in their start
-       position; without it the transition has nothing to run from.
-       The timer is not belt and braces, it is the actual guarantee: rAF does
-       not run at all in a tab that is not painting, and the devices begin at
-       opacity 0, so a page that never gets a frame would sit there empty.
-       Whichever lands first wins; the class is idempotent. */
-    var reveal = function () { start.classList.add('is-ready'); };
-    window.requestAnimationFrame(function () { window.requestAnimationFrame(reveal); });
-    window.setTimeout(reveal, 250);
+    // A swipe or a trackpad scroll moves the cards without us: once the row
+    // settles, adopt whichever card it settled on and give it a full turn.
+    // Only the visitor's own input counts. If one of OUR smooth scrolls is cut
+    // short (it can be, in a tab that is not painting), the row would settle
+    // on the old card, and adopting that would quietly undo the move; so in
+    // that case the move is finished instead.
+    var userMoved = false;
+    var byUser = function () { userMoved = true; };
+    track.addEventListener('pointerdown', byUser, { passive: true });
+    track.addEventListener('touchstart', byUser, { passive: true });
+    track.addEventListener('keydown', byUser);
+    track.addEventListener('wheel', function (e) {
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) { userMoved = true; }   // sideways only
+    }, { passive: true });
+
+    var settle = function () {
+      var x = track.scrollLeft, best = 0, bestD = Infinity;
+      for (var i = 0; i < n; i++) {
+        var d = Math.abs(leftFor(i) - x);
+        if (d < bestD) { bestD = d; best = i; }
+      }
+      if (best === index) { userMoved = false; return; }
+      if (userMoved) { userMoved = false; index = best; mark(); runFill(); }
+      else { track.scrollTo({ left: leftFor(index), behavior: 'auto' }); }
+    };
+    var settleTimer = 0;
+    if ('onscrollend' in window) {
+      track.addEventListener('scrollend', settle);
+    } else {
+      track.addEventListener('scroll', function () {
+        clearTimeout(settleTimer);
+        settleTimer = setTimeout(settle, 140);
+      }, { passive: true });
+    }
+
+    // Nothing moves while it is off screen or the tab is in the background,
+    // and it picks up where it left off when it is back.
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        holds.view = !entries[0].isIntersecting;
+        applyHold();
+      }, { threshold: 0.35 }).observe(track);
+    }
+    document.addEventListener('visibilitychange', function () {
+      holds.hidden = document.hidden;
+      applyHold();
+    });
+    // Someone tabbing through the controls should not have the cards move
+    // under them. Mouse clicks do not count: the arrows would stop the timer.
+    tour.addEventListener('focusin', function (e) {
+      if (e.target.matches && e.target.matches(':focus-visible')) { holds.focus = true; applyHold(); }
+    });
+    tour.addEventListener('focusout', function (e) {
+      if (!tour.contains(e.relatedTarget)) { holds.focus = false; applyHold(); }
+    });
+
+    // A resize moves every card's left edge; put the current one back.
+    var resizeTimer = 0;
+    window.addEventListener('resize', function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function () {
+        track.scrollTo({ left: leftFor(index), behavior: 'auto' });
+      }, 120);
+    }, { passive: true });
+
+    applyHold();
+    mark();
+    runFill();
   })();
 
   /* ---------------------------------------------- hero fan

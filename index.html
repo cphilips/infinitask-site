@@ -18,13 +18,19 @@
 <meta property="og:image" content="img/icon/icon-512.png">
 <meta property="og:type" content="website">
 <script>document.documentElement.className += ' js';</script>
-<link rel="stylesheet" href="css/site.css?v=20261025211221">
+<link rel="stylesheet" href="css/site.css?v=20261115181500">
 </head>
 <body>
 
 <div class="veil" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
 
-<header class="nav" id="nav">
+<header class="nav nav--reveal" id="nav">
+  <!-- Brand pill, top left: wide windows only, and only once you have
+       scrolled (see .nav__brand in site.css). -->
+  <a class="nav__brand nav__pill" href="#top" aria-label="InfiniTask home">
+    <img class="nav__mark" src="img/icon/app-icon.webp" alt="" width="460" height="460">
+    <span class="nav__word">InfiniTask</span>
+  </a>
   <nav class="nav__links nav__pill" aria-label="Main">
     <a class="nav__home" href="#top" aria-label="Home" title="Home"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M2.7 9.1 10 3.1l7.3 6M4.7 7.7v8.1c0 .5.4.9.9.9h8.8c.5 0 .9-.4.9-.9V7.7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
     <a href="#features">Features</a>
@@ -37,57 +43,122 @@
 
 <main>
 
-  <!-- The morphing app icon. Fixed, so it can live anywhere in the document;
-       JS places it over .brand-slot, which now sits in the band below rather
-       than in the first screen. -->
-  <a class="brand" id="brand" href="#top" aria-label="InfiniTask, back to top">
-    <img class="brand__mark" src="img/icon/app-icon.webp" alt="" width="460" height="460">
-  </a>
-
   <!-- ============================================ start
-       The first screen, built to read like the app's own first screen: light,
-       quiet, one thing to look at. The blue is not painted on; it rises into
-       view as you scroll (see .start__blue), so the page opens clean and the
-       colour arrives on the way down into the band below. -->
+       The first screen, laid out from Craig's mock (2026-11-15) and modelled
+       on apple.com/iphone: the brand and two buttons across the top, then a
+       row of three cards, one per device, that moves along on a timer. The
+       progress bar bottom left fills across all three; the arrows bottom right
+       step through them. Without JS the row still scrolls and swipes.
+       The purple that used to rise from the foot of this section as you
+       scrolled was taken out (Craig, 2026-11-15). -->
   <section class="start" id="top" data-veil="#E8EBF2">
-    <i class="start__blue" aria-hidden="true"></i>
-
-    <div class="wrap start__inner">
-      <div class="start__copy">
-        <img class="start__mark" src="img/icon/logo-colour.webp" alt="" width="180" height="180" loading="eager">
-        <h1 class="start__wordmark">InfiniTask</h1>
-        <p class="start__sub">Gorgeous task management for everyone</p>
-
-        <p class="start__actions">
-          <!-- App Store badge hidden for now (Craig, 2026-10-24), to go back in
-               nearer launch. Uncomment to restore: the .start__store CSS is
-               still in site.css and the artwork is still in img/badge/.
-               Worth revisiting when it returns: Apple's guidelines intend the
-               "Download on the App Store" badge for apps you can download, and
-               the Pre-order badge for ones you cannot yet.
-          <a class="start__store" href="#get">
-            <img src="img/badge/download-on-the-app-store.svg"
-                 alt="Download on the App Store" width="120" height="40">
-          </a>
-          -->
-          <a class="start__more" href="#point">Learn more</a>
-        </p>
-
-        <p class="start__req">For iPhone, iPhone Duo and iPad. Requires iOS 26.5 or later.</p>
+    <div class="start__head">
+      <div class="start__brand">
+        <img class="start__icon" src="img/icon/app-icon.webp" alt="" width="460" height="460" loading="eager">
+        <div class="start__names">
+          <h1 class="start__wordmark">InfiniTask</h1>
+          <p class="start__sub">Gorgeous task management for everyone</p>
+        </div>
       </div>
 
-      <!-- Three devices in a row, all standing on one baseline. The Duo is in
-           front because it is the one worth looking at; the iPad and iPhone
-           sit either side of it saying "and these too". -->
-      <div class="start__stage">
-        <div class="start__dev start__dev--pad">
-          <img src="img/shots/40-start-ipad.webp" alt="InfiniTask on iPad in the Moon Grey theme, showing the Home Renovation Project with its Tasks and recent attachments under a waterfall photo." width="1379" height="2000" loading="eager">
+      <p class="start__actions">
+        <!-- Apple's App Store badge in place of the black button, greyed out
+             and not a link until launch, for App Store submission (Craig,
+             2026-11-15). At launch, make the span an <a> to the listing and
+             drop start__store--soon. The black badge shows on a light page and
+             the white one on a dark page, as the black button did. -->
+        <span class="start__store start__store--soon">
+          <img class="start__store-light" src="img/badge/download-on-the-app-store.svg"
+               alt="Download on the App Store, coming soon" width="120" height="40">
+          <img class="start__store-dark" src="img/badge/download-on-the-app-store-white.svg"
+               alt="Download on the App Store, coming soon" width="120" height="40">
+        </span>
+        <a class="start__cta start__cta--more" href="#point">Learn more</a>
+      </p>
+    </div>
+
+    <div class="tour" role="region" aria-roledescription="carousel" aria-label="InfiniTask on iPhone Duo, iPhone and iPad">
+      <div class="tour__track" id="tour-track" aria-live="off">
+
+        <article class="tour__card tour__card--duo" role="group" aria-roledescription="slide" aria-label="1 of 3: iPhone Duo">
+          <div class="tour__copy">
+            <h2 class="tour__title">Duo Done.</h2>
+            <p class="tour__sub">Ready for day uno. And Duo.</p>
+          </div>
+          <div class="tour__stage">
+            <div class="tour__dev tour__dev--duo-folded">
+              <img src="img/shots/50-hero-duo-folded.webp" alt="InfiniTask on a folded iPhone Duo, showing the Product Launch Project over a photo of dune grass." width="900" height="1306" loading="eager">
+            </div>
+            <div class="tour__dev tour__dev--duo-land">
+              <img src="img/shots/51-hero-duo-folded-land.webp" alt="A folded iPhone Duo on its side, showing the Task Plant the tomato seedlings with its Tags." width="1300" height="896" loading="eager">
+            </div>
+            <div class="tour__dev tour__dev--duo">
+              <img src="img/shots/42-start-duo.webp" alt="InfiniTask on an opened iPhone Duo, showing Today with Activity on the left and QuickStats on the right." width="2000" height="1407" loading="eager">
+            </div>
+          </div>
+          <p class="tour__note">Customisation requires a one-time PRO purchase. <a href="#pro">Learn more</a></p>
+        </article>
+
+        <article class="tour__card tour__card--phone" role="group" aria-roledescription="slide" aria-label="2 of 3: iPhone">
+          <div class="tour__copy">
+            <h2 class="tour__title">iPhone ready.</h2>
+            <p class="tour__sub">Your whole day, one tap away.</p>
+          </div>
+          <div class="tour__stage">
+            <div class="tour__dev tour__dev--phone">
+              <img src="img/shots/52-hero-iphone-projects.webp" alt="The Projects screen on iPhone, with recently created Stacks and Tasks above a folder for each Project." width="920" height="2000" loading="lazy">
+            </div>
+            <div class="tour__dev tour__dev--phone">
+              <img src="img/shots/53-hero-iphone-notebooks.webp" alt="The Notebooks library on iPhone in the Moon Grey theme, with recently created Notes above each Notebook's cover." width="920" height="2000" loading="lazy">
+            </div>
+            <div class="tour__dev tour__dev--phone">
+              <img src="img/shots/54-hero-iphone-journal.webp" alt="The Travel Journal Notebook on iPhone, its blue cover over a beach photo, with Notes from the bay and a Kyoto wish list." width="920" height="2000" loading="lazy">
+            </div>
+            <div class="tour__dev tour__dev--phone">
+              <img src="img/shots/55-hero-iphone-add-things.webp" alt="The Add Things sheet on iPhone, offering a Due Date, Attachments, an Audio Note, a Location, a Website, a Timeframe, a Reminder and a Timer." width="920" height="2000" loading="lazy">
+            </div>
+          </div>
+          <p class="tour__note">Customisation requires a one-time PRO purchase. <a href="#pro">Learn more</a></p>
+        </article>
+
+        <article class="tour__card tour__card--pad" role="group" aria-roledescription="slide" aria-label="3 of 3: iPad">
+          <div class="tour__copy">
+            <h2 class="tour__title">Big screen, check.</h2>
+            <p class="tour__sub">Available on iPad, wherever you go.</p>
+          </div>
+          <div class="tour__stage">
+            <div class="tour__dev tour__dev--pad">
+              <img src="img/shots/40-start-ipad.webp" alt="InfiniTask on iPad in the Moon Grey theme, showing the Home Renovation Project with its Tasks and recent attachments under a waterfall photo." width="1379" height="2000" loading="lazy">
+            </div>
+            <div class="tour__dev tour__dev--pad-land">
+              <img src="img/shots/56-hero-ipad-land.webp" alt="Today on iPad in landscape, with recent Activity on the left and QuickStats on the right." width="2000" height="1500" loading="lazy">
+            </div>
+          </div>
+          <p class="tour__note">Customisation requires a one-time PRO purchase. <a href="#pro">Learn more</a></p>
+        </article>
+
+      </div>
+
+      <div class="tour__controls">
+        <div class="tour__time">
+          <div class="tour__bar">
+            <span class="tour__fill-clip" aria-hidden="true"><i class="tour__fill"></i></span>
+            <button class="tour__seg" type="button" data-go="0" aria-controls="tour-track" aria-label="Show iPhone Duo" aria-current="true"></button>
+            <button class="tour__seg" type="button" data-go="1" aria-controls="tour-track" aria-label="Show iPhone"></button>
+            <button class="tour__seg" type="button" data-go="2" aria-controls="tour-track" aria-label="Show iPad"></button>
+          </div>
+          <button class="tour__pause" type="button" aria-controls="tour-track" aria-label="Pause the tour">
+            <svg class="tour__icon-pause" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><rect x="5.2" y="4" width="3.2" height="12" rx="1.1" fill="currentColor"/><rect x="11.6" y="4" width="3.2" height="12" rx="1.1" fill="currentColor"/></svg>
+            <svg class="tour__icon-play" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M6.6 4.6c0-.9 1-1.4 1.7-.9l7.3 4.9c.7.4.7 1.4 0 1.8l-7.3 4.9c-.7.5-1.7 0-1.7-.9z" fill="currentColor"/></svg>
+          </button>
         </div>
-        <div class="start__dev start__dev--duo">
-          <img src="img/shots/42-start-duo.webp" alt="InfiniTask on an opened iPhone Duo, showing Today with Activity on the left and QuickStats on the right." width="2000" height="1407" loading="eager">
-        </div>
-        <div class="start__dev start__dev--phone">
-          <img src="img/shots/41-start-iphone.webp" alt="InfiniTask on iPhone in the Moon Grey theme, showing the Blast Off Project and its two Tasks." width="920" height="2000" loading="eager">
+        <div class="tour__arrows">
+          <button class="tour__arrow tour__arrow--prev" type="button" aria-controls="tour-track" aria-label="Previous">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14.6 5.4 8 12l6.6 6.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="tour__arrow tour__arrow--next" type="button" aria-controls="tour-track" aria-label="Next">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9.4 5.4 16 12l-6.6 6.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
         </div>
       </div>
     </div>
@@ -96,7 +167,7 @@
   <!-- ============================================ thesis -->
   <section class="band band--bridge" id="point" data-veil="#6657DE">
     <div class="wrap wrap--reading center reveal">
-      <div class="brand-slot" aria-hidden="true"></div>
+      <img class="brand-logo" src="img/icon/app-icon.webp" alt="" width="460" height="460" loading="lazy">
       <p class="section-label">The whole point</p>
       <h2>Meticulously crafted to let you just get things done.</h2>
       <p class="lede">Most task apps make you choose between beautiful and simple. InfiniTask doesn't. Every detail's been considered, every interaction smoothed, so all you have to do is open it and go.</p>
@@ -245,7 +316,7 @@
 
       <div class="feature reveal qs-feature">
         <div class="qs-fieldwrap" aria-hidden="true">
-          <div class="qs-field"><i></i><i class="qf--forest"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--blush"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--blue"></i><i></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--forest"></i><i></i><i class="qf--sage"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--blue"></i><i></i><i class="qf--purple"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--pink"></i><i></i><i class="qf--forest"></i><i></i><i class="qf--blue"></i><i class="qf--teal"></i><i></i><i class="qf--sage"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--blue"></i><i></i><i class="qf--pink"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--pink"></i><i></i><i class="qf--forest"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--purple"></i><i></i><i class="qf--blush"></i><i></i></div>
+          <div class="qs-field"><i></i><i class="qf--forest"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--blush"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--blue"></i><i></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--forest"></i><i></i><i class="qf--sage"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--blue"></i><i></i><i class="qf--purple"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--pink"></i><i></i><i class="qf--forest"></i><i></i><i class="qf--blue"></i><i class="qf--teal"></i><i></i><i class="qf--sage"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--blue"></i><i></i><i class="qf--pink"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--pink"></i><i></i><i class="qf--forest"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--purple"></i><i></i><i class="qf--blush"></i><i></i><i></i><i class="qf--forest"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--blush"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--blue"></i><i></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--forest"></i><i></i><i class="qf--sage"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--blue"></i><i></i><i class="qf--purple"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--pink"></i><i></i><i class="qf--forest"></i><i></i><i class="qf--blue"></i><i class="qf--teal"></i><i></i><i class="qf--sage"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--blue"></i><i></i><i class="qf--pink"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--pink"></i><i></i><i class="qf--forest"></i><i></i><i class="qf--blue"></i><i></i><i class="qf--blue"></i><i class="qf--purple"></i><i></i><i class="qf--blush"></i><i></i></div>
         </div>
         <div class="feature__text">
           <p class="section-label section-label--pro"><img src="img/icon/pro-badge.webp" alt="Pro feature" width="61" height="24" loading="lazy"></p>
@@ -412,16 +483,17 @@
     </div>
   </section>
 
-  <!-- ============================================ honest pricing -->
-  <section class="band band--tint band--edge">
+  <!-- ============================================ honest pricing
+       data-confetti: the app's Pro confetti rains here (site.js). -->
+  <section class="band band--tint band--edge" data-confetti>
     <div class="wrap wrap--reading reveal">
       <div class="center">
         <p class="section-label">Pricing</p>
-        <h2>One purchase, explained honestly.</h2>
+        <h2>No subscriptions or hidden costs.</h2>
       </div>
       <div class="grid-cards" style="margin-top:2.5rem;">
         <div class="card">
-          <h4>Really one-time?</h4>
+          <h4>Become a PRO for life.</h4>
           <p class="muted" style="margin:0;">Yes. One payment, yours for life, including Pro features added later. No subscription, no renewal, nothing that expires.</p>
         </div>
         <div class="card">
@@ -437,7 +509,7 @@
           <p class="muted" style="margin:0;">Because an app like this should be something you own, not something you rent. Simple as that.</p>
         </div>
       </div>
-      <p class="center muted" style="margin-top:2rem;">And honestly: if you never buy Pro, you're not missing anything you need. That's by design.</p>
+      <p class="center muted" style="margin-top:2rem;">And honestly: if you never buy Pro, you're not missing out on anything you need other than customisations. And that's by design.</p>
     </div>
   </section>
 
@@ -708,6 +780,6 @@
   </div>
 </dialog>
 
-<script src="js/site.js?v=20261025211221"></script>
+<script src="js/site.js?v=20261115181500"></script>
 </body>
 </html>

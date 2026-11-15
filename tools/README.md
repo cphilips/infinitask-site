@@ -43,3 +43,16 @@ the whole sequence. Re-measure it if the recording is reframed.
 
 Then update `data-frames` on the `.unfold` stage in `index.html` if the count
 changed.
+
+# Rebuilding the start-screen carousel's frames and screenshots
+
+```bash
+python3 tools/build-hero-assets.py
+```
+
+Run from the Website folder. It derives three extra device frames from the
+licensed ones in `img/frames` (a folded Duo, the folded Duo on its side, and
+an iPad in landscape) and writes resized copies of the carousel screenshots
+into `img/shots` as `50-hero-*` to `56-hero-*`. The docstring explains how the
+folded Duo is spliced together and where each screenshot came from; the CSS
+measurements for the new frames (`.tour__dev--*` in `site.css`) follow from it.

@@ -307,9 +307,6 @@ p:last-child { margin-bottom: 0; }
 @media (prefers-reduced-motion: reduce) {
   /* nothing animates here; the grain is static and stays */
 }
-/* The morphing icon starts here now rather than in the hero, so the slot needs
-   air under it before the label. */
-.band--bridge .brand-slot { margin-bottom: clamp(1rem, 2.5vw, 1.6rem); }
 .band--bridge .pillars { margin-top: clamp(2.5rem, 5vw, 3.5rem); }
 .band--bridge h2,
 .band--bridge .lede { color: #fff; opacity: 1; }
@@ -317,6 +314,18 @@ p:last-child { margin-bottom: 0; }
    and the .82 alpha alone dropped it to 3.76. */
 .band--bridge .section-label { color: #fff; }
 .band--edge { border-block: 1px solid var(--divider); }
+
+/* The Pricing section's confetti (site.js draws it). Over the cards, never in
+   the way of a click, and feathered in at the section's top edge so pieces
+   come out of the page there rather than from a hard line. */
+[data-confetti] { position: relative; }
+.confetti {
+  position: absolute; inset: 0; z-index: 3;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(transparent, #000 5rem);
+          mask-image: linear-gradient(transparent, #000 5rem);
+}
 
 /* -------------------------------------------------- nav
    A floating split nav: a transparent fixed rail holding two pills, brand on
@@ -468,6 +477,58 @@ p:last-child { margin-bottom: 0; }
     background-color: currentColor;
     -webkit-mask: url('../img/logo/wordmark-white.png') no-repeat center / contain;
           mask: url('../img/logo/wordmark-white.png') no-repeat center / contain;
+  }
+}
+
+/* ---------------- brand pill (Craig, 2026-11-15)
+   Icon and wordmark in the same glass as the links pill, and exactly its
+   height, top left, linking home. Wide windows only. It is not there when the
+   page opens: it slides down from above the screen and fades in as the start
+   screen's own logo goes up under the nav, and back up when that returns, so
+   the two are never on screen together (site.js adds .has-brand). */
+.nav__brand { display: none; }
+@media (min-width: 1024px) {
+  .nav__brand {
+    display: flex; align-items: center; gap: .55rem;
+    height: var(--nav-pill-h);
+    margin-right: auto;              /* the links pill stays on the right */
+    padding: 12px 18px;              /* Craig, 2026-11-15. The pill keeps the links pill's 46px
+                                        height; the 24px icon sits centred in it */
+    border-radius: 999px;
+    text-decoration: none;
+    opacity: 0; visibility: hidden; pointer-events: none;
+    transform: translateY(calc(-100% - 20px));
+    transition: transform .5s cubic-bezier(.2, .7, .3, 1), opacity .35s ease,
+                visibility 0s linear .5s;
+  }
+  .nav.has-brand .nav__brand {
+    opacity: 1; visibility: visible; pointer-events: auto;
+    transform: none;
+    transition: transform .55s cubic-bezier(.2, .7, .3, 1), opacity .45s ease,
+                visibility 0s;
+  }
+  .nav__brand .nav__mark { width: 24px; height: 24px; }
+  .nav__brand .nav__word { width: calc(18px * 900 / 170); height: 18px; }   /* the asset's 900 x 170 */
+  .nav--bottom .nav__brand { display: none; }
+}
+.nav__brand:hover { text-decoration: none; }
+.nav__brand:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+
+/* The links pill does the same on the home page (Craig, 2026-11-15): not
+   there on first load, it comes down with the brand pill once the start
+   screen's logo goes up under the nav. Only where index.html sets
+   .nav--reveal, so Support and Privacy keep their links from the start; only
+   on wide windows, like the brand pill; never in the bottom nav. Hidden by
+   opacity rather than visibility so it stays in the tab order, and keyboard
+   focus brings it straight in. html.js keeps it in place without script. */
+@media (min-width: 1024px) {
+  html.js .nav--reveal .nav__links {
+    transition: transform .55s cubic-bezier(.2, .7, .3, 1), opacity .45s ease;
+  }
+  html.js .nav--reveal:not(.has-brand):not(.nav--bottom) .nav__links:not(:focus-within) {
+    opacity: 0; pointer-events: none;
+    transform: translateY(calc(-100% - 20px));
+    transition: transform .5s cubic-bezier(.2, .7, .3, 1), opacity .35s ease;
   }
 }
 
@@ -685,120 +746,142 @@ body.has-bottom-nav {
 }
 
 /* -------------------------------------------------- start screen
-   The first thing anyone sees, built to feel like the app's own first screen:
-   light, quiet, one thing to look at. Everything that used to shout here (the
-   positioning paragraph, the four pillars) moved down into the band below,
-   which is where Learn more lands. */
+   Craig's mock (2026-11-15), modelled on apple.com/iphone: brand and two
+   buttons across the top, then three cards, one per device, that move along
+   on a timer, with progress bottom left and arrows bottom right.
+
+   Every size here was measured off the mock, which is drawn at 1929px wide:
+   the edge is 100px there, a card is 1453 x 878, and so on. They are written
+   as shares of the section's width (cqw) so the whole thing scales as one,
+   with clamps at both ends. */
 .start {
   position: relative;
   isolation: isolate;
-  /* A screenful, like the app's own first screen, and it keeps the seam with
-     the band below off the fold so the blue has somewhere to arrive from. */
-  min-height: 100svh;
-  display: grid; align-content: center;
+  container: start / inline-size;
+  /* No min-height: on a desktop the header, card and controls already fill
+     the screen, and on a tall tablet a full-height box only centred them in
+     a band of empty page. */
   background: var(--app-bg);
-  padding-top: calc(var(--nav-h) + clamp(.5rem, 3vw, 2rem));
-  padding-bottom: clamp(3rem, 8vw, 6rem);
-  /* clip, not hidden: hidden on one axis forces the other to auto, and the
-     devices lean past the grid edge on a narrow window. */
+  padding-top: calc(var(--nav-h) + clamp(1.25rem, min(4.6cqw, 6svh), 5.5rem));
+  padding-bottom: clamp(2.25rem, min(5cqw, 6svh), 5rem);
+  /* clip, not hidden: hidden on one axis forces the other to auto. */
   overflow-x: clip;
   overflow-y: visible;
+
+  /* Where the header, the first card and the controls line up. 100px at the
+     mock's width, and on a wide screen it grows so the content stays a
+     1730px column rather than stretching. */
+  --edge: max(clamp(16px, 5.2cqw, 100px), calc((100cqw - 1730px) / 2));
+  --card-w: calc((100cqw - var(--edge) * 2) * .84);
+  /* 1453 x 773 at the mock's width: the mock's card was 878 tall, and Craig
+     took 12% off it (2026-11-15). Held unless the window is too short for it,
+     in which case the card gets wider rather than pushing its own bottom off
+     the first screen. The devices are sized off the card's height (see --u),
+     so they shrink with it and nothing inside overflows. */
+  --card-h: min(calc(var(--card-w) / 1.881), max(440px, calc(100svh - 240px)));
+  --card-gap: clamp(12px, 2.6cqw, 50px);
 }
 
-/* The blue is a layer rather than a background, so its opacity can be driven
-   from scroll: the page opens on the flat app ground and the colour rises into
-   view on the way down. By the time the seam with the band below is anywhere
-   near the viewport the ramp is finished, so the two meet on the same value. */
-.start__blue {
-  position: absolute; inset: 0; z-index: -1;
-  /* What moves is how far UP the blue reaches, not the whole layer's opacity.
-     Fading a flat layer in from zero leaves the section's last pixel light
-     while the band below is already #6657DE, and the seam steps the moment you
-     scroll one pixel. Anchoring the final stop at 100% means the two always
-     meet on the same value, whatever the reach happens to be. */
-  --reach: 15%;
-  /* Purple, Craig's #6657DE (2026-10-24); it used to rise into blue. The
-     class keeps its old name because site.js finds it by that. */
-  background: linear-gradient(to bottom,
-    rgba(102, 87, 222, 0)   calc(100% - var(--reach)),
-    rgba(102, 87, 222, .55) calc(100% - var(--reach) * .34),
-    #6657DE 100%);
-  pointer-events: none;
-}
-html:not(.js) .start__blue { --reach: 70%; }   /* no JS, no scroll ramp */
-/* Hidden on arrival (Craig, 2026-10-24): the first screen opens on the plain
-   app ground, with no purple hem, and the layer fades in the moment you scroll
-   or press Learn more (site.js adds .is-on). This trades against the seam note
-   above: for the length of the fade the section's foot is lighter than the
-   band below, so the fade is kept short enough to be over within the first
-   scroll. Without JS the layer is simply there. */
-html.js .start__blue { opacity: 0; transition: opacity .8s ease; }
-html.js .start__blue.is-on { opacity: 1; }
-@media (prefers-reduced-motion: reduce) { html.js .start__blue { transition: none; } }
 
-.start__inner {
-  display: grid;
-  gap: clamp(2.25rem, 5vw, 3.5rem);
-  grid-template-columns: 1fr;
-  align-items: center;
+/* ---------------- header: icon, wordmark and line on the left, buttons right */
+.start__head {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 1.1rem 2rem;
+  padding-inline: var(--edge);
+  /* Craig's mock, 2026-11-15: a 64px icon, a 42px wordmark, and both
+     buttons 42px tall, level with the wordmark's top and foot. Phones keep
+     a smaller icon and wordmark (see the 699px block). */
+  --brand-icon: 64px;
+  --brand-word-h: 42px;
+  --head-btn-h: 42px;
 }
-@media (min-width: 900px) {
-  /* Wider than the page grid, and most of it goes to the devices. */
-  .start__inner {
-    max-width: 1320px;
-    grid-template-columns: minmax(290px, .55fr) 1.45fr;
-    gap: clamp(2rem, 4vw, 3.5rem);
-  }
+.start__brand {
+  display: flex; align-items: center;
+  gap: clamp(.65rem, 1.2cqw, 1.45rem);
+  min-width: 0;
 }
-
-.start__copy { text-align: center; }
-@media (min-width: 900px) { .start__copy { text-align: left; } }
-
-.start__mark {
-  display: block; width: clamp(68px, 8.5vw, 96px); height: auto;
-  margin: 0 auto clamp(.8rem, 1.6vw, 1.1rem);
+.start__icon {
+  flex: none;
+  width: var(--brand-icon); height: var(--brand-icon);
+  border-radius: 22.5%;
+}
+/* The line sits on the wordmark's baseline, as in the mock, and drops under
+   it when there is no room beside it. */
+.start__names {
+  display: flex; flex-wrap: wrap; align-items: flex-end;
+  column-gap: clamp(.8rem, 1.6cqw, 1.95rem); row-gap: .3rem;
+  min-width: 0;
 }
 .start__wordmark {
-  margin: 0 auto .45rem;
+  margin: 0;
   color: var(--text-1);
-  font-size: clamp(2.3rem, 6vw, 3.5rem); font-weight: 600;
-  letter-spacing: -.02em; line-height: 1;
+  font-size: clamp(2rem, 4.2cqw, 4.5rem); font-weight: 700;
+  letter-spacing: -.03em; line-height: 1;
 }
-/* Same masked wordmark the old hero used, but taking its colour from the text
-   token rather than a hardcoded white, so it inverts with the theme. */
+/* The masked wordmark artwork, taking its colour from the text token so it
+   inverts with the theme. */
 @supports ((-webkit-mask-image: url('')) or (mask-image: url(''))) {
   .start__wordmark {
-    width: clamp(196px, 25vw, 240px);   /* 240 at full size, per Craig */
+    width: calc(var(--brand-word-h) * 900 / 170);   /* the artwork is 900 x 170 */
     aspect-ratio: 900 / 170;
     text-indent: -200vw; overflow: hidden; white-space: nowrap;
     background-color: currentColor;
-    -webkit-mask: url('../img/logo/wordmark-white.png') no-repeat center / contain;
-            mask: url('../img/logo/wordmark-white.png') no-repeat center / contain;
+    -webkit-mask: url('../img/logo/wordmark-white.png') no-repeat left center / contain;
+            mask: url('../img/logo/wordmark-white.png') no-repeat left center / contain;
   }
 }
 .start__sub {
-  margin: 0 0 clamp(1.3rem, 2.6vw, 1.8rem);
+  margin: 0 0 -.18em;           /* text baseline onto the wordmark's foot */
   color: var(--section-header);
-  font-size: clamp(1rem, 1.7vw, 1.15rem); font-weight: 500;
+  font-size: clamp(.95rem, 1.15cqw, 1.4rem); font-weight: 500;
+  line-height: 1.25;
 }
 
 .start__actions {
-  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
-  gap: 1.15rem; margin: 0 0 1.05rem;
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: 12px;
+  margin: 0;
 }
-/* Inverts with the theme, which is also what Apple's own badge does: there is
-   a black one for light backgrounds and a white one for dark, and you pick per
-   background rather than shipping one of them everywhere. On the dark page the
-   black pill all but vanished into it. */
-/* Apple's own badge artwork, used as supplied. Their Marketing Resources and
-   Identity Guidelines govern it, so this rule deliberately does almost nothing:
-   no background, no border, no radius, no shadow, and nothing on hover or
-   active, because "don't modify, angle, or animate the badge" rules out the
-   lift every other button on this page has.
-   The black badge carries Apple's own #a6a6a6 border, which is what keeps it
-   legible on the dark theme, so one unmodified file serves both.
-   Height is above the 40px onscreen minimum, and .start__actions' 1.15rem gap
-   clears the required quarter-of-the-height of free space on every side. */
+/* Rounded rectangles the size and shape of Apple's badge beside them, as in
+   Craig's mock (2026-11-15): 8px is the badge's own corner at this height.
+   Inverted on a dark page so the dark one does not vanish into it. */
+.start__cta {
+  display: inline-flex; align-items: center; justify-content: center;
+  height: var(--head-btn-h);
+  padding-inline: 1.15rem;
+  border-radius: 8px;
+  font-size: .95rem; font-weight: 600;
+  white-space: nowrap; text-decoration: none;
+  transition: transform .15s ease, filter .15s ease, box-shadow .15s ease;
+}
+.start__cta:hover { text-decoration: none; transform: translateY(-1px); }
+.start__cta:active { transform: translateY(0) scale(.98); }
+.start__cta:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+/* --get is not on the page for now: Apple's badge took its place (2026-11-15). */
+.start__cta--get  { background: #000; color: #fff; }
+.start__cta--get:hover { filter: brightness(1.35); }
+.start__cta--more {
+  width: calc(var(--head-btn-h) * 119.66407 / 40);   /* the badge's width */
+  padding-inline: 0;
+  background: #fff; color: var(--text-1);
+  box-shadow: 0 1px 2px rgba(14, 16, 30, .06);
+}
+.start__cta--more:hover { box-shadow: 0 6px 16px rgba(14, 16, 30, .10); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .start__cta--get  { background: #fff; color: #000; }
+  :root:not([data-theme='light']) .start__cta--get:hover { filter: brightness(.92); }
+  :root:not([data-theme='light']) .start__cta--more { background: var(--card-bg); color: var(--text-1); }
+}
+:root[data-theme='dark'] .start__cta--get  { background: #fff; color: #000; }
+:root[data-theme='dark'] .start__cta--get:hover { filter: brightness(.92); }
+:root[data-theme='dark'] .start__cta--more { background: var(--card-bg); color: var(--text-1); }
+
+/* Apple's own badge artwork, used as supplied, kept for when the App Store
+   link goes live (see the note in index.html). Their Marketing Resources and
+   Identity Guidelines govern it, so this rule deliberately does almost
+   nothing: no background, no border, no radius, no shadow, and nothing on
+   hover or active, because "don't modify, angle, or animate the badge" rules
+   out the lift every other button on this page has. */
 .start__store {
   display: inline-block;
   line-height: 0;              /* no descender gap under the artwork */
@@ -806,71 +889,254 @@ html.js .start__blue.is-on { opacity: 1; }
 }
 .start__store img {
   display: block;
-  width: auto; height: 46px;   /* minimum is 40px */
+  width: auto; height: var(--head-btn-h);   /* Apple's minimum is 40px */
 }
 .start__store:hover { text-decoration: none; }
 .start__store:focus-visible { outline: 2px solid var(--blue); outline-offset: 4px; }
+/* Black badge on a light page, white on a dark one, as the black button was. */
+.start__store .start__store-dark { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .start__store .start__store-light { display: none; }
+  :root:not([data-theme='light']) .start__store .start__store-dark  { display: block; }
+}
+:root[data-theme='dark'] .start__store .start__store-light { display: none; }
+:root[data-theme='dark'] .start__store .start__store-dark  { display: block; }
+/* Until launch (Craig, 2026-11-15): greyed out, and a span rather than a
+   link, so App Store submission finds no link to a listing that is not live.
+   Drop this class at launch and the badge shows as Apple supplies it. */
+.start__store--soon { opacity: .4; cursor: default; -webkit-user-select: none; user-select: none; }
+.start__store--soon img { -webkit-user-drag: none; }
 
-.start__more { color: var(--blue); font-weight: 600; font-size: 1.02rem; }
-.start__more:hover { text-decoration: underline; }
+/* ---------------- the cards
+   A plain horizontal scroller with snap points, so a swipe, a trackpad and
+   the arrow keys all work with no script at all. site.js adds the timer, the
+   progress bar and the buttons on top.
+   The first card lines up with the header; each card after it snaps to the
+   same line, with the one before peeking in from the left. The trailing
+   spacer lets the last card reach that line too. */
+.tour { margin-top: clamp(1.5rem, min(6cqw, 7svh), 7.2rem); }
 
-.start__req { margin: 0; color: var(--section-header); font-size: .78rem; line-height: 1.5; }
-
-@media (min-width: 900px) {
-  .start__mark, .start__wordmark { margin-inline: 0; }
-  .start__wordmark { -webkit-mask-position: left center; mask-position: left center; }
-  .start__actions { justify-content: flex-start; }
+.tour__track {
+  position: relative;            /* offsetLeft of the cards is measured from here */
+  display: flex; gap: var(--card-gap);
+  overflow-x: auto; overflow-y: hidden;
+  overscroll-behavior-x: contain;  /* a sideways swipe does not go Back */
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--edge);
+  padding-inline-start: var(--edge);
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.tour__track::-webkit-scrollbar { display: none; }
+/* A spacer, not padding-inline-end: some Safari versions leave a flex
+   scroller's end padding out of the scrollable area. */
+.tour__track::after {
+  content: ''; flex: none;
+  width: calc(100cqw - var(--edge) - var(--card-w) - var(--card-gap));
+}
+@media (prefers-reduced-motion: no-preference) {
+  .tour__track { scroll-behavior: smooth; }
 }
 
-/* ---------------- the device cluster
-   Laid out from Craig's mock (2026-10-24). The Duo and the iPhone stand
-   together on the stage's bottom edge, the iPhone overlapping the Duo's right
-   end. The iPad stands taller behind both, its top well above theirs and its
-   foot hidden behind them. The Duo is the point of it: it is in front, arrives
-   last on load and travels furthest, so the eye finishes there.
-
-   Every % below is measured off the mock, as a share of the stage's width
-   (left, width) or height (top): stage 759 x 728, iPad 450 wide at 231 / 0,
-   Duo 610 wide at 0, iPhone 222 wide at 537. Heights follow from each frame's
-   own proportions. The stage is capped so the whole cluster, the iPad's top
-   included, still fits a short laptop screen under the nav. */
-.start__stage {
+.tour__card {
   position: relative;
-  width: min(100%, 760px, calc((100svh - 13rem) * 1.0426));
-  aspect-ratio: 1.0426 / 1;
-  margin-inline: auto;
+  flex: none;
+  width: var(--card-w);
+  height: var(--card-h);
+  border-radius: 24px;            /* Craig, 2026-11-15 */
+  overflow: hidden;               /* devices run off the card's edge */
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  container-type: size;
+  /* One unit inside a card: 1% of its height while the card holds the mock's
+     proportions, and the width-led value once it is taller than that (on a
+     phone), so sizes follow whichever edge is tighter. Everything in the card
+     is a multiple of it. At the mock's width a card is 188u wide. */
+  --u: min(1cqh, 1.881cqw);
+}
+.tour__card--duo   { background: #FFFFFF; color: #1C1C1C; --ink-2: #6E6E84; --stage-gap: 5; }
+.tour__card--phone { background: #2D3146; color: #FFFFFF; --ink-2: rgba(255, 255, 255, .86); --stage-gap: 8; }
+.tour__card--pad   {
+  background: linear-gradient(to bottom, #6B6D8A 0%, #4C4E67 50%, #2E3247 100%);
+  /* Full white: the line sits on the gradient's lightest part. */
+  color: #FFFFFF; --ink-2: #FFFFFF; --stage-gap: 12;
 }
 
-/* Frames, screen insets and corners come from the shared device frame rules
-   (see "device frame"); this block only places the three. */
-.start__dev {
-  position: absolute; bottom: 0;
-  box-shadow: 0 26px 54px rgba(16, 18, 32, .24);
+.tour__copy {
+  position: absolute; z-index: 1;
+  top: calc(var(--u) * 7); left: calc(var(--u) * 7.2); right: calc(var(--u) * 7.2);
 }
-
-.start__dev--pad   { z-index: 1; width: 59.29%; left: 30.43%; top: 0; bottom: auto; }
-.start__dev--duo   { z-index: 2; width: 80.37%; left: 0; }
-.start__dev--phone { z-index: 3; width: 29.25%; left: 70.75%; }
-
-/* They come in together, a beat apart, and settle. Duo last and furthest. */
-.start__dev {
-  opacity: 0; translate: 0 26px; scale: .965;
-  transition: opacity .85s ease, translate .85s cubic-bezier(.2, .7, .3, 1),
-              scale .85s cubic-bezier(.2, .7, .3, 1);
+.tour__title {
+  margin: 0;
+  color: inherit;
+  /* Smaller and a weight lighter than the mock's (Craig, 2026-11-15): about
+     51px semibold on a 773px card, where it was 68px bold on an 878px one. */
+  font-size: max(1.45rem, calc(var(--u) * 6.6)); font-weight: 600;
+  letter-spacing: -.02em; line-height: 1.04;
 }
-.start__dev--duo { translate: 0 42px; scale: .94; }
-.start.is-ready .start__dev { opacity: 1; translate: 0 0; scale: 1; }
-.start.is-ready .start__dev--pad   { transition-delay: .08s; }
-.start.is-ready .start__dev--phone { transition-delay: .20s; }
-.start.is-ready .start__dev--duo   { transition-delay: .34s; }
-
-html:not(.js) .start__dev { opacity: 1; translate: 0 0; scale: 1; }
-@media (prefers-reduced-motion: reduce) {
-  .start__dev { opacity: 1; translate: 0 0; scale: 1; transition: none; }
+.tour__sub {
+  margin: calc(var(--u) * .9) 0 0;
+  color: var(--ink-2);
+  font-size: max(.9rem, calc(var(--u) * 2.5)); font-weight: 500;
+  line-height: 1.3;
 }
+.tour__note {
+  position: absolute; z-index: 1;
+  right: calc(var(--u) * 5.4); bottom: calc(var(--u) * 3.6);
+  margin: 0;
+  color: var(--ink-2);
+  font-size: max(.7rem, calc(var(--u) * 1.85)); font-weight: 500;
+  line-height: 1.2;
+}
+/* "Learn more" goes to the Pro section, underlined like the Pro caveat's link
+   (Craig, 2026-11-15). The site's blue on the white Duo card; on the two dark
+   cards the dark-mode blue, as the usual one is too dim to read there. */
+.tour__note a { color: var(--tour-link, var(--blue)); text-decoration: underline; }
+.tour__note a:hover { text-decoration: underline; }
+.tour__note a:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; border-radius: 2px; }
+.tour__card--phone, .tour__card--pad { --tour-link: #4DB0FF; }
 
-@media (max-width: 899px) {
-  .start__stage { max-width: 580px; }
+/* The devices stand in a row under the copy, centred on one line, each
+   sized by its height in card units. These started as the mock's sizes; when
+   the card lost 12% of its height they were raised a little and the gaps
+   widened, so the rows still span the card as the mock's did rather than
+   shrinking into its left-hand side, and the opened Duo still runs off the
+   right edge. */
+.tour__stage {
+  position: absolute;
+  top: calc(var(--u) * 21); bottom: calc(var(--u) * 7);
+  left: calc(var(--u) * 7); right: 0;
+  display: flex; align-items: center;
+  gap: calc(var(--u) * var(--stage-gap));
+}
+.tour__dev {
+  position: relative;             /* the screenshot and frame are placed in it */
+  flex: none;
+  height: calc(var(--u) * var(--h) * var(--dev-scale, 1));
+  box-shadow: 0 calc(var(--u) * 1.6) calc(var(--u) * 4) rgba(16, 18, 32, .16);
+}
+.tour__dev--duo-folded { --h: 58.5; }
+.tour__dev--duo-land   { --h: 41.9; }
+.tour__dev--duo        { --h: 58.9; }
+.tour__dev--phone      { --h: 71; }
+.tour__dev--pad        { --h: 70; }
+.tour__dev--pad-land   { --h: 67; }
+
+/* ---------------- progress, pause and arrows
+   As wide as a card, so the arrows end on the card's right edge. */
+.tour__controls {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  width: var(--card-w);
+  margin: clamp(1rem, min(3.2cqw, 4svh), 3.9rem) 0 0 var(--edge);
+}
+html:not(.js) .tour__controls { display: none; }   /* nothing to drive them */
+
+.tour__time { display: flex; align-items: center; gap: clamp(.6rem, 1.1cqw, 1.2rem); min-width: 0; }
+
+/* One bar for the whole run: it fills a third per card, over that card's
+   time, so it reads as how far through the tour you are. The fill is a full
+   pill slid in from the left inside a clip that is itself a pill, so both
+   ends stay round at any length and the motion is a transform. */
+.tour__bar {
+  position: relative; flex: none;
+  width: clamp(120px, calc(var(--card-w) * .39), 568px);
+  height: clamp(10px, 1.35cqw, 26px);
+  border-radius: 999px;
+  background: #D7D7E3;
+}
+.tour__fill-clip {
+  position: absolute; inset: clamp(2px, .2cqw, 4px);
+  border-radius: 999px; overflow: hidden;
+}
+.tour__fill {
+  display: block; width: 100%; height: 100%;
+  border-radius: 999px;
+  background: #FFFFFF;
+  /* At rest it shows the end of the current card's third, which is also all
+     anyone who prefers reduced motion sees. */
+  transform: translateX(calc((var(--to, .3334) - 1) * 100%));
+}
+.tour__fill.is-running { animation: tour-fill var(--tour-time, 6s) linear both; }
+.tour.is-held .tour__fill { animation-play-state: paused; }
+@keyframes tour-fill {
+  from { transform: translateX(calc((var(--from, 0) - 1) * 100%)); }
+  to   { transform: translateX(calc((var(--to, .3334) - 1) * 100%)); }
+}
+/* Three invisible buttons over the bar's thirds: click a third to jump to
+   that card. Taller than the bar so they are a fair target on a phone. */
+.tour__seg {
+  position: absolute; top: -10px; bottom: -10px;
+  width: calc(100% / 3);
+  padding: 0; border: 0; background: none; cursor: pointer;
+  border-radius: 999px;
+}
+.tour__seg:nth-of-type(1) { left: 0; }
+.tour__seg:nth-of-type(2) { left: calc(100% / 3); }
+.tour__seg:nth-of-type(3) { left: calc(100% / 3 * 2); }
+.tour__seg:focus-visible { outline: 2px solid var(--blue); outline-offset: -6px; }
+
+.tour__pause, .tour__arrow {
+  display: grid; place-items: center; flex: none;
+  padding: 0; border: 0; border-radius: 50%;
+  background: #F9F9FB; color: #7D7F96;
+  box-shadow: 0 1px 2px rgba(14, 16, 30, .06), 0 6px 18px rgba(14, 16, 30, .08);
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease, color .15s ease;
+}
+.tour__pause:hover, .tour__arrow:hover {
+  color: #3E4060; transform: translateY(-1px);
+  box-shadow: 0 1px 2px rgba(14, 16, 30, .06), 0 10px 24px rgba(14, 16, 30, .12);
+}
+.tour__pause:active, .tour__arrow:active { transform: scale(.96); }
+.tour__pause:focus-visible, .tour__arrow:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+
+/* The pause button is not in the mock. It is here because anything that moves
+   on its own for more than five seconds needs a way to stop it (WCAG 2.2.2),
+   and Apple's gallery carries one too. */
+.tour__pause { width: clamp(32px, 2.3cqw, 44px); height: clamp(32px, 2.3cqw, 44px); }
+.tour__pause svg { width: 46%; height: 46%; }
+.tour__icon-play { display: none; }
+.tour.is-paused .tour__icon-play { display: block; }
+.tour.is-paused .tour__icon-pause { display: none; }
+@media (prefers-reduced-motion: reduce) { .tour__pause { display: none; } }   /* never plays */
+
+.tour__arrows { display: flex; gap: clamp(.6rem, 2.4cqw, 3.3rem); }
+.tour__arrow { width: clamp(42px, 3.32cqw, 64px); height: clamp(42px, 3.32cqw, 64px); }
+.tour__arrow svg { width: 42%; height: 42%; }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .tour__bar { background: #33364F; }
+  :root:not([data-theme='light']) .tour__fill { background: #D9DBEC; }
+  :root:not([data-theme='light']) .tour__pause,
+  :root:not([data-theme='light']) .tour__arrow { background: var(--card-bg); color: #A9ACC8; box-shadow: none; }
+  :root:not([data-theme='light']) .tour__pause:hover,
+  :root:not([data-theme='light']) .tour__arrow:hover { color: #FFFFFF; box-shadow: none; }
+}
+:root[data-theme='dark'] .tour__bar { background: #33364F; }
+:root[data-theme='dark'] .tour__fill { background: #D9DBEC; }
+:root[data-theme='dark'] .tour__pause,
+:root[data-theme='dark'] .tour__arrow { background: var(--card-bg); color: #A9ACC8; box-shadow: none; }
+:root[data-theme='dark'] .tour__pause:hover,
+:root[data-theme='dark'] .tour__arrow:hover { color: #FFFFFF; box-shadow: none; }
+
+/* ---------------- narrower windows
+   A tablet keeps the row but gives the cards more height, so the devices
+   stay big and the last one runs off the edge. A phone gets tall cards, a
+   little wider, with the devices running off to the right. */
+@media (max-width: 999px) {
+  .start { --card-h: calc(var(--card-w) / 1.3); }
+}
+@media (max-width: 699px) {
+  .start {
+    --card-w: calc((100cqw - var(--edge) * 2) * .9);
+    --card-h: calc(var(--card-w) / .74);
+  }
+  /* Lifted clear of the footnote, which sits under the devices here. */
+  .tour__stage { top: calc(var(--u) * 25); bottom: calc(var(--u) * 10); }
+  .tour { --dev-scale: .92; }     /* the stage is shorter under the taller copy */
+  .tour__note { left: calc(var(--u) * 7.2); right: auto; }
+  /* The icon and wordmark at the sizes phones had before Craig's 64 / 42. */
+  .start__head { --brand-icon: 52px; --brand-word-h: calc(150px * 170 / 900); }
 }
 
 /* -------------------------------------------------- hero */
@@ -903,30 +1169,20 @@ html:not(.js) .start__dev { opacity: 1; translate: 0 0; scale: 1; }
 }
 .hero__inner { position: relative; z-index: 2; padding-block: clamp(2.5rem, 7vw, 4.5rem) 0; text-align: center; }
 
-/* ---------------- the morphing app icon
-   One element does both jobs: the big logo in the hero, and the small
-   back-to-top button pinned at the corner once you scroll. JS writes the
-   geometry in pixels each frame, so nothing swaps and nothing jumps. */
-.brand-slot { height: var(--brand-slot-h, 200px); }
-
-.brand {
-  position: fixed; top: 0; left: 0; z-index: 210;
-  display: block; width: 1px; height: 1px;   /* JS sizes and places it */
-  text-decoration: none;
-  -webkit-tap-highlight-color: transparent;
-}
-.brand:hover { text-decoration: none; }
-.brand__mark {
-  position: absolute; top: 0; left: 0;
-  max-width: none;               /* the global img rule would clamp it to the 1px parent */
+/* ---------------- the app icon above the headline
+   A plain image in the flow. It used to be fixed and morph into a pinned
+   corner button as you scrolled; that was taken out (Craig, 2026-11-14)
+   because it fought the scroll for no gain, and the nav pill's home button
+   and the footer's "back to top" already do that job. */
+.brand-logo {
+  display: block;
+  width: clamp(88px, 13vw, 124px);
+  height: auto;
+  margin-inline: auto;
+  margin-bottom: clamp(1rem, 2.5vw, 1.6rem);
   border-radius: 24%;
   box-shadow: 0 22px 50px rgba(30, 20, 70, .38);
-  transition: box-shadow .3s ease;
 }
-@supports ((-webkit-mask-image: url('')) or (mask-image: url(''))) {
-  }
-/* once it is the corner button it needs to read against whatever is behind */
-.brand.is-pinned .brand__mark { box-shadow: 0 2px 10px rgba(14, 16, 30, .22); }
 /* Static wordmark above the headline. Deliberately not part of the morphing
    icon: it stays put and scrolls away with the rest of the hero. */
 .hero__wordmark {
@@ -1085,23 +1341,64 @@ html:not(.js) .start__dev { opacity: 1; translate: 0 0; scale: 1; }
      --fw/--fh  the PNG       --bx/--by/--bw/--bh/--br  the body and its corner
      --sx/--sy/--sw/--sh/--sr  where the screenshot goes (a few px into the
                                bezel, so no hairline of background shows) */
-.device, .start__dev {
+.device, .tour__dev {
   --frame: url('../img/frames/iphone.webp');
   --fw: 980; --fh: 2000;
   --bx: 19; --by: 13; --bw: 942; --bh: 1973; --br: 200;
   --sx: 46; --sy: 40; --sw: 887; --sh: 1919; --sr: 150;
 }
-.start__dev--pad {
-  --frame: url('../img/frames/ipad.webp');
-  --fw: 1478; --fh: 2000;
-  --bx: 62; --by: 62; --bw: 1354; --bh: 1876; --br: 116;
-  --sx: 141; --sy: 141; --sw: 1195; --sh: 1717; --sr: 30;
+/* Apple's official iPad Pro (M5) 13" bezel (Craig, 2026-11-15). Its screen
+   is 4:3 like the real one, where the old ipad.webp frame was narrower. */
+.tour__dev--pad {
+  --frame: url('../img/frames/ipad-pro.webp');
+  --fw: 1470; --fh: 1915;
+  --bx: 19; --by: 22; --bw: 1432; --bh: 1871; --br: 90;
+  --sx: 73; --sy: 75; --sw: 1324; --sh: 1765; --sr: 24;
 }
-.start__dev--duo {
+.tour__dev--duo {
   --frame: url('../img/frames/duo.webp');
   --fw: 2000; --fh: 1453;
   --bx: 38; --by: 38; --bw: 1930; --bh: 1377; --br: 146;
   --sx: 74; --sy: 74; --sw: 1851; --sh: 1304; --sr: 95;
+}
+/* Apple's official folded Duo bezel (Craig, 2026-11-15), and it and the
+   iPad Pro turned on their sides. tools/build-hero-assets.py makes the files
+   and has the measurements: turning a frame swaps each rectangle's axes.
+   The folded Duo's screen corners differ, nearly square on the hinge side
+   and round on the other, so --sr is the small one and the bezel rounds the
+   rest; --br is the large one, so the body never pokes past the bezel. */
+.tour__dev--duo-folded {
+  --frame: url('../img/frames/duo-folded.webp');
+  --fw: 1083; --fh: 1506;
+  --bx: 11; --by: 24; --bw: 1042; --bh: 1458; --br: 150;
+  --sx: 59; --sy: 53; --sw: 965; --sh: 1400; --sr: 12;
+}
+.tour__dev--duo-land {
+  --frame: url('../img/frames/duo-folded-land.webp');
+  --fw: 1506; --fh: 1083;
+  --bx: 24; --by: 11; --bw: 1458; --bh: 1042; --br: 150;
+  --sx: 53; --sy: 59; --sw: 1400; --sh: 965; --sr: 12;
+}
+/* One radius cannot fit the folded Duo's screen: square on the hinge side
+   (12), round on the far side (120). Clipping the capture to the small one
+   left its far corners poking out past the bezel, so it gets four, each as a
+   share of its own axis (screen 965 x 1400 upright). Turned clockwise, the
+   hinge side becomes the top. */
+.tour__dev.tour__dev--duo-folded > img {
+  border-radius:
+    calc(12 / 965 * 100%) calc(120 / 965 * 100%) calc(120 / 965 * 100%) calc(12 / 965 * 100%) /
+    calc(12 / 1400 * 100%) calc(120 / 1400 * 100%) calc(120 / 1400 * 100%) calc(12 / 1400 * 100%);
+}
+.tour__dev.tour__dev--duo-land > img {
+  border-radius:
+    calc(12 / 1400 * 100%) calc(12 / 1400 * 100%) calc(120 / 1400 * 100%) calc(120 / 1400 * 100%) /
+    calc(12 / 965 * 100%) calc(12 / 965 * 100%) calc(120 / 965 * 100%) calc(120 / 965 * 100%);
+}
+.tour__dev--pad-land {
+  --frame: url('../img/frames/ipad-pro-land.webp');
+  --fw: 1915; --fh: 1470;
+  --bx: 22; --by: 19; --bw: 1871; --bh: 1432; --br: 90;
+  --sx: 75; --sy: 73; --sw: 1765; --sh: 1324; --sr: 24;
 }
 
 .device {
@@ -1110,13 +1407,13 @@ html:not(.js) .start__dev { opacity: 1; translate: 0 0; scale: 1; }
   margin-inline: auto;
   box-shadow: var(--shadow-device);
 }
-.device, .start__dev {
+.device, .tour__dev {
   aspect-ratio: var(--bw) / var(--bh);
   padding: 0;
   border-radius: calc(var(--br) / var(--bw) * 100%) / calc(var(--br) / var(--bh) * 100%);
   background: #000;
 }
-.device::after, .start__dev::after {
+.device::after, .tour__dev::after {
   content: ''; position: absolute; z-index: 2;
   left: calc(var(--bx) / var(--bw) * -100%);
   top: calc(var(--by) / var(--bh) * -100%);
@@ -1126,7 +1423,7 @@ html:not(.js) .start__dev { opacity: 1; translate: 0 0; scale: 1; }
   background: var(--frame) 0 0 / 100% 100% no-repeat;
   pointer-events: none;
 }
-.device > img, .device > .daynight__stack, .start__dev > img {
+.device > img, .device > .daynight__stack, .tour__dev > img {
   position: absolute; display: block;
   left: calc((var(--sx) - var(--bx)) / var(--bw) * 100%);
   top: calc((var(--sy) - var(--by)) / var(--bh) * 100%);
@@ -2222,6 +2519,17 @@ html:not(.js) .unfold { margin-block: clamp(2.5rem, 5vw, 3.5rem) 0; }
 .qs-feature > .feature__text,
 .qs-feature > .feature__art { position: relative; z-index: 1; }
 
+/* The content only comes to about 340px, which left this reading as a thin
+   strip between two much heavier rows. 960px is the height Craig asked for
+   (2026-11-14); .feature already centres its two columns, so the extra lands
+   as air above and below rather than pushing anything about. min-height, not
+   height, so a narrow desktop window whose tiles grow taller is never clipped.
+   Left off below the 860px breakpoint, where the row stacks and is already
+   taller than this: forcing it there would only add dead space on a phone. */
+@media (min-width: 860px) {
+  .qs-feature { min-height: 960px; }
+}
+
 /* The blur has to be clipped to the section or it bleeds into the bands above
    and below, which is worse the narrower the window gets, because the feature
    stacks and grows taller. The wrapper is exactly the section's height and
@@ -2239,7 +2547,12 @@ html:not(.js) .unfold { margin-block: clamp(2.5rem, 5vw, 3.5rem) 0; }
   position: absolute; inset: -10% 0;
   display: grid; gap: .6rem;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  grid-auto-rows: 104px;
+  /* minmax, not a flat 104px. At 960px tall a fixed row height ran out of
+     blobs 576px down and left the bottom of the section bare, so the run in
+     the markup was doubled to 130 tiles, which fills it at the row height the
+     blobs were drawn for. The 1fr is the backstop for a display wide enough to
+     swallow those 130 in fewer rows: the wash stretches rather than stops. */
+  grid-auto-rows: minmax(104px, 1fr);
   filter: blur(34px);
   opacity: .32;
 }
